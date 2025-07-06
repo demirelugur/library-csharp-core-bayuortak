@@ -1,0 +1,55 @@
+<CodeSnippet Format="1.1.0" xmlns="http://schemas.microsoft.com/VisualStudio/2005/CodeSnippet">
+  <Header>
+    <Title>snip_jsbegin</Title>
+    <Author>Uğur DEMİREL</Author>
+    <Shortcut>snip_jsbegin</Shortcut>
+    <Description>Bir Javascript sayfasına başlanırken ilk kullanılacak yapı</Description>
+    <SnippetTypes>
+      <SnippetType>Expansion</SnippetType>
+    </SnippetTypes>
+  </Header>
+  <Snippet>
+    <Declarations>
+      <Literal>
+        <ID>functionname</ID>
+        <ToolTip>Foksiyon Adı</ToolTip>
+        <Default>temp</Default>
+      </Literal>
+    </Declarations>
+    <Code Language="JavaScript">
+        <![CDATA[
+        'use strict';
+        import { Operation as o } from '../../../lib/module/operation.js';
+        (function () {
+            let _service = new o.service('...', '...');
+            window.$functionname$_islem = function (_ths) {
+                _ths = jQuery(_ths);
+                let tp = _ths.attr('data-tp');
+                if (tp.startsWith('table.')) {
+                    tp = tp.replace('table.', '');
+                    let tr = _ths.parents('tr'), model = tr.__decodeandparseattr('data-model');
+                    if (tp === 'edit') {
+                        opendetay(model);
+                        return;
+                    }
+                    if (tp === 'delete') {
+                        o.swal.confirm(function (_st) {
+                            if (_st) {
+                                _service.islemJson(tp, { uyeuid }, function (_response) {
+                                    o.swal.executeAction(_response, function () {
+                                        if(_response.status) {
+                                           tr.remove();
+                                        }
+                                    });
+                                });
+                            }
+                        });
+                        return;
+                    }
+                }
+            };
+        })();
+        $end$]]>
+      </Code>
+  </Snippet>
+</CodeSnippet>

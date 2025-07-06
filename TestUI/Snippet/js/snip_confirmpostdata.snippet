@@ -1,0 +1,32 @@
+<CodeSnippet Format="1.1.0" xmlns="http://schemas.microsoft.com/VisualStudio/2005/CodeSnippet">
+  <Header>
+    <Title>snip_confirmpostdata</Title>
+    <Author>Uğur DEMİREL</Author>
+    <Shortcut>snip_confirmpostdata</Shortcut>
+    <Description>Confirm, PostData ve SwalExecuteAction işlemlerinin aynı anda yapılabilmesi için oluşturuldu</Description>
+    <SnippetTypes>
+      <SnippetType>Expansion</SnippetType>
+    </SnippetTypes>
+  </Header>
+  <Snippet>
+    <Code Language="JavaScript">
+        <![CDATA[
+        o.swal.confirm(function (_st) {
+            if (_st) {
+                _service.postData(form.attr('action'), form.serialize(), function (_response) {
+                    o.swal.executeAction(_response);
+                }, { loader: true });
+				
+                _service.islemJson('methodName', {}, function (_response) {
+                    o.swal.executeAction(_response);
+                }, { loader: true });
+				
+                _service.islemFileUpload('imageislem.manuel.' + tp, formData, function (_response) {
+                    o.swal.executeAction(_response);
+                }, { loader: true });
+            }
+        });
+        $end$]]>
+      </Code>
+  </Snippet>
+</CodeSnippet>

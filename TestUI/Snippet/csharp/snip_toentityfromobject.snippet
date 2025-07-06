@@ -1,0 +1,40 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<CodeSnippets xmlns="http://schemas.microsoft.com/VisualStudio/2005/CodeSnippet">
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>snip_toentityfromobject</Title>
+      <Shortcut>snip_toentityfromobject</Shortcut>
+      <Description>Bazı yardımcı classlarda ilgili çevirme işlemleri için oluşturan ToEntityFromObject methodu için yapılmıştır</Description>
+      <Author>Uğur DEMİREL</Author>
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations>
+        <Literal>
+          <ID>type</ID>
+          <ToolTip>Class name</ToolTip>
+          <Default>MyClass</Default>
+        </Literal>
+      </Declarations>
+      <Code Language="csharp">
+        <![CDATA[
+        public static $type$ ToEntityFromObject(object value)
+        {
+            if (value == null) { return new $type$(); }
+            if (value is $type$ _t) { return _t; }
+			      if (value is IFormCollection _form)
+            {
+                return ToEntityFromObject(new
+                {
+                    src_en = _form.ToKeyValueParseOrDefault_formcollection<string>(nameof(src_en)) ?? ""
+                });
+            }
+            return value.ToEnumerable().Select(x => x.ToDynamic()).Select(x => new $type$()).FirstOrDefault();
+        }
+        $end$]]>
+      </Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>
