@@ -5,8 +5,7 @@
     {
         public void Dispose() { GC.SuppressFinalize(this); }
         public int depid { get; set; }
-        public Guid uid { get; set; }
-        public int dil { get; set; }
+        public byte dil { get; set; }
         public string adi { get; set; }
         public string adiuzun { get; set; }
         public string dilcode => (this.dil == 1 ? "tr" : (this.dil == 2 ? "en" : ""));

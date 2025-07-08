@@ -70,9 +70,9 @@
         /// <returns>Kimlik tipi ve seri numarasını döner</returns>
         public static (NVIKimlikTypes? tip, string serino) GetKimlikInfo(this wspersonel wspersonel)
         {
-            var _kimlikserino = String.Concat(wspersonel.personelKpscuzdanseri.ToStringOrEmpty(), wspersonel.personelKpscuzdanno.ToStringOrEmpty());
-            if (NVIHelperTR.TryValidate_YeniKimlikSeriNo(_kimlikserino, out string _serino)) { return (NVIKimlikTypes.yeni, _serino); }
-            if (NVIHelperTR.TryValidate_EskiNufusCuzdaniSeriNo(_kimlikserino, out _serino, out int _no)) { return (NVIKimlikTypes.eski, String.Concat(_serino, _no.ToString())); }
+            var _k = String.Concat(wspersonel.personelKpscuzdanseri.ToStringOrEmpty(), wspersonel.personelKpscuzdanno.ToStringOrEmpty()).ToUpper();
+            if (NVIHelperTR.TryValidate_YeniKimlikSeriNo(_k, out _)) { return (NVIKimlikTypes.yeni, _k); }
+            if (NVIHelperTR.TryValidate_EskiNufusCuzdaniSeriNo(_k, out _, out _)) { return (NVIKimlikTypes.eski, _k); }
             return (null, "");
         }
         /// <summary>

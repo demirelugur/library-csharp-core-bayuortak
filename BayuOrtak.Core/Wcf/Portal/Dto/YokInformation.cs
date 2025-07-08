@@ -6,12 +6,15 @@
         public void Dispose() { GC.SuppressFinalize(this); }
         public int uyeid { get; set; }
         public bool durumkadro { get; set; }
-        public bool durumconnection { get; set; }
+        public bool durumbaglanti { get; set; }
         public int? fakid { get; set; }
+        public string fakadi { get; set; }
         public int? bolid { get; set; }
+        public string boladi { get; set; }
         public int? abdid { get; set; }
-        public string authorid { get; set; }
-        public string orcid { get; set; }
+        public string abdadi { get; set; }
+        public string akademiksrc { get; set; }
+        public string orcidsrc { get; set; }
         public int? arastirmaciid { get; set; }
         public string uaktemel { get; set; }
         public string uakbilim { get; set; }

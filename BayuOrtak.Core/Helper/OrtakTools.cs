@@ -115,6 +115,33 @@
         public sealed class _get
         {
             /// <summary>
+            /// Veritabanı bağlantı dizesi oluşturur. 
+            /// <para><c>Data Source=###;Initial Catalog=###;Persist Security Info=True;User ID=###;Password=###;MultipleActiveResultSets=True;TrustServerCertificate=True</c></para>
+            /// </summary>
+            /// <param name="datasource">Veritabanı sunucu adı veya IP adresi (DataSource)</param>
+            /// <param name="initialcatalog">Bağlanılacak veritabanı adı (Initial Catalog)</param>
+            /// <param name="userid">Veritabanı kullanıcı adı (User ID)</param>
+            /// <param name="password">Veritabanı kullanıcı şifresi (Password)</param>
+            /// <returns>Oluşturulan SQL bağlantı dizesini döndürür</returns>
+            /// <remarks>
+            /// Oluşturulan bağlantı dizesinde aşağıdaki özellikler ayarlanır:
+            /// <list type="bullet">
+            /// <item><description><b>PersistSecurityInfo</b>: Güvenlik bilgilerinin bağlantı dizesinde kalması sağlanır</description></item>
+            /// <item><description><b>MultipleActiveResultSets</b>: Aynı bağlantı üzerinde birden fazla aktif sonuç kümesine izin verilir (MARS)</description></item>
+            /// <item><description><b>TrustServerCertificate</b>: Sunucu sertifikasının doğrulanmadan güvenilir kabul edilmesi sağlanır</description></item>
+            /// </list>
+            /// </remarks>
+            public static string GetConnectionString(string datasource, string initialcatalog, string userid, string password) => new SqlConnectionStringBuilder
+            {
+                DataSource = datasource,
+                InitialCatalog = initialcatalog,
+                UserID = userid,
+                Password = password,
+                PersistSecurityInfo = true,
+                MultipleActiveResultSets = true,
+                TrustServerCertificate = true
+            }.ToString();
+            /// <summary>
             /// Verilen bir JSON Web Token (JWT) için belirtilen bir özelliğin son kullanma tarihini alır.
             /// <code>DateTimeOffset.FromUnixTimeSeconds(_to.ToJObjectFromToken(token)[&quot;exp&quot;].Value&lt;long&gt;()).UtcDateTime;</code>
             /// </summary>

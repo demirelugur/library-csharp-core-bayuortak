@@ -1,13 +1,11 @@
 ﻿namespace TestUI
 {
-    using BayuOrtak.Core.Extensions;
     using System.Diagnostics.CodeAnalysis;
     [SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "<Pending>")]
     public class Program
     {
         private static void Main(string[] args)
         {
-            var p = "".ToInt32();
             MainAsync(args).GetAwaiter().GetResult();
             Console.WriteLine("Hello, World!");
             //Console.ReadKey();

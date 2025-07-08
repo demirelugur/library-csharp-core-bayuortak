@@ -13,7 +13,7 @@
     /// Bu sınıf, personelin hangi durumlarda olduğunu belirlemek ve bu durumları
     /// yönetmek için gerekli yöntemleri sağlar.
     /// </summary>
-    public class CNHR_DurumTypes : BaseEnum<CNHR_DurumTypes.NHR_DurumTypes>
+    public class CNHR_DurumTypes : BaseEnum<CNHR_DurumTypes.NHR_DurumTypes> // Not: 1) Enum değerleri [dbo].[sp_wcf_personelinformationall] içerisinde değerler tanımlanmaktadır.
     {
         /// <summary>
         /// Personel özel durum türlerini temsil eden bit alanı (flags) enumudur.

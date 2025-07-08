@@ -100,35 +100,6 @@
             /// </summary>
             public static readonly int[] ogretimuye_unvanids = new int[] { 1, 2, 10000 };
         }
-        public sealed class _portal // TODO: Yeni Web Sitesinden sonra yapılandırılmalı!
-        {
-            public const int codelength_fakulte = 13;
-            public const int codelength_birim = 20;
-            public const int codelength_abd = 27;
-            /// <summary>
-            /// Sekreter Unvan Kodları
-            /// <list type="bullet">
-            /// <item>
-            /// <term>Enstitü</term>: IDY0040
-            /// </item>
-            /// <item>
-            /// <term>Fakülte</term>: IDY0045
-            /// </item>
-            /// <item>
-            /// <term>Meslek Yüksekokulu</term>: IDY0090
-            /// </item>
-            /// <item>
-            /// <term>Yüksekokul Sekreter</term>: IDY0145
-            /// </item>
-            /// </list>
-            /// </summary>
-            public static readonly Dictionary<string, string> sekreterunvans = new Dictionary<string, string> {
-                { "IDY0040", "Enstitü Sekreteri" },
-                { "IDY0045", "Fakülte Sekreteri" },
-                { "IDY0090", "Meslek Yüksekokulu Sekreteri" },
-                { "IDY0145", "Yüksekokul Sekreteri" }
-            };
-        }
         public sealed class _title
         {
             public const string koordinat_bayburtuniversitesi = "40.250230335582955,40.23025617808133";

@@ -1,19 +1,18 @@
-MIT Lisansı (MIT)
+MIT No Attribution
 
-Tüm hakları saklıdır. 2024 Uğur DEMİREL
+Copyright 2024 Uğur DEMİREL
 
-Bu yazılımı ve ilişkilendirilmiş dokümantasyon dosyalarını (bundan böyle "BayuOrtak.Core" olarak anılacaktır)
-edinen herhangi bir kişiye, bu Yazılım ile sınırsız bir şekilde işlem yapma izni verilmektedir.
-Bu, kopyalama, değiştirme, birleştirme, yayınlama, dağıtma, alt lisans verme ve/veya Yazılım'ın kopyalarını
-satma haklarını içermektedir. Yazılım'ı sağlanan kişilerin de aynı şekilde kullanmasına izin verilmiştir;
-ancak aşağıdaki koşullara uyulması gerekmektedir:
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so.
 
-Yukarıdaki telif hakkı bildirimi ve bu izin bildirimi, Yazılım'ın tüm kopyalarında
-veya önemli kısımlarında yer almalıdır.
-
-YAZILIM, "OLDUĞU GİBİ" SUNULMAKTADIR, HERHANGİ BİR TÜR GARANTİ VERİLMEMEKTEDİR, AÇIK YA DA ZIMNİ,
-TİCARETELİK, BELİRLİ BİR AMACA UYGUNLUK VEYA İHLAL ETMEME GARANTİLERİ DAHİL, ANCAK BUNLARLA
-SINIRLI OLMAYAN GARANTİLERİ KAPSAMAKTADIR. YAZARLAR YA DA TELİF HAKKI SAHİPLERİ, YAZILIM'IN
-KULLANIMINDAN YA DA DİĞER ŞEKİLLERDEKİ İŞLEMLERDEN KAYNAKLANAN HERHANGİ BİR TALEP,
-ZARAR VEYA DİĞER YÜKÜMLÜLÜKLERDEN, SÖZLEŞME, HUKUKSUZ EYLEM YA DA BAŞKA BİR YOLLA
-BAĞLANTILI OLARAK SORUMLU TUTULAMAZ
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.

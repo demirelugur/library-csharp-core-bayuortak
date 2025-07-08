@@ -1,0 +1,17 @@
+﻿dotnet dev-certs https --trust
+************************
+dotnet tool install --global dotnet-ef
+************************
+Data Source=###;Initial Catalog=###;Persist Security Info=True;User ID=###;Password=###;MultipleActiveResultSets=True;TrustServerCertificate=True
+************************
+Identity için
+Microsoft.AspNetCore.Identity.EntityFrameworkCore
+Microsoft.Extensions.Identity.Core
+Microsoft.AspNetCore.Authentication.JwtBearer
+************************
+Swagger için
+Swashbuckle.AspNetCore
+Swashbuckle.AspNetCore.SwaggerGen
+LDAP için
+System.DirectoryServices.AccountManagement -> LDAP PrincipalContext kullanabilmek için
+************************
