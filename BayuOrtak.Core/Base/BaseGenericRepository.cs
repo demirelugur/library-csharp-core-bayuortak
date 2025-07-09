@@ -33,7 +33,7 @@
         }
         public TContext Context { get; }
         public DbSet<T> DbSet => this.Context.Set<T>();
-        public virtual Task DeleteAsync(T entity, CancellationToken cancellationToken = default) // Not: cancellationToken kullanılmamasına rağmen eklenmesi gerekiyor. override yapıldığı yerlde gerekirse diye
+        public virtual Task DeleteAsync(T entity, CancellationToken cancellationToken = default) // Not: cancellationToken kullanılmasa da, override edilen yerlerde gerektiğinde kullanılabilmesi için eklenmesi gerekiyor.
         {
             if (entity != null)
             {

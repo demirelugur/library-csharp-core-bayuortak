@@ -29,21 +29,21 @@
         private static string getconnectionstring(IConfigurationSection section) => _get.GetConnectionString(section["datasource"], "master", section["userid"], section["password"]);
         private static async Task MainAsync(string[] args)
         {
-            var configuration = new ConfigurationBuilder().SetBasePath(Directory.GetCurrentDirectory()).AddJsonFile("appsettings.json", false, true).Build();
-            var backupDirectory = configuration["backupdirectory"];
-            if (!Directory.Exists(backupDirectory))
+            var _configuration = new ConfigurationBuilder().SetBasePath(Directory.GetCurrentDirectory()).AddJsonFile("appsettings.json", false, true).Build();
+            var _backupdirectory = _configuration["backupdirectory"];
+            if (!Directory.Exists(_backupdirectory))
             {
-                Console.WriteLine($"\"{backupDirectory}\" dosya yolu bulunamadı!");
+                Console.WriteLine($"\"{_backupdirectory}\" dosya yolu bulunamadı!");
                 return;
             }
-            var _backupFiles = Directory.GetFiles(backupDirectory, "*.bak");
-            if (_backupFiles.Length == 0)
+            var _backupfiles = Directory.GetFiles(_backupdirectory, "*.bak");
+            if (_backupfiles.Length == 0)
             {
                 Console.WriteLine("\".bak\" uzantılı bir belge bulunamadı!");
                 return;
             }
-            var _dap = new DapperHelper(new SqlConnection(getconnectionstring(configuration.GetSection("connectionstring"))), default);
-            foreach (var item in _backupFiles)
+            var _dap = new DapperHelper(new SqlConnection(getconnectionstring(_configuration.GetSection("connectionstring"))), default);
+            foreach (var item in _backupfiles)
             {
                 var status = false;
                 try
@@ -54,7 +54,7 @@
                     Console.WriteLine($"{database}, Restore işlemine başlandı.");
                     Console.WriteLine($"{database}, Veritabanı üzerine kayıt var mı kontrol yapılıyor ve açık bağlantı(session) varsa bağlantılar da öldürülüyor.");
                     var _dy = (await _dap.QueryDynamicAsync(@"DECLARE @dbid SMALLINT = DB_ID(@database) 
-                        IF EXISTS(SELECT D.* FROM [sys].[databases] AS D WHERE D.[database_id] = @dbid)
+                        IF (@dbid > 0)
                         BEGIN
                           DECLARE @sql NVARCHAR(10), @sessionid SMALLINT, @sessionids VARCHAR(MAX) = ''
                           DECLARE session_cursor CURSOR FOR SELECT S.[session_id] FROM [sys].[dm_exec_sessions] AS S WHERE S.[database_id] = @dbid

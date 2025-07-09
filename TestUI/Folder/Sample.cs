@@ -7,7 +7,7 @@
     using System.ComponentModel;
     using System.ComponentModel.DataAnnotations;
     using System.Runtime.Serialization;
-    using static BayuOrtak.Core.Enums.CKampusTypes;
+    using static BayuOrtak.Core.Enums.CMonthTR;
     using static BayuOrtak.Core.Helper.GlobalConstants;
     internal class Sample // Not: Bu ihtimalin gelme durumu olmamasına rağmen ne olur olmaz yazılan kontrol
     {
@@ -21,9 +21,9 @@
         public int depid { get; set; }
 
         [Validation_Required]
-        [EnumDataType(typeof(KampusTypes), ErrorMessage = _validationerrormessage.enumdatatype)]
-        [DefaultValue(KampusTypes.baberti)]
-        public KampusTypes kampustip { get; set; }
+        [EnumDataType(typeof(MonthTR), ErrorMessage = _validationerrormessage.enumdatatype)]
+        [DefaultValue(MonthTR.oca)]
+        public MonthTR ay { get; set; }
 
         [Validation_Required]
         [Validation_MinDateOnly]
