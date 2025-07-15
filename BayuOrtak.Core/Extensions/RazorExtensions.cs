@@ -16,8 +16,7 @@
     public static class RazorExtensions
     {
         /// <summary>
-        /// Verilen model nesnesini JSON biçiminde HTML içerik olarak döndürür.
-        /// Model, JSON biçimine dönüştürülerek Razor görünümünde kullanılmak üzere işlenir.
+        /// Verilen model nesnesini JSON biçiminde HTML içerik olarak döndürür. Model, JSON biçimine dönüştürülerek Razor görünümünde kullanılmak üzere işlenir.
         /// </summary>
         public static IHtmlContent RenderJson(this IHtmlHelper htmlhelper, object model)
         {
@@ -46,8 +45,7 @@
             return HtmlString.Empty;
         }
         /// <summary>
-        /// Versiyon bilgisi içeren bir JavaScript veya CSS kaynağı için HTML etiketini oluşturur.
-        /// Dosya yolu, versiyon ve opsiyonel HTML özellikleri dikkate alınarak ilgili etiket döndürülür.
+        /// Versiyon bilgisi içeren bir JavaScript veya CSS kaynağı için HTML etiketini oluşturur. Dosya yolu, versiyon ve opsiyonel HTML özellikleri dikkate alınarak ilgili etiket döndürülür.
         /// </summary>
         public static IHtmlContent GenerateVersionedResourceTag(this IHtmlHelper htmlhelper, bool isdebug, Version version, string filepath, object htmlattributes = null)
         {
@@ -88,8 +86,7 @@
             }
         }
         /// <summary>
-        /// Uzun tam sayı değerler için bir input alanı oluşturur.
-        /// ID, isim, değer ve diğer HTML özellikleri ayarlanarak Razor görünümünde kullanılmak üzere döndürülür.
+        /// Uzun tam sayı değerler için bir input alanı oluşturur. ID, isim, değer ve diğer HTML özellikleri ayarlanarak Razor görünümünde kullanılmak üzere döndürülür.
         /// </summary>
         public static IHtmlContent InputField_forlong(this IHtmlHelper htmlhelper, string name, long value = 0, object htmlattributes = null)
         {
@@ -111,8 +108,7 @@
             }
         }
         /// <summary>
-        /// Ondalık sayı değerler için bir input alanı oluşturur.
-        /// ID, isim, değer ve diğer HTML özellikleri ayarlanarak Razor görünümünde kullanılmak üzere döndürülür.
+        /// Ondalık sayı değerler için bir input alanı oluşturur. ID, isim, değer ve diğer HTML özellikleri ayarlanarak Razor görünümünde kullanılmak üzere döndürülür.
         /// </summary>
         public static IHtmlContent InputField_fordecimal(this IHtmlHelper htmlhelper, string name, decimal value = Decimal.Zero, object htmlattributes = null)
         {
@@ -159,8 +155,7 @@
             }
         }
         /// <summary>
-        /// Inputmask kütüphanesini kullanarak Türkiye telefon numarası biçiminde uygun bir input alanı oluşturur.
-        /// Girilen değerin telefon numarası biçimine uygun olması için maske uygular.
+        /// Inputmask kütüphanesini kullanarak Türkiye telefon numarası biçiminde uygun bir input alanı oluşturur. Girilen değerin telefon numarası biçimine uygun olması için maske uygular.
         /// </summary>
         public static IHtmlContent InputMask_forphonenumbertr(this IHtmlHelper htmlhelper, string name, string value = "", object htmlattributes = null)
         {
@@ -181,8 +176,7 @@
             }
         }
         /// <summary>
-        /// Inputmask kütüphanesini kullanarak pozitif sayı girişi için maskeleme özelliğine sahip bir input alanı oluşturur.
-        /// Tekrar sayısı ve isteğe bağlı olarak maske özellikleri yapılandırılabilir.
+        /// Inputmask kütüphanesini kullanarak pozitif sayı girişi için maskeleme özelliğine sahip bir input alanı oluşturur. Tekrar sayısı ve isteğe bağlı olarak maske özellikleri yapılandırılabilir.
         /// </summary>
         public static IHtmlContent InputMask_forpositivenumber(this IHtmlHelper htmlhelper, string name, int maskcount, string value = "", object htmlattributes = null)
         {

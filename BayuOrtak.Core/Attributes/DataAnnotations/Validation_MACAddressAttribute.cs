@@ -22,13 +22,13 @@
         /// <returns>Başarı durumu veya hata sonucu.</returns>
         protected override ValidationResult IsValid(object value, ValidationContext validationContext)
         {
-            var macValue = value.ToStringOrEmpty();
-            if (_try.TryMACAddress(macValue, out string _mac))
+            var mac = value.ToStringOrEmpty();
+            if (_try.TryMACAddress(mac, out string _mac))
             {
                 validationContext.SetValidatePropertyValue(_mac);
                 return ValidationResult.Success;
             }
-            if (!validationContext.IsRequiredAttribute() && macValue == "")
+            if (mac == "" && !validationContext.IsRequiredAttribute())
             {
                 validationContext.SetValidatePropertyValue(null);
                 return ValidationResult.Success;

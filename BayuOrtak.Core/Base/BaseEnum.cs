@@ -38,8 +38,8 @@
         /// <summary>
         /// Belirtilen bayrak değerine sahip enum değerlerini döndürür.
         /// </summary>
-        /// <param name="flagValue">Bayrak değeri</param>
+        /// <param name="flagvalue">Bayrak değeri</param>
         /// <returns>Bayrak değerine sahip enum değerleri</returns>
-        public static T[] FlagEnumArray(T flagValue) => EnumArray.Where(x => flagValue.HasFlag(x)).ToArray();
+        public static T[] FlagEnumArray(T flagvalue) => EnumArray.Where(x => flagvalue.HasFlag(x)).ToArray();
     }
 }

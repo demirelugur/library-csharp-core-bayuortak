@@ -53,12 +53,12 @@
                 validationContext.SetValidatePropertyValue(_uri.ToString().TrimEnd('/'));
                 return ValidationResult.Success;
             }
-            if (!validationContext.IsRequiredAttribute() && uri == "")
+            if (uri == "" && !validationContext.IsRequiredAttribute())
             {
                 validationContext.SetValidatePropertyValue(null);
                 return ValidationResult.Success;
             }
-            return new ValidationResult(this.ErrorMessage ?? $"{validationContext.DisplayName}, geçerli bir http, https protokollerine uygun Uri adresi olmalıdır!", new List<string> { validationContext.MemberName });
+            return new ValidationResult(this.ErrorMessage ?? $"{validationContext.DisplayName}, geçerli bir \"http, https\" protokollerine uygun Uri adresi olmalıdır!", new List<string> { validationContext.MemberName });
         }
     }
 }

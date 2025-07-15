@@ -24,7 +24,7 @@
         protected override ValidationResult IsValid(object value, ValidationContext validationContext)
         {
             if (_try.TryTCKimlikNo(value.ToStringOrEmpty(), out _)) { return ValidationResult.Success; }
-            if (!validationContext.IsRequiredAttribute() && value == null) { return ValidationResult.Success; }
+            if (value == null && !validationContext.IsRequiredAttribute()) { return ValidationResult.Success; }
             return new ValidationResult(this.ErrorMessage ?? $"{validationContext.DisplayName}, T.C. Kimlik Numarası biçimine uygun olmalıdır!", new List<string> { validationContext.MemberName });
         }
     }

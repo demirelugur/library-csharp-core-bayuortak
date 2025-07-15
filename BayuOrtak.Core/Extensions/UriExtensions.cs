@@ -26,7 +26,7 @@
         /// <summary>
         /// Verilen URI&#39;nin bağlantı durumunu kontrol eder.
         /// </summary>
-        public static async Task<(bool statuswarning, Uri requesturi)> IsConnectionStatusAsync(this Uri uri, TimeSpan timeout, CancellationToken cancellationToken = default)
+        public static async Task<(bool statuswarning, Uri requesturi)> IsConnectionStatusAsync(this Uri uri, TimeSpan timeout, CancellationToken cancellationToken)
         {
             if (uri == null) { return (true, default); }
             using (var client = new HttpClient
@@ -46,7 +46,7 @@
         /// <summary>
         /// Belirtilen <see cref="Uri"/> adresinden byte[] veri almaya çalışır.
         /// </summary>
-        public static async Task<(bool statuswarning, byte[] databinary, string mimetype)> GetBinaryDataAsync(this Uri uri, TimeSpan timeout, CancellationToken cancellationToken = default)
+        public static async Task<(bool statuswarning, byte[] databinary, string mimetype)> GetBinaryDataAsync(this Uri uri, TimeSpan timeout, CancellationToken cancellationToken)
         {
             Guard.CheckNull(uri, nameof(uri));
             using (var client = new HttpClient

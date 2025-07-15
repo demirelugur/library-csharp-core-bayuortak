@@ -80,8 +80,7 @@
         /// <returns>Dönüştürülmüş long değeri.</returns>
         public static long ToLong(this object value, long defaultValue = 0) => value.ToInt64(defaultValue);
         /// <summary>
-        /// Bir <see cref="object"/> türündeki değeri, <see cref="decimal"/> türüne dönüştürür.
-        /// Eğer dönüşüm başarısız olursa, belirtilen varsayılan değeri döner.
+        /// Bir <see cref="object"/> türündeki değeri, <see cref="decimal"/> türüne dönüştürür. Eğer dönüşüm başarısız olursa, belirtilen varsayılan değeri döner.
         /// </summary>
         /// <param name="value">Dönüştürülecek nesne değeri.</param>
         /// <param name="defaultValue">Dönüşüm başarısız olduğunda dönecek varsayılan <see cref="decimal"/> değeri. Varsayılan olarak sıfırdır.</param>
@@ -92,8 +91,7 @@
             return Convert.ToString(value).ParseOrDefault<decimal?>() ?? defaultValue;
         }
         /// <summary>
-        /// Bir nesneyi dinamik bir nesneye (<see cref="ExpandoObject"/>) dönüştürür.
-        /// Dönüştürülen nesne, içindeki tüm özellik adları ve değerleriyle birlikte dinamik bir yapı sunar.
+        /// Bir nesneyi dinamik bir nesneye (<see cref="ExpandoObject"/>) dönüştürür. Dönüştürülen nesne, içindeki tüm özellik adları ve değerleriyle birlikte dinamik bir yapı sunar.
         /// </summary>
         /// <param name="value">Dönüştürülecek nesne.</param>
         /// <returns>Dinamik bir nesne olarak temsil edilen <see cref="ExpandoObject"/>.</returns>
@@ -104,9 +102,7 @@
             return e as ExpandoObject;
         }
         /// <summary>
-        /// Verilen nesneyi string olarak dönüştürür, null ise varsayılan bir değer döndürür. 
-        /// Eğer nesne string türündeyse, belirlenen varsayılan değeri kontrol eder. 
-        /// Diğer nesneleri JSON biçimine çevirir ve URI güvenli olacak şekilde kodlar.
+        /// Verilen nesneyi string olarak dönüştürür, null ise varsayılan bir değer döndürür. Eğer nesne string türündeyse, belirlenen varsayılan değeri kontrol eder. Diğer nesneleri JSON biçimine çevirir ve URI güvenli olacak şekilde kodlar.
         /// </summary>
         /// <param name="value">Dönüştürülecek nesne.</param>
         /// <param name="defaultvalue">Nesne null ise döndürülecek varsayılan değer.</param>

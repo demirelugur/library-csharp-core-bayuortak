@@ -1,9 +1,11 @@
 ﻿namespace BayuOrtak.Core.Wcf.Nhr
 {
     using BayuOrtak.Core.Extensions;
+    using BayuOrtak.Core.Helper;
     using BayuOrtak.Core.Interface;
     using System.ServiceModel;
     using Wcf_Nhr_personelinfo;
+
     public interface INHRHelper : IConnectionStatus
     {
         PersonelinfoServiceClient client { get; }
@@ -39,7 +41,11 @@
                 return _Client;
             }
         }
-        public async Task<bool> IsConnectionStatusAsync(TimeSpan timeout, CancellationToken cancellationToken = default) => !(await this.client.Endpoint.Address.Uri.IsConnectionStatusAsync(timeout, cancellationToken)).statuswarning;
+        public async Task<(bool statuswarning, string error)> IsConnectionStatusAsync(TimeSpan timeout, string dil, CancellationToken cancellationToken)
+        {
+            var _t = await this.client.Endpoint.Address.Uri.IsConnectionStatusAsync(timeout, cancellationToken);
+            return (_t.statuswarning, _t.statuswarning ? GlobalConstants.webservice_connectionwarning(dil, "NHR PersonelInfo") : "");
+        }
         public async Task<wspersonel> bytckimliknoAsync(long tckn) => (await this.client.bytckimliknoAsync(this.username, this.password, tckn)).@return;
         public async Task<wspersonel> byemailAsync(string eposta) => (await this.client.byemailAsync(this.username, this.password, eposta)).@return;
         public async Task<wspersonel> bykurumsicilnoAsync(string sicilno) => (await this.client.bykurumsicilnoAsync(this.username, this.password, sicilno)).@return;

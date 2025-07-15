@@ -14,28 +14,28 @@
         /// </summary>
         public enum RetMesaj : byte
         {
-            /// <summary>İsteğin başarılı bir şekilde sonuçlandığını belirten mesaj.</summary>
+            /// <summary>İsteğiniz başarılı bir şekilde sonuçlandı.</summary>
             [Description("İsteğiniz başarılı bir şekilde sonuçlandı.")]
             basari = 1,
-            /// <summary>İşlem sırasında beklenmeyen bir sonuç meydana geldiğini belirten mesaj.</summary>
+            /// <summary>İşlem sırasında beklenmeyen bir sonuç meydana geldi! Yönetici ile iletişime geçiniz.</summary>
             [Description("İşlem sırasında beklenmeyen bir sonuç meydana geldi! Yönetici ile iletişime geçiniz.")]
             hata,
-            /// <summary>Parametrelere uyumlu kayıt bulunamadığını belirten mesaj.</summary>
+            /// <summary>Parametrelere uyumlu kayıt bulunamadı!</summary>
             [Description("Parametrelere uyumlu kayıt bulunamadı!")]
             kayityok,
-            /// <summary>Girilen değer tarih biçimine uygun olmadığını belirten mesaj.</summary>
+            /// <summary>Girilen değer tarih biçimine uygun değildir! Kontrol ediniz.</summary>
             [Description("Girilen değer tarih biçimine uygun değildir! Kontrol ediniz.")]
             tarih,
-            /// <summary>Metin içinde yasaklı kelimelerin geçip geçmediğini belirten mesaj.</summary>
+            /// <summary>Metin içinde \"yasaklı\" kelimeler geçmektedir! Yönetici ile iletişime geçiniz.</summary>
             [Description("Metin içinde \"yasaklı\" kelimeler geçmektedir! Yönetici ile iletişime geçiniz.")]
             unethical,
-            /// <summary>İşlem için yetki bulunmadığını belirten mesaj.</summary>
+            /// <summary>İşlem için yetkiniz bulunmamaktadır! Yönetici ile iletişime geçiniz.</summary>
             [Description("İşlem için yetkiniz bulunmamaktadır! Yönetici ile iletişime geçiniz.")]
             unauthority,
-            /// <summary>Sunucu ile iletişim kurulamıyor olduğunu belirten mesaj.</summary>
+            /// <summary>Sunucu bilgisayar ile iletişim kurulamıyor! Yönetici ile iletişime geçiniz.</summary>
             [Description("Sunucu bilgisayar ile iletişim kurulamıyor! Yönetici ile iletişime geçiniz.")]
             unconnection,
-            /// <summary>Girilebilecek maksimum karakter sınırının aşıldığını belirten mesaj.</summary>
+            /// <summary>Girilebilecek maksimum karakter sınırı aşıldı! Yönetici ile iletişime geçiniz.</summary>
             [Description("Girilebilecek maksimum karakter sınırı aşıldı! Yönetici ile iletişime geçiniz.")]
             maxlength
         }

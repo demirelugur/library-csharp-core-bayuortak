@@ -1,6 +1,7 @@
 ﻿namespace BayuOrtak.Core.Wcf.Ogr
 {
     using BayuOrtak.Core.Extensions;
+    using BayuOrtak.Core.Helper;
     using BayuOrtak.Core.Interface;
     using System;
     using System.ServiceModel;
@@ -52,7 +53,11 @@
                 return _Client;
             }
         }
-        public async Task<bool> IsConnectionStatusAsync(TimeSpan timeout, CancellationToken cancellationToken = default) => !(await this.client.Endpoint.Address.Uri.IsConnectionStatusAsync(timeout, cancellationToken)).statuswarning;
+        public async Task<(bool statuswarning, string error)> IsConnectionStatusAsync(TimeSpan timeout, string dil, CancellationToken cancellationToken)
+        {
+            var _t = await this.client.Endpoint.Address.Uri.IsConnectionStatusAsync(timeout, cancellationToken);
+            return (_t.statuswarning, _t.statuswarning ? GlobalConstants.webservice_connectionwarning(dil, "OgrService") : "");
+        }
         public Task<OgrImage_Response> GetByOgrImage_ogridAsync(int ogrid) => this.client.GetByOgrImageAsync(this.username, this.password, ogrid.ToString(), false);
         public Task<OgrImage_Response> GetByOgrImage_ogrnoAsync(string ogrno) => this.client.GetByOgrImageAsync(this.username, this.password, ogrno, true);
         public Task<OgrContact_Response> GetByOgrContact_ogridAsync(int ogrid) => this.client.GetByOgrContactAsync(this.username, this.password, ogrid.ToString(), false);

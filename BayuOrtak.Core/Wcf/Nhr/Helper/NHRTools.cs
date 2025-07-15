@@ -5,8 +5,8 @@
     using System;
     using System.Drawing;
     using static BayuOrtak.Core.Helper.GlobalConstants;
-    using static BayuOrtak.Core.Wcf.Nhr.Enums.CNHR_DurumTypes;
-    using static BayuOrtak.Core.Wcf.Nhr.Enums.CNHR_UnvanTypes;
+    using static BayuOrtak.Core.Wcf.Nhr.Enums.CNhr_DurumTypes;
+    using static BayuOrtak.Core.Wcf.Nhr.Enums.CNhr_UnvanTypes;
     /// <summary>
     /// NHRTools sınıfı, personel iş kayıtları ve özelliklerine dair çeşitli yardımcı metotlar sağlar.
     /// Bu sınıf, personel unvanları, durum tipleri ve özel durum kontrolleri gibi işlevleri yerine getirir.
@@ -68,12 +68,12 @@
         /// <param name="personelJobrecordtipi">Personelin iş kayıt tipi</param>
         /// <param name="personelJobrecordalttipi">Personelin iş kayıt alt tipi</param>
         /// <returns>Personelin unvan tipini NHR_UnvanTypes türünde döner.</returns>
-        public static NHR_UnvanTypes GetUnvanTypes(string personelJobrecordtipi, string personelJobrecordalttipi)
+        public static Nhr_UnvanTypes GetUnvanTypes(string personelJobrecordtipi, string personelJobrecordalttipi)
         {
-            var v = personelJobrecordtipi.ToSeoFriendly();
-            if (v == "akademik") { return NHR_UnvanTypes.aka; }
-            if (v == "idari") { return NHR_UnvanTypes.ida; }
-            return (IsSozlesmeliPersonel(personelJobrecordalttipi) ? NHR_UnvanTypes.soz : NHR_UnvanTypes.dig);
+            var _r = personelJobrecordtipi.ToSeoFriendly();
+            if (_r == "akademik") { return Nhr_UnvanTypes.aka; }
+            if (_r == "idari") { return Nhr_UnvanTypes.ida; }
+            return (IsSozlesmeliPersonel(personelJobrecordalttipi) ? Nhr_UnvanTypes.soz : Nhr_UnvanTypes.dig);
         }
         /// <summary>
         /// Personelin durum tipini belirler.
@@ -82,25 +82,36 @@
         /// <param name="personelOzurorani">Personelin özür oranı</param>
         /// <param name="personelOzurdurumu">Personelin özür durumu</param>
         /// <returns>Personelin durum tipini NHR_DurumTypes türünde döner, bulunamazsa null döner.</returns>
-        public static NHR_DurumTypes? GetDurumTypes(string personelJobrecordalttipi, string personelOzurorani, string personelOzurdurumu)
+        public static Nhr_DurumTypes? GetDurumTypes(string personelJobrecordalttipi, string personelOzurorani, string personelOzurdurumu)
         {
-            var r = 0;
-            if (IsMadde35ileGiden(personelJobrecordalttipi)) { r = (int)NHR_DurumTypes.madde35ilegiden; }
-            else if (IsIdariGorevliGelen(personelJobrecordalttipi)) { r = (int)NHR_DurumTypes.idarigorevgelen; }
-            else if (IsYabanciUyrukluTamZamanli(personelJobrecordalttipi)) { r = (int)NHR_DurumTypes.yabanciuyruklutamzamanli; }
-            if (IsEngelliPersonel(personelOzurorani, personelOzurdurumu)) { r = r + (int)NHR_DurumTypes.engelli; }
-            return (r > 0 ? (NHR_DurumTypes?)r : null);
+            var _r = 0;
+            if (IsMadde35ileGiden(personelJobrecordalttipi)) { _r = (int)Nhr_DurumTypes.madde35ilegiden; }
+            else if (IsIdariGorevliGelen(personelJobrecordalttipi)) { _r = (int)Nhr_DurumTypes.idarigorevgelen; }
+            else if (IsYabanciUyrukluTamZamanli(personelJobrecordalttipi)) { _r = (int)Nhr_DurumTypes.yabanciuyruklutamzamanli; }
+            if (IsEngelliPersonel(personelOzurorani, personelOzurdurumu)) { _r = _r + (int)Nhr_DurumTypes.engelli; } // Not: else if yazılmamalıdır!
+            return (_r > 0 ? (Nhr_DurumTypes?)_r : null);
         }
         /// <summary>
-        /// Sicil numarasının geçerli olup olmadığını kontrol eder.
+        /// Verilen bir sicil numarasını kontrol eder ve belirtilen formata uygun şekilde düzenler. Sicil numarası &quot;İ-&quot; ile başlayabilir ve maksimum 6 karakter olabilir (örn. İ-1234). Alternatif olarak, sadece 4 haneli bir sayı olabilir (örn. 0939). Sayı 1000&#39;den küçükse, 4 haneli olacak şekilde başına sıfır eklenir (örn. 0012). Sayı 1 ile 9999 arasında olmalıdır.
         /// </summary>
-        /// <param name="sicilno">Sicil numarası</param>
-        /// <returns>Geçerli sicil numarası ise <see langword="true"/>, değilse <see langword="false"/> döner.</returns>
-        public static bool IsSicilNo(string sicilno)
+        /// <param name="value">Kontrol edilecek sicil numarası (örn. &quot;İ-1&quot;, &quot;12&quot;, &quot;5001&quot;).</param>
+        /// <param name="outvalue">Geçerli bir sicil numarası ise formatlanmış çıktı (örn. &quot;İ-0001&quot;, &quot;0012&quot;). Aksi takdirde boş string.</param>
+        /// <returns>Sicil numarası geçerliyse <see langword="true"/>, aksi takdirde <see langword="false"/> döner.</returns>
+        /// <remarks>
+        /// - &quot;İ-&quot; ile başlayan girişler için maksimum uzunluk 6 karakterdir.
+        /// - &quot;İ-&quot; olmadan sadece sayı girişleri için maksimum uzunluk 4 karakterdir.
+        /// - Geçersiz girişler (örn. harf içeren, 9999&#39;dan büyük sayılar) için <see langword="false"/> döner.
+        /// </remarks>
+        public static bool TrySicilNo(string value, out string outvalue)
         {
-            sicilno = sicilno.ToStringOrEmpty().ToLower();
-            return (isnumeric_private(sicilno) || (sicilno.Length == _nhr.sicilno && sicilno.StartsWith("i-") && isnumeric_private(sicilno.Substring(2, 4))));
+            value = value.ToStringOrEmpty().ToUpper();
+            outvalue = "";
+            if (value == "") { return false; }
+            var _startsI = value.StartsWith("İ-");
+            if (value.Length > (_startsI ? _nhr.sicilno : 4)) { return false; }
+            if (!Int32.TryParse((_startsI ? value.Substring(2) : value), out int number) || number < 1 || number > 9999) { return false; }
+            outvalue = String.Concat(_startsI ? "İ-" : "", number.ToString().Replicate(4));
+            return true;
         }
-        private static bool isnumeric_private(string value) => (Int32.TryParse(value, out int _i) && _i > 0 && _i < 10000);
     }
 }

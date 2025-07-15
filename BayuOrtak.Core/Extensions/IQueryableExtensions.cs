@@ -42,19 +42,19 @@
         /// <summary>
         /// Seçilen ifadeye göre ilk kayıt veya varsayılan değeri asenkron olarak getirir.
         /// </summary>
-        public static Task<TObject> SelectThenFirstOrDefaultAsync<T, TObject>(this IQueryable<T> source, Expression<Func<T, TObject>> selector, CancellationToken cancellationToken = default) where T : class => source.Select(selector).FirstOrDefaultAsync(cancellationToken);
+        public static Task<TObject> SelectThenFirstOrDefaultAsync<T, TObject>(this IQueryable<T> source, Expression<Func<T, TObject>> selector, CancellationToken cancellationToken) where T : class => source.Select(selector).FirstOrDefaultAsync(cancellationToken);
         /// <summary>
         /// Verilen ifade ile maksimum değeri asenkron olarak getirir, yoksa varsayılan değeri döner.
         /// </summary>
-        public static async Task<TKey> MaxOrDefaultAsync<T, TKey>(this IQueryable<T> source, Expression<Func<T, TKey>> selector, CancellationToken cancellationToken = default) where T : class => (await source.AnyAsync(cancellationToken) ? await source.MaxAsync(selector, cancellationToken) : default(TKey));
+        public static async Task<TKey> MaxOrDefaultAsync<T, TKey>(this IQueryable<T> source, Expression<Func<T, TKey>> selector, CancellationToken cancellationToken) where T : class => (await source.AnyAsync(cancellationToken) ? await source.MaxAsync(selector, cancellationToken) : default(TKey));
         /// <summary>
         /// Verilen ifade ile minimum değeri asenkron olarak getirir, yoksa varsayılan değeri döner.
         /// </summary>
-        public static async Task<TKey> MinOrDefaultAsync<T, TKey>(this IQueryable<T> source, Expression<Func<T, TKey>> selector, CancellationToken cancellationToken = default) where T : class => (await source.AnyAsync(cancellationToken) ? await source.MinAsync(selector, cancellationToken) : default(TKey));
+        public static async Task<TKey> MinOrDefaultAsync<T, TKey>(this IQueryable<T> source, Expression<Func<T, TKey>> selector, CancellationToken cancellationToken) where T : class => (await source.AnyAsync(cancellationToken) ? await source.MinAsync(selector, cancellationToken) : default(TKey));
         /// <summary>
         /// Verilen IQueryable kaynağındaki sayısal değerlerin toplamını asenkron olarak getirir, yoksa varsayılan değeri döner.
         /// </summary>
-        public static async Task<TKey> SumOrDefaultAsync<TKey>(this IQueryable<TKey> source, CancellationToken cancellationToken = default) where TKey : struct, IConvertible
+        public static async Task<TKey> SumOrDefaultAsync<TKey>(this IQueryable<TKey> source, CancellationToken cancellationToken) where TKey : struct, IConvertible
         {
             if (!await source.AnyAsync(cancellationToken)) { return default(TKey); }
             object value;
@@ -70,7 +70,7 @@
         /// <summary>
         /// Verilen metin için benzersiz bir SEO dostu string oluşturur.
         /// </summary>
-        public static async Task<string> GenerateUniqueSEOStringAsync(this IQueryable<string> source, string text, int maxLength, string dil, CancellationToken cancellationToken = default)
+        public static async Task<string> GenerateUniqueSEOStringAsync(this IQueryable<string> source, string text, int maxLength, string dil, CancellationToken cancellationToken)
         {
             var i = 0;
             string r, t = text.ToSeoFriendly();

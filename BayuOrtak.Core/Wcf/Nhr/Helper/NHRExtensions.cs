@@ -6,8 +6,8 @@
     using System;
     using System.Linq;
     using Wcf_Nhr_personelinfo;
-    using static BayuOrtak.Core.Wcf.Nhr.Enums.CNHR_DurumTypes;
-    using static BayuOrtak.Core.Wcf.Nhr.Enums.CNHR_UnvanTypes;
+    using static BayuOrtak.Core.Wcf.Nhr.Enums.CNhr_DurumTypes;
+    using static BayuOrtak.Core.Wcf.Nhr.Enums.CNhr_UnvanTypes;
     /// <summary>
     /// Personel Otomasyonu için NHRExtensions sınıfı, wspersonel objesine ve ilgili türlere çeşitli yardımcı ve kontrol metotları sağlar.
     /// Bu sınıf, personel objeleri üzerinde null kontrolü, aktiflik durumu, unvan ve durum tipleri gibi 
@@ -56,23 +56,23 @@
         /// </summary>
         /// <param name="wspersonel">Kontrol edilecek personel objesi</param>
         /// <returns>Unvan tipini döner</returns>
-        public static NHR_UnvanTypes GetUnvanTypes(this wspersonel wspersonel) => NHRTools.GetUnvanTypes(wspersonel.personelJobrecordtipi, wspersonel.personelJobrecordalttipi);
+        public static Nhr_UnvanTypes GetUnvanTypes(this wspersonel wspersonel) => NHRTools.GetUnvanTypes(wspersonel.personelJobrecordtipi, wspersonel.personelJobrecordalttipi);
         /// <summary>
         /// Personelin durum tipini döner.
         /// </summary>
         /// <param name="wspersonel">Kontrol edilecek personel objesi</param>
         /// <returns>Durum tipini döner</returns>
-        public static NHR_DurumTypes? GetDurumTypes(this wspersonel wspersonel) => NHRTools.GetDurumTypes(wspersonel.personelJobrecordtipi, wspersonel.personelOzurorani, wspersonel.personelOzurdurumu);
+        public static Nhr_DurumTypes? GetDurumTypes(this wspersonel wspersonel) => NHRTools.GetDurumTypes(wspersonel.personelJobrecordtipi, wspersonel.personelOzurorani, wspersonel.personelOzurdurumu);
         /// <summary>
         /// Personelin kimlik bilgilerini döner. Yeni kimlik veya eski kimlik bilgilerine göre kontrol yapılır.
         /// </summary>
         /// <param name="wspersonel">Kimlik bilgisi kontrol edilecek personel objesi</param>
         /// <returns>Kimlik tipi ve seri numarasını döner</returns>
-        public static (NVIKimlikTypes? tip, string serino) GetKimlikInfo(this wspersonel wspersonel)
+        public static (Nvi_KimlikTypes? tip, string serino) GetKimlikInfo(this wspersonel wspersonel)
         {
             var _k = String.Concat(wspersonel.personelKpscuzdanseri.ToStringOrEmpty(), wspersonel.personelKpscuzdanno.ToStringOrEmpty()).ToUpper();
-            if (NVIHelperTR.TryValidate_YeniKimlikSeriNo(_k, out _)) { return (NVIKimlikTypes.yeni, _k); }
-            if (NVIHelperTR.TryValidate_EskiNufusCuzdaniSeriNo(_k, out _, out _)) { return (NVIKimlikTypes.eski, _k); }
+            if (NVIHelperTR.TryValidate_YeniKimlikSeriNo(_k, out _)) { return (Nvi_KimlikTypes.yeni, _k); }
+            if (NVIHelperTR.TryValidate_EskiNufusCuzdaniSeriNo(_k, out _, out _)) { return (Nvi_KimlikTypes.eski, _k); }
             return (null, "");
         }
         /// <summary>

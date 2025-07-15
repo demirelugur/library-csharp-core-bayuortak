@@ -1,8 +1,7 @@
 ﻿namespace BayuOrtak.Core.Helper.Results
 {
     /// <summary>
-    /// İki farklı tür arasında sol dış birleştirme sonuçlarını temsil eden bir sınıf.
-    /// Bu sınıf, sol (left) ve sağ (right) taraflarda bulunan verileri tutar.
+    /// İki farklı tür arasında sol dış birleştirme sonuçlarını temsil eden bir sınıf. Bu sınıf, sol (left) ve sağ (right) taraflarda bulunan verileri tutar.
     /// </summary>
     /// <typeparam name="T">Sol tarafın veri türü.</typeparam>
     /// <typeparam name="Y">Sağ tarafın veri türü.</typeparam>

@@ -42,14 +42,10 @@
         /// <param name="key">Hedef değerin anahtarı. Anahtarın &quot;[]&quot; ile bitmesi beklenir, aksi takdirde otomatik olarak eklenir.</param>
         /// <param name="outvalues">Belirtilen türdeki değerleri içeren çıktı dizisi. Anahtar bulunamazsa boş bir dizi döner.</param>
         /// <returns>
-        /// Anahtar bulunduğunda ve değerler belirtilen türe dönüştürüldüğünde <see langword="true"/> döner, 
-        /// aksi takdirde <see langword="false"/> döner.
+        /// Anahtar bulunduğunda ve değerler belirtilen türe dönüştürüldüğünde <see langword="true"/> döner, aksi takdirde <see langword="false"/> döner.
         /// </returns>
         /// <remarks>
-        /// Bu metot, bir form verisindeki (IFormCollection) belirli bir anahtara karşılık gelen değerleri
-        /// belirtilen türe dönüştürerek bir dizi olarak döndürmek için kullanılır. 
-        /// Eğer anahtar &quot;[]&quot; ile bitmiyorsa, otomatik olarak eklenir.
-        /// Dönüştürme sırasında hata oluşursa, varsayılan değerler kullanılır.
+        /// Bu metot, bir form verisindeki (IFormCollection) belirli bir anahtara karşılık gelen değerleri belirtilen türe dönüştürerek bir dizi olarak döndürmek için kullanılır. Eğer anahtar &quot;[]&quot; ile bitmiyorsa, otomatik olarak eklenir. Dönüştürme sırasında hata oluşursa, varsayılan değerler kullanılır.
         /// </remarks>
         public static bool TryGetValue_array<T>(this IFormCollection form, string key, out T[] outvalues)
         {
@@ -67,12 +63,7 @@
             return false;
         }
         /// <summary>
-        /// Belirtilen anahtar - değer çiftini form koleksiyonuna ekler veya günceller.
-        /// <para>
-        /// Eğer <paramref name="key"/> null veya boş ise, form koleksiyonu değiştirilmeden geri döndürülür.
-        /// Aksi takdirde, belirtilen <paramref name="key"/> ve <paramref name="value"/> ile yeni bir form koleksiyonu oluşturulur.
-        /// Eğer anahtar koleksiyonda zaten varsa, değeri güncellenir; yoksa yeni bir anahtar-değer çifti eklenir.
-        /// </para>
+        /// Belirtilen anahtar - değer çiftini form koleksiyonuna ekler veya günceller. Eğer <paramref name="key"/> null veya boş ise, form koleksiyonu değiştirilmeden geri döndürülür. Aksi takdirde, belirtilen <paramref name="key"/> ve <paramref name="value"/> ile yeni bir form koleksiyonu oluşturulur. Eğer anahtar koleksiyonda zaten varsa, değeri güncellenir; yoksa yeni bir anahtar-değer çifti eklenir.
         /// <para>
         /// Bu metod, formun dosya koleksiyonunu (<see cref="IFormCollection.Files"/>) korur.
         /// </para>
@@ -81,8 +72,7 @@
         /// <param name="key">Eklenecek veya güncellenecek anahtarın adı.</param>
         /// <param name="value">Anahtara atanacak değer(ler). Tek bir string veya birden fazla string içerebilir.</param>
         /// <returns>
-        /// Güncellenmiş veya eklenmiş anahtar - değer çifti ile yeni bir <see cref="IFormCollection"/> nesnesi.
-        /// Eğer <paramref name="key"/> null veya boş ise, orijinal form koleksiyonu döndürülür.
+        /// Güncellenmiş veya eklenmiş anahtar - değer çifti ile yeni bir <see cref="IFormCollection"/> nesnesi. Eğer <paramref name="key"/> null veya boş ise, orijinal form koleksiyonu döndürülür.
         /// </returns>
         public static IFormCollection Upsert(this IFormCollection form, string key, StringValues value)
         {

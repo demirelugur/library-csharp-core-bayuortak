@@ -15,7 +15,7 @@
         KPSPublicV2SoapClient client { get; }
         Task<bool> KisiVeCuzdanDogrula_YeniKimlikAsync(long tckn, string ad, string soyad, DateOnly dogumTarih, string yeniTckkSeriNo);
         Task<bool> KisiVeCuzdanDogrula_EskiKimlikAsync(long tckn, string ad, string soyad, DateOnly dogumTarih, string eskiCuzdanSeri, int eskiCuzdanNo);
-        Task<bool> KontrolAsync(long tckn, string ad, string soyad, DateOnly dogumTarih, NVIKimlikTypes tip, string yeniTckkSeriNo, string eskiCuzdanSeri, int eskiCuzdanNo);
+        Task<bool> KontrolAsync(long tckn, string ad, string soyad, DateOnly dogumTarih, Nvi_KimlikTypes tip, string yeniTckkSeriNo, string eskiCuzdanSeri, int eskiCuzdanNo);
     }
     public sealed class NVIHelperTR : INVIHelperTR, IDisposable
     {
@@ -36,32 +36,36 @@
                 return _Client;
             }
         }
-        public async Task<bool> IsConnectionStatusAsync(TimeSpan timeout, CancellationToken cancellationToken = default) => !(await this.client.Endpoint.Address.Uri.IsConnectionStatusAsync(timeout, cancellationToken)).statuswarning;
+        public async Task<(bool statuswarning, string error)> IsConnectionStatusAsync(TimeSpan timeout, string dil, CancellationToken cancellationToken)
+        {
+            var _t = await this.client.Endpoint.Address.Uri.IsConnectionStatusAsync(timeout, cancellationToken);
+            return (_t.statuswarning, _t.statuswarning ? GlobalConstants.webservice_connectionwarning(dil, "NVI KPSPublicV2") : "");
+        }
         public async Task<bool> KisiVeCuzdanDogrula_YeniKimlikAsync(long tckn, string ad, string soyad, DateOnly dogumTarih, string yeniTckkSeriNo) => (await this.client.KisiVeCuzdanDogrulaAsync(tckn, ad.ToUpper(), soyad.ToUpper(), true, dogumTarih.Day, true, dogumTarih.Month, true, dogumTarih.Year, null, null, yeniTckkSeriNo.ToUpper())).Body.KisiVeCuzdanDogrulaResult;
         public async Task<bool> KisiVeCuzdanDogrula_EskiKimlikAsync(long tckn, string ad, string soyad, DateOnly dogumTarih, string eskiCuzdanSeri, int eskiCuzdanNo) => (await this.client.KisiVeCuzdanDogrulaAsync(tckn, ad.ToUpper(), soyad.ToUpper(), true, dogumTarih.Day, true, dogumTarih.Month, true, dogumTarih.Year, eskiCuzdanSeri.ToUpper(), eskiCuzdanNo, null)).Body.KisiVeCuzdanDogrulaResult;
-        public Task<bool> KontrolAsync(long tckn, string ad, string soyad, DateOnly dogumTarih, NVIKimlikTypes tip, string yeniTckkSeriNo, string eskiCuzdanSeri, int eskiCuzdanNo)
+        public Task<bool> KontrolAsync(long tckn, string ad, string soyad, DateOnly dogumTarih, Nvi_KimlikTypes tip, string yeniTckkSeriNo, string eskiCuzdanSeri, int eskiCuzdanNo)
         {
             Guard.CheckZeroOrNegative(tckn, nameof(tckn));
             Guard.CheckEmpty(ad, nameof(ad));
             Guard.CheckEmpty(soyad, nameof(soyad));
-            if (tip == NVIKimlikTypes.yeni)
+            if (tip == Nvi_KimlikTypes.yeni)
             {
                 Guard.CheckEmpty(yeniTckkSeriNo, nameof(yeniTckkSeriNo));
                 return this.KisiVeCuzdanDogrula_YeniKimlikAsync(tckn, ad, soyad, dogumTarih, yeniTckkSeriNo);
             }
-            if (tip == NVIKimlikTypes.eski)
+            if (tip == Nvi_KimlikTypes.eski)
             {
                 Guard.CheckEmpty(eskiCuzdanSeri, nameof(eskiCuzdanSeri));
                 Guard.CheckZeroOrNegative(eskiCuzdanNo, nameof(eskiCuzdanNo));
                 return this.KisiVeCuzdanDogrula_EskiKimlikAsync(tckn, ad, soyad, dogumTarih, eskiCuzdanSeri, eskiCuzdanNo);
             }
-            throw _other.ThrowNotSupportedForEnum<NVIKimlikTypes>();
+            throw _other.ThrowNotSupportedForEnum<Nvi_KimlikTypes>();
         }
-        public static bool IsValidate(string value, NVIKimlikTypes tip)
+        public static bool IsValidate(string value, Nvi_KimlikTypes tip)
         {
-            if (tip == NVIKimlikTypes.yeni) { return TryValidate_YeniKimlikSeriNo(value, out _); }
-            if (tip == NVIKimlikTypes.eski) { return TryValidate_EskiNufusCuzdaniSeriNo(value, out _, out _); }
-            throw _other.ThrowNotSupportedForEnum<NVIKimlikTypes>();
+            if (tip == Nvi_KimlikTypes.yeni) { return TryValidate_YeniKimlikSeriNo(value, out _); }
+            if (tip == Nvi_KimlikTypes.eski) { return TryValidate_EskiNufusCuzdaniSeriNo(value, out _, out _); }
+            throw _other.ThrowNotSupportedForEnum<Nvi_KimlikTypes>();
         }
         public static bool TryValidate_YeniKimlikSeriNo(string value, out string outvalue)
         {

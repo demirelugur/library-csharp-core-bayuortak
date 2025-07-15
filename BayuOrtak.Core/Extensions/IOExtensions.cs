@@ -21,7 +21,7 @@
         /// <summary>
         /// Verilen byte dizisini belirtilen fiziksel yola asenkron olarak yükler.
         /// </summary>
-        public static async Task FileUploadAsync(this byte[] bytes, string physicallyPath, CancellationToken cancellationToken = default)
+        public static async Task FileUploadAsync(this byte[] bytes, string physicallyPath, CancellationToken cancellationToken)
         {
             Guard.CheckEmpty(bytes, nameof(bytes));
             Guard.CheckEmpty(physicallyPath, nameof(physicallyPath));
@@ -89,7 +89,7 @@
         /// <summary>
         /// Verilen IFormFile nesnesini belirtilen fiziksel yola asenkron olarak yükler.
         /// </summary>
-        public static async Task FileUploadAsync(this IFormFile file, string physicallyPath, CancellationToken cancellationToken = default)
+        public static async Task FileUploadAsync(this IFormFile file, string physicallyPath, CancellationToken cancellationToken)
         {
             Guard.CheckNull(file, nameof(file));
             Guard.CheckEmpty(physicallyPath, nameof(physicallyPath));
@@ -102,7 +102,7 @@
         /// <summary>
         /// Bir IFormFile nesnesini byte dizisine dönüştürür.
         /// </summary>
-        public static async Task<byte[]> ToByteArrayAsync(this IFormFile formFile, CancellationToken cancellationToken = default)
+        public static async Task<byte[]> ToByteArrayAsync(this IFormFile formFile, CancellationToken cancellationToken)
         {
             Guard.CheckNull(formFile, nameof(formFile));
             using (var ms = new MemoryStream())

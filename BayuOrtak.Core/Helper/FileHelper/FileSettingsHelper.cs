@@ -14,79 +14,36 @@
     public sealed class FileSettingsHelper : IEquatable<FileSettingsHelper>
     {
         #region Equals
-        /// <summary>
-        /// Verilen bir nesne ile bu nesnenin eşitliğini kontrol eder.
-        /// </summary>
-        /// <param name="other">Karşılaştırılacak diğer nesne.</param>
-        /// <returns>Eşitlik durumu (true/false).</returns>
         public override bool Equals(object other) => this.Equals(other as FileSettingsHelper);
-        /// <summary>
-        /// Bu nesnenin hash kodunu döndürür.
-        /// </summary>
-        /// <returns>Hash kodu.</returns>
         public override int GetHashCode() => HashCode.Combine(this.ext, this.size, this.filecount);
-        /// <summary>
-        /// Verilen başka bir <see cref="FileSettingsHelper"/> nesnesi ile bu nesnenin eşitliğini kontrol eder.
-        /// </summary>
-        /// <param name="other">Karşılaştırılacak diğer <see cref="FileSettingsHelper"/> nesnesi.</param>
-        /// <returns>Eşitlik durumu (true/false).</returns>
         public bool Equals(FileSettingsHelper other)
         {
-            if (other == null) { return false; }
-            return (this.ext.IsEqual(other.ext) && this.size == other.size && this.filecount == other.filecount);
+            if (other is FileSettingsHelper _f) { return this.ext.IsEqual(_f.ext) && this.size == _f.size && this.filecount == _f.filecount; }
+            return false;
         }
         #endregion
         private string[] _Ext;
         private long _Size;
         private byte _Filecount;
-        /// <summary>
-        /// Dosya uzantılarını tutan dizi.
-        /// </summary>
         [Validation_Required]
         [Validation_ArrayMinLength]
         [Display(Name = "Uzantı")]
         public string[] ext { get { return _Ext; } set { _Ext = (value ?? Array.Empty<string>()).Select(x => x.ToStringOrEmpty()).Where(x => x.Length > 1).Select(x => (x[0] == '.' ? x : $".{x}")).Select(x => x.ToLower()).OrderBy(x => x).Distinct().ToArray(); } }
-        /// <summary>
-        /// Yüklenebilecek toplam dosya boyutunu temsil eder. &quot;bytes&quot; cinsinden belirtilmelidir.
-        /// </summary>
         [Validation_Required]
         [Range(1, Int64.MaxValue, ErrorMessage = _validationerrormessage.range)]
         [DefaultValue(1048576)]
         [Display(Name = "Belge Boyutu")]
         public long size { get { return _Size; } set { _Size = value; } }
-        /// <summary>
-        /// Yüklenebilecek dosya sayısını temsil eder.
-        /// </summary>
         [Validation_Required]
         [Range(1, Byte.MaxValue, ErrorMessage = _validationerrormessage.range)]
         [DefaultValue(1)]
         [Display(Name = "Belge Sayısı")]
         public byte filecount { get { return _Filecount; } set { _Filecount = value; } }
-        /// <summary>
-        /// Dosya boyutunu biçimlendirilmiş olarak döndürür. 
-        /// Bu özellik, boyut birimlerini uygun şekilde döndürür.
-        /// </summary>
         [JsonIgnore]
         [IgnoreDataMember]
         public string getformatsize => FormatSize(Convert.ToDouble(size));
-        /// <summary>
-        /// Dosyaların yüklenmesi sırasında herhangi bir istisna olup olmadığını kontrol eder.
-        /// </summary>
-        /// <param name="files">Kontrol edilecek dosyaların koleksiyonu.</param>
-        /// <param name="dil">İşlem sırasında kullanılacak dil (örneğin: &quot;tr&quot; veya &quot;en&quot;).</param>
-        /// <param name="outvalues">Hata mesajlarını içeren bir dizi.</param>
-        /// <returns>Bir istisna durumu (true/false).</returns>
         public bool gettryfileisexception(ICollection<IFormFile> files, string dil, out string[] outvalues) => TryFileisException(files, this, dil, out outvalues);
-        /// <summary>
-        /// Varsayılan bir örnek oluşturur; tüm özellikler varsayılan değerlerle başlatılır.
-        /// </summary>
         public FileSettingsHelper() : this(default, default, default) { }
-        /// <summary>
-        /// Dosya uzantıları, boyut, dosya sayısı ve toplam boyut durumu gibi tüm parametreleri alarak bir örnek oluşturur.
-        /// </summary>
-        /// <param name="ext">Dosya uzantıları.</param>
-        /// <param name="size">Yüklenebilecek toplam boyut.</param>
-        /// <param name="filecount">Yüklenebilecek dosya sayısı.</param>
         public FileSettingsHelper(string[] ext, long size, byte filecount)
         {
             this.ext = ext;

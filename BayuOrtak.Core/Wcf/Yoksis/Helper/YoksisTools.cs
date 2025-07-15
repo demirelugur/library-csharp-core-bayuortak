@@ -3,11 +3,9 @@
     using BayuOrtak.Core.Extensions;
     using System.ServiceModel;
     using System.ServiceModel.Security;
-    public class YoksisTools
+    using Wcf_Yoksis_OzgecmisV2;
+    public sealed class YoksisTools
     {
-        /// <summary>
-        /// HTTP iletişim ayarlarını içeren temel yapılandırma.
-        /// </summary>
         internal static readonly BasicHttpBinding basicHttpBinding = new BasicHttpBinding
         {
             MaxReceivedMessageSize = 104857600,
@@ -26,6 +24,7 @@
                 }
             }
         };
+        public static bool IsKayitBulunmadi(SonucBilgiTip? sonuc) => (sonuc == null || (sonuc.SonucKod == 0 && sonuc.SonucMesaj.ToSeoFriendly() == "kayit-bulunmadi"));
         /// <summary>
         /// Verilen ORCID değerini bir URI formatına dönüştürür. 
         /// Eğer ORCID boş bir string ise null döner. 

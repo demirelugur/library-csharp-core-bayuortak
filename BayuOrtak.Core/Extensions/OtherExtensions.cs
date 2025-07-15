@@ -32,8 +32,8 @@
         /// <returns>Değiştirilmişse <see langword="true"/>, değilse <see langword="false"/> döner.</returns>
         public static bool IsModified<T>(this DbContext dbContext, T entity, params Expression<Func<T, object>>[] expressions) where T : class
         {
-            var _ee = dbContext.Entry(entity);
-            var _ie = typeof(T).GetProperties().Where(x => x.IsMappedProperty() && _ee.Property(x.Name).IsModified).ToArray();
+            var _entry = dbContext.Entry(entity);
+            var _ie = typeof(T).GetProperties().Where(x => x.IsMappedProperty() && _entry.Property(x.Name).IsModified).ToArray();
             var _columns = (expressions ?? Array.Empty<Expression<Func<T, object>>>()).Select(x => x.GetExpressionName()).ToArray();
             if (_columns.Length == 0) { return _ie.Length > 0; }
             return _ie.Any(x => _columns.Contains(x.Name));
@@ -41,41 +41,41 @@
         /// <summary>
         /// Belirli bir bileşik anahtar özelliği ile eski varlığın güncellenmesini sağlar.
         /// </summary>
-        public static async Task<T> SetCompositeKeyAsync<T, TKey>(this DbContext dbContext, bool isSaveChanges, T oldEntity, Expression<Func<T, TKey>> compositeKey, TKey compositeKeyValue, string dil, CancellationToken cancellationToken = default) where T : class, new()
+        public static async Task<T> SetCompositeKeyAsync<T, TKey>(this DbContext dbContext, bool isSaveChanges, T oldEntity, Expression<Func<T, TKey>> compositeKey, TKey compositeKeyValue, string dil, CancellationToken cancellationToken) where T : class, new()
         {
             Guard.UnSupportLanguage(dil, nameof(dil));
-            var t = typeof(T);
-            var tableName = t.GetTableName(false);
+            var _t = typeof(T);
+            var _tablename = _t.GetTableName(false);
             var _c = compositeKey.GetExpressionName();
-            var _props = t.GetProperties().Where(x => x.IsMappedProperty()).Select(x => new
+            var _props = _t.GetProperties().Where(x => x.IsMappedProperty()).Select(x => new
             {
                 name = x.Name,
                 setcolumn = x.Name == _c,
-                iscompositekey = _try.TryCustomAttribute(x, out KeyAttribute _) && _try.TryCustomAttribute(x, out DatabaseGeneratedAttribute _dga) && _dga.DatabaseGeneratedOption == DatabaseGeneratedOption.None
+                iscompositekey = x.IsPK() && x.GetDatabaseGeneratedOption() == DatabaseGeneratedOption.None
             }).ToArray();
             if (_props.Where(x => x.iscompositekey).Count() < 2)
             {
-                if (dil == "en") { throw new KeyNotFoundException($"The \"{tableName}\" table must contain at least 2 properties with \"{typeof(KeyAttribute).FullName}\" or \"{typeof(DatabaseGeneratedAttribute).FullName}\" attributes to continue processing!"); }
-                throw new KeyNotFoundException($"İşleme devam edebilmek için \"{tableName}\" tablosunda en az 2 özelliğin \"{typeof(KeyAttribute).FullName}\" veya \"{typeof(DatabaseGeneratedAttribute).FullName}\" içermesi gerekmektedir!");
+                if (dil == "en") { throw new KeyNotFoundException($"The \"{_tablename}\" table must contain at least 2 properties with \"{typeof(KeyAttribute).FullName}\" or \"{typeof(DatabaseGeneratedAttribute).FullName}\" attributes to continue processing!"); }
+                throw new KeyNotFoundException($"İşleme devam edebilmek için \"{_tablename}\" tablosunda en az 2 özelliğin \"{typeof(KeyAttribute).FullName}\" veya \"{typeof(DatabaseGeneratedAttribute).FullName}\" içermesi gerekmektedir!");
             }
             if (_props.Any(x => x.setcolumn && x.iscompositekey))
             {
-                var newEntity = new T();
-                var e = dbContext.Entry(oldEntity);
-                var dbset = dbContext.Set<T>();
-                dbset.Attach(oldEntity);
+                var _newentity = new T();
+                var _entry = dbContext.Entry(oldEntity);
+                var _dbset = dbContext.Set<T>();
+                _dbset.Attach(oldEntity);
                 foreach (var itemProp in _props.Select(x => new
                 {
                     x.name,
                     x.setcolumn
-                }).ToArray()) { _other.SetPropertyValue(newEntity, itemProp.name, (itemProp.setcolumn ? compositeKeyValue : e.Property(itemProp.name).OriginalValue)); }
-                await dbset.AddAsync(newEntity, cancellationToken);
-                dbset.Remove(oldEntity);
+                }).ToArray()) { _other.SetPropertyValue(_newentity, itemProp.name, (itemProp.setcolumn ? compositeKeyValue : _entry.Property(itemProp.name).OriginalValue)); }
+                await _dbset.AddAsync(_newentity, cancellationToken);
+                _dbset.Remove(oldEntity);
                 if (isSaveChanges) { await dbContext.SaveChangesAsync(cancellationToken); }
-                return newEntity;
+                return _newentity;
             }
-            if (dil == "en") { throw new Exception($"The property \"{_c}\" in table \"{tableName}\" must have either \"{typeof(KeyAttribute).FullName}\" or \"{typeof(DatabaseGeneratedAttribute).FullName}\" specified!"); }
-            throw new Exception($"\"{tableName}\" tablosundaki \"{_c}\" özelliğinde \"{typeof(KeyAttribute).FullName}\" veya \"{typeof(DatabaseGeneratedAttribute).FullName}\" belirtilmelidir!");
+            if (dil == "en") { throw new Exception($"The property \"{_c}\" in table \"{_tablename}\" must have either \"{typeof(KeyAttribute).FullName}\" or \"{typeof(DatabaseGeneratedAttribute).FullName}\" specified!"); }
+            throw new Exception($"\"{_tablename}\" tablosundaki \"{_c}\" özelliğinde \"{typeof(KeyAttribute).FullName}\" veya \"{typeof(DatabaseGeneratedAttribute).FullName}\" belirtilmelidir!");
         }
         #endregion
         #region Decimal
@@ -87,8 +87,7 @@
         /// <remarks>Bu metodun ters işlemi için <code>Convert.ToDecimal(value, CultureInfo.InvariantCulture);</code> kullanılabilir.</remarks>
         public static string ToStringInvariantCulture(this decimal value) => value.ToString(CultureInfo.InvariantCulture);
         /// <summary>
-        /// Verilen bir ondalık değeri belirtilen ondalık basamak sayısına yuvarlayarak string olarak döndürür.
-        /// İsteğe bağlı olarak, yuvarlama yöntemi belirtilebilir.
+        /// Verilen bir ondalık değeri belirtilen ondalık basamak sayısına yuvarlayarak string olarak döndürür. İsteğe bağlı olarak, yuvarlama yöntemi belirtilebilir.
         /// </summary>
         /// <param name="d">Yuvarlanacak <see cref="decimal"/> değeri.</param>
         /// <param name="decimals">Yuvarlanacak ondalık basamak sayısı (varsayılan olarak 2).</param>
@@ -129,8 +128,7 @@
             return _try.TryCustomAttribute(pi, out RequiredAttribute _);
         }
         /// <summary>
-        /// Verilen doğrulama bağlamına göre, belirtilen özelliğin değerini günceller.
-        /// Eğer özellik yazılabilir durumdaysa, yeni değer atanır.
+        /// Verilen doğrulama bağlamına göre, belirtilen özelliğin değerini günceller. Eğer özellik yazılabilir durumdaysa, yeni değer atanır.
         /// </summary>
         /// <param name="validationContext">Doğrulama işlemi sırasında bağlam bilgilerini içeren nesne.</param>
         /// <param name="value">Güncellenmek istenen yeni değer.</param>
@@ -145,18 +143,6 @@
         }
         #endregion
         #region Other
-        /// <summary>
-        /// Belirtilen özellik bilgilerinin haritalanmış bir özellik olup olmadığını kontrol eder.
-        /// </summary>
-        /// <param name="propertyInfo">Kontrol edilecek özellik bilgisi.</param>
-        /// <returns>Haritalanmış bir özellik ise <see langword="true"/>, değilse false <see langword="false"/>.</returns>
-        public static bool IsMappedProperty(this PropertyInfo propertyInfo)
-        {
-            if (propertyInfo == null) { return false; }
-            if (!propertyInfo.CanRead || !propertyInfo.CanWrite || _try.TryCustomAttribute(propertyInfo, out NotMappedAttribute _)) { return false; }
-            if ((propertyInfo.GetMethod.IsVirtual || propertyInfo.SetMethod.IsVirtual) && (propertyInfo.PropertyType.IsMappedTable() || (propertyInfo.PropertyType.IsGenericType && propertyInfo.PropertyType.GetGenericTypeDefinition() == typeof(ICollection<>) && propertyInfo.PropertyType.GenericTypeArguments[0].IsMappedTable()))) { return false; }
-            return true;
-        }
         /// <summary>
         /// Verilen sayının asal olup olmadığını kontrol eder.
         /// </summary>
@@ -174,14 +160,11 @@
             return true;
         }
         /// <summary>
-        /// Belirtilen <see cref="ActionDescriptor"/> nesnesinin dönüş tipinin &quot;ActionResult&quot;
-        /// veya &quot;IActionResult&quot; olup olmadığını ve &quot;public&quot; erişim seviyesinde olup olmadığını kontrol eder.
-        /// Eğer dönüş tipi &quot;Task&lt;ActionResult&gt;&quot; veya &quot;Task&lt;IActionResult&gt;&quot; ise bunu da geçerli kabul eder.
+        /// Belirtilen <see cref="ActionDescriptor"/> nesnesinin dönüş tipinin &quot;ActionResult&quot; veya &quot;IActionResult&quot; olup olmadığını ve &quot;public&quot; erişim seviyesinde olup olmadığını kontrol eder. Eğer dönüş tipi &quot;Task&lt;ActionResult&gt;&quot; veya &quot;Task&lt;IActionResult&gt;&quot; ise bunu da geçerli kabul eder.
         /// </summary>
         /// <param name="value">Kontrol edilecek <see cref="ActionDescriptor"/> nesnesi.</param>
         /// <returns>
-        /// Metodun &quot;public&quot; erişim seviyesinde olması ve dönüş tipinin &quot;ActionResult&quot;, &quot;IActionResult&quot;,
-        /// &quot;Task&lt;ActionResult&gt;&quot; veya &quot;Task&lt;IActionResult&gt;&quot; olması durumunda &quot;true&quot; döner; aksi takdirde &quot;false&quot; döner.
+        /// Metodun &quot;public&quot; erişim seviyesinde olması ve dönüş tipinin &quot;ActionResult&quot;, &quot;IActionResult&quot;, &quot;Task&lt;ActionResult&gt;&quot; veya &quot;Task&lt;IActionResult&gt;&quot; olması durumunda &quot;true&quot; döner; aksi takdirde &quot;false&quot; döner.
         /// </returns>
         public static bool IsPublicActionResult(this ActionDescriptor value)
         {

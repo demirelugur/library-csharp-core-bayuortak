@@ -32,7 +32,7 @@
                 validationContext.SetValidatePropertyValue(_ma.Address);
                 return ValidationResult.Success;
             }
-            if (!validationContext.IsRequiredAttribute() && email == "")
+            if (email == "" && !validationContext.IsRequiredAttribute())
             {
                 validationContext.SetValidatePropertyValue(null);
                 return ValidationResult.Success;

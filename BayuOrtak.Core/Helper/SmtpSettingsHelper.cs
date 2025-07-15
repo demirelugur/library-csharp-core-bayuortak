@@ -10,77 +10,58 @@
     using System.Net.Mail;
     using static BayuOrtak.Core.Helper.GlobalConstants;
     using static BayuOrtak.Core.Helper.OrtakTools;
-    public sealed class SmtpSettingsHelper
+    public sealed class SmtpSettingsHelper : IEquatable<SmtpSettingsHelper>
     {
-        /// <summary>
-        /// SMTP sunucu kullanıcı adı.
-        /// </summary>
+        #region Equals
+        public override bool Equals(object other) => this.Equals(other as SmtpSettingsHelper);
+        public override int GetHashCode() => HashCode.Combine(this.email, this.password, this.host, this.port, this.enablessl, this.usedefaultcredentials, this.deliverymethod, this.timeout);
+        public bool Equals(SmtpSettingsHelper other)
+        {
+            if (other is SmtpSettingsHelper _ssh) { return this.email == _ssh.email && this.password == _ssh.password && this.host == _ssh.host && this.port == _ssh.port && this.enablessl == _ssh.enablessl && this.usedefaultcredentials == _ssh.usedefaultcredentials && this.deliverymethod == _ssh.deliverymethod && this.timeout == _ssh.timeout; }
+            return false;
+        }
+        #endregion
         [Validation_Required]
         [EmailAddress(ErrorMessage = _validationerrormessage.email)]
         [Validation_StringLength(_maximumlength.eposta)]
         [Display(Name = "e-Posta")]
         [DefaultValue("")]
         public string email { get; set; }
-        /// <summary>
-        /// SMTP sunucu parolası.
-        /// </summary>s
         [Validation_Required]
         [Validation_StringLength(16, 8)]
         [Display(Name = "Şifre")]
         [DefaultValue("")]
         public string password { get; set; }
-        /// <summary>
-        /// SMTP sunucu adresi.
-        /// </summary>
         [Validation_Required]
         [Validation_StringLength(30)]
         [Display(Name = "Host")]
         [DefaultValue("")]
         public string host { get; set; }
-        /// <summary>
-        /// SMTP sunucusunun port numarası.
-        /// </summary>
         [Validation_Required]
         [Validation_RangePositiveInt32]
         [Display(Name = "Port")]
         [DefaultValue(25)]
         public int port { get; set; }
-        /// <summary>
-        /// SSL kullanım durumunu belirtir.
-        /// </summary>
         [Validation_Required]
         [Display(Name = "Enable SSL")]
         [DefaultValue(false)]
         public bool enablessl { get; set; }
-        /// <summary>
-        /// Varsayılan kimlik bilgilerini kullanma durumunu belirtir.
-        /// </summary>
         [Validation_Required]
         [Display(Name = "Use Default Credentials")]
         [DefaultValue(false)]
         public bool usedefaultcredentials { get; set; }
-        /// <summary>
-        /// SMTP iletim yöntemini belirtir.
-        /// </summary>
         [Validation_Required]
         [EnumDataType(typeof(SmtpDeliveryMethod), ErrorMessage = _validationerrormessage.enumdatatype)]
         [Display(Name = "Delivery Method")]
         [DefaultValue(SmtpDeliveryMethod.Network)]
         public SmtpDeliveryMethod deliverymethod { get; set; }
-        /// <summary>
-        /// SMTP istemcisinin zaman aşım süresi.
-        /// </summary>
         [Validation_Required]
         [Display(Name = "Timeout")]
         [DefaultValue(0)]
         public int timeout { get; set; }
-        /// <summary>
-        /// <see cref="SmtpClient"/> objesini oluşturur
-        /// </summary>
-        /// <returns></returns>
         public SmtpClient toSmtpClient()
         {
-            var sc = new SmtpClient
+            var _sc = new SmtpClient
             {
                 Port = this.port,
                 Host = this.host,
@@ -89,24 +70,10 @@
                 Credentials = new NetworkCredential(this.email, this.password),
                 DeliveryMethod = this.deliverymethod
             };
-            if (this.timeout > 0) { sc.Timeout = this.timeout; }
-            return sc;
+            if (this.timeout > 0) { _sc.Timeout = this.timeout; }
+            return _sc;
         }
-        /// <summary>
-        /// Varsayılan yapıcı metot.
-        /// </summary>
         public SmtpSettingsHelper() : this("", "", "", default, default, default, default, default) { }
-        /// <summary>
-        /// Belirtilen parametrelerle SmtpSettingsHelper nesnesi oluşturur.
-        /// </summary>
-        /// <param name="email">e-Posta.</param>
-        /// <param name="password">e-Posta Şifresi.</param>
-        /// <param name="host">Sunucu adresi.</param>
-        /// <param name="port">Port numarası.</param>
-        /// <param name="enablessl">SSL durumu.</param>
-        /// <param name="usedefaultcredentials">Varsayılan kimlik bilgilerini kullanma durumu.</param>
-        /// <param name="deliverymethod">İletim yöntemi.</param>
-        /// <param name="timeout">Zaman aşım süresi.</param>
         public SmtpSettingsHelper(string email, string password, string host, int port, bool enablessl, bool usedefaultcredentials, SmtpDeliveryMethod deliverymethod, int timeout)
         {
             this.email = email;
@@ -162,12 +129,8 @@
             }
             if (value is String _s)
             {
-                try
-                {
-                    if (_try.TryJson(_s, JTokenType.Object, out JObject _jo) && _jo.ToObject<SmtpSettingsHelper>() is SmtpSettingsHelper _sj) { return _sj; }
-                    return new SmtpSettingsHelper();
-                }
-                catch { return new SmtpSettingsHelper(); }
+                if (_try.TryJson(_s, JTokenType.Object, out JObject _jo) && _jo.ToObject<SmtpSettingsHelper>() is SmtpSettingsHelper _sj) { return _sj; }
+                return new SmtpSettingsHelper();
             }
             return value.ToEnumerable().Select(x => x.ToDynamic()).Select(x => new SmtpSettingsHelper((string)x.email, (string)x.password, (string)x.host, (int)x.port, (bool)x.enablessl, (bool)x.usedefaultcredentials, (SmtpDeliveryMethod)x.deliverymethod, (int)x.timeout)).FirstOrDefault();
         }

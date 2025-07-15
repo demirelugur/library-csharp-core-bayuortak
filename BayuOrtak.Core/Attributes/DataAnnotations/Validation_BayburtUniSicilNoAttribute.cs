@@ -27,13 +27,13 @@
         /// </returns>
         protected override ValidationResult IsValid(object value, ValidationContext validationContext)
         {
-            var sicilno = value.ToStringOrEmpty().ToUpper();
-            if (NHRTools.IsSicilNo(sicilno))
+            var sicilno = value.ToStringOrEmpty();
+            if (NHRTools.TrySicilNo(sicilno, out string _sicilno))
             {
-                validationContext.SetValidatePropertyValue(sicilno);
+                validationContext.SetValidatePropertyValue(_sicilno);
                 return ValidationResult.Success;
             }
-            if (!validationContext.IsRequiredAttribute() && sicilno == "")
+            if (sicilno == "" && !validationContext.IsRequiredAttribute())
             {
                 validationContext.SetValidatePropertyValue(null);
                 return ValidationResult.Success;

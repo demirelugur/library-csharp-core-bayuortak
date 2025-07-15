@@ -1,19 +1,16 @@
 ﻿namespace BayuOrtak.Core.Extensions
 {
-    using BayuOrtak.Core.Helper;
     using BayuOrtak.Core.Helper.Results;
     using Microsoft.AspNetCore.Mvc.ModelBinding;
     using Microsoft.AspNetCore.Mvc.Rendering;
     using System;
     using System.Collections.Generic;
-    using System.Collections.Specialized;
     using System.Linq;
     public static class CollectionExtensions
     {
         #region IDictionary
         /// <summary>
-        /// Belirtilen anahtar ve değeri bir sözlüğe ekler. Eğer anahtar zaten mevcutsa, değeri günceller; 
-        /// mevcut değilse, yeni bir anahtar-değer çifti olarak ekler.
+        /// Belirtilen anahtar ve değeri bir sözlüğe ekler. Eğer anahtar zaten mevcutsa, değeri günceller; mevcut değilse, yeni bir anahtar-değer çifti olarak ekler.
         /// </summary>
         /// <typeparam name="K">Sözlükteki anahtar türü.</typeparam>
         /// <typeparam name="V">Sözlükteki değer türü.</typeparam>
@@ -63,15 +60,13 @@
             return ret;
         }
         /// <summary>
-        /// Belirtilen anahtara (key) göre bir sözlükten (IDictionary) değer çekip, belirli bir türe <typeparamref name="T"/> dönüştürür.
-        /// Eğer sözlük veya anahtar geçersizse, varsayılan değeri döndürür.
+        /// Belirtilen anahtara (key) göre bir sözlükten (IDictionary) değer çekip, belirli bir türe <typeparamref name="T"/> dönüştürür. Eğer sözlük veya anahtar geçersizse, varsayılan değeri döndürür.
         /// </summary>
         /// <typeparam name="T">Dönüştürülecek veri türü.</typeparam>
-        /// <param name="dic">Anahtar-değer çiftleri içeren sözlük.</param>
+        /// <param name="dic">Anahtar - Değer çiftleri içeren sözlük.</param>
         /// <param name="key">Sözlükte aranan anahtar (key).</param>
         /// <returns>
-        /// Sözlükte belirtilen anahtara karşılık gelen değeri <typeparamref name="T"/> türüne dönüştürülmüş şekilde döndürür.
-        /// Anahtar yoksa veya geçersizse, <typeparamref name="T"/> türünün varsayılan değerini döndürür.
+        /// Sözlükte belirtilen anahtara karşılık gelen değeri <typeparamref name="T"/> türüne dönüştürülmüş şekilde döndürür. Anahtar yoksa veya geçersizse, <typeparamref name="T"/> türünün varsayılan değerini döndürür.
         /// </returns>
         public static T ToKeyValueParseOrDefault_dictionary<T>(this IDictionary<string, string> dic, string key)
         {
@@ -104,8 +99,7 @@
             if (values != null) { foreach (var value in values) { value.Dispose(); } }
         }
         /// <summary>
-        /// İki koleksiyon arasında bir sol dış birleşim (left join) gerçekleştiren bir yöntemdir. 
-        /// Her öğe için bir anahtar kullanır ve sağdaki koleksiyondan bir eşleşme olup olmadığını kontrol eder.
+        /// İki koleksiyon arasında bir sol dış birleşim (left join) gerçekleştiren bir yöntemdir. Her öğe için bir anahtar kullanır ve sağdaki koleksiyondan bir eşleşme olup olmadığını kontrol eder.
         /// </summary>
         /// <typeparam name="TLeft">Sol koleksiyon tipi.</typeparam>
         /// <typeparam name="TRight">Sağ koleksiyon tipi.</typeparam>
@@ -126,8 +120,7 @@
             right = r
         });
         /// <summary>
-        /// İki koleksiyon arasında bir sol dış birleşim (left join) gerçekleştiren bir yöntemdir. 
-        /// Sağ koleksiyondan birden fazla eşleşmeyi destekler.
+        /// İki koleksiyon arasında bir sol dış birleşim (left join) gerçekleştiren bir yöntemdir. Sağ koleksiyondan birden fazla eşleşmeyi destekler.
         /// </summary>
         /// <typeparam name="TLeft">Sol koleksiyon tipi.</typeparam>
         /// <typeparam name="TRight">Sağ koleksiyon tipi.</typeparam>
@@ -186,16 +179,13 @@
             return ret;
         }
         /// <summary>
-        /// Kaynakdaki elemanların sırasını <b>Fisher-Yates algoritmasını</b> kullanarak rastgele karıştırır ve 
-        /// karıştırılmış bir ICollection olarak geri döner.
+        /// Kaynakdaki elemanların sırasını <b>Fisher-Yates algoritmasını</b> kullanarak rastgele karıştırır ve karıştırılmış bir ICollection olarak geri döner.
         /// </summary>
         /// <typeparam name="T">Kaynağın eleman türü.</typeparam>
         /// <param name="source">Rastgele sıralanacak orijinal kaynak.</param>
         /// <returns>Karıştırılmış elemanları içeren yeni bir ICollection&lt;T&gt; örneği.</returns>
         /// <remarks>
-        /// Bu metot, verilen IEnumerable&lt;T&gt; kaynakdaki elemanların yerini <b>Fisher-Yates algoritması</b> ile rastgele değiştirir.
-        /// Karıştırılmış elemanları yeni bir ICollection&lt;T&gt; olarak döndürür.
-        /// &quot;Random.Shared&quot; ile tek bir Random örneği paylaşılır, bu da çoklu iş parçacıklı senaryolarda daha güvenilir bir kullanım sağlar.
+        /// Bu metot, verilen IEnumerable&lt;T&gt; kaynakdaki elemanların yerini <b>Fisher-Yates algoritması</b> ile rastgele değiştirir. Karıştırılmış elemanları yeni bir ICollection&lt;T&gt; olarak döndürür. &quot;Random.Shared&quot; ile tek bir Random örneği paylaşılır, bu da çoklu iş parçacıklı senaryolarda daha güvenilir bir kullanım sağlar.
         /// </remarks>
         public static ICollection<T> Shuffle<T>(this IEnumerable<T> source)
         {
@@ -210,6 +200,18 @@
                 r[j] = temp;
             }
             return r;
+        }
+        /// <summary>
+        /// Verilen asenkron sıralı enumerable (IAsyncEnumerable) koleksiyonundan ilk öğeyi döndürür. Koleksiyon boşsa, varsayılan değeri (default) döndürür. İşlem, verilen iptal token'ı ile iptal edilebilir.
+        /// </summary>
+        /// <typeparam name="T">Koleksiyondaki öğelerin türü.</typeparam>
+        /// <param name="source">İlk öğenin alınacağı asenkron sıralı enumerable koleksiyon.</param>
+        /// <param name="cancellationToken">Asenkron işlemi iptal etmek için kullanılan token.</param>
+        /// <returns>Koleksiyonun ilk öğesi veya koleksiyon boşsa varsayılan değer (default).</returns>
+        public static async Task<T> FirstOrDefaultFromAsyncEnumerable<T>(this IAsyncEnumerable<T> source, CancellationToken cancellationToken)
+        {
+            await foreach (var item in source.WithCancellation(cancellationToken)) { return item; }
+            return default;
         }
         #endregion
         #region ICollection
@@ -236,8 +238,7 @@
         /// <returns>Boş veya null ise <see langword="true"/>, aksi halde <see langword="false"/> döner.</returns>
         public static bool IsNullOrEmpty_collection<T>(this ICollection<T> values) => (values == null || values.Count == 0);
         /// <summary>
-        /// Başka bir koleksiyondan mevcut koleksiyona öğeleri topluca ekler. 
-        /// List&lt;T&gt; için optimize edilmiş bir yöntemdir.
+        /// Başka bir koleksiyondan mevcut koleksiyona öğeleri topluca ekler. List&lt;T&gt; için optimize edilmiş bir yöntemdir.
         /// </summary>
         /// <typeparam name="T">Koleksiyon tipi.</typeparam>
         /// <param name="initial">Öğelerin ekleneceği mevcut koleksiyon.</param>
@@ -250,38 +251,26 @@
                 else { foreach (var l in other) { initial.Add(l); } }
             }
         }
-        /// <summary>
-        /// Başka bir NameValueCollection&#39;dan mevcut NameValueCollection&#39;a tüm anahtarları ve değerleri ekler.
-        /// </summary>
-        /// <param name="initial">Anahtar-değer çiftlerini alacak mevcut NameValueCollection.</param>
-        /// <param name="other">Eklenecek anahtar-değer çiftlerini içeren diğer NameValueCollection.</param>
-        public static void AddAllKeysAndValues(this NameValueCollection initial, NameValueCollection other)
-        {
-            Guard.CheckNull(initial, nameof(initial));
-            if (other != null) { foreach (var item in other.AllKeys) { initial.Add(item, other[item]); } }
-        }
         #endregion
         #region string[]
         /// <summary>
         /// Hata mesajları dizisini iç içe geçmiş istisnalara dönüştürür.
-        /// Dizi boş ise bir <see cref="ArgumentNullException"/> döndürür.
         /// </summary>
         /// <param name="errors">Hata mesajlarının yer aldığı dizi.</param>
         /// <returns>İç içe geçmiş <see cref="Exception"/> nesnesi.</returns>
-        /// <exception cref="ArgumentNullException">Hata mesajları dizisi null veya boş olduğunda.</exception>
         public static Exception ToNestedException(this string[] errors)
         {
             errors = (errors ?? Array.Empty<string>()).Reverse().ToArray();
-            if (errors.Length == 0) { return new ArgumentNullException(nameof(errors)); }
-            Exception r = null;
-            var i = errors.Length - 1;
-            while (i >= 0)
+            if (errors.Length == 0) { return new Exception(); }
+            Exception _ex = null;
+            var _i = errors.Length - 1;
+            while (_i >= 0)
             {
-                if (r == null) { r = new Exception(errors[i]); }
-                else { r = new Exception(errors[i], r); }
-                i--;
+                if (_ex == null) { _ex = new Exception(errors[_i]); }
+                else { _ex = new Exception(errors[_i], _ex); }
+                _i--;
             }
-            return r;
+            return _ex;
         }
         #endregion
     }

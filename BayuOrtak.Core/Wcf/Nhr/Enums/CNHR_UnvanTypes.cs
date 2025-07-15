@@ -13,14 +13,14 @@
     /// Bu sınıf, personelin hangi unvanlara sahip olduğunu belirlemek ve bu unvanları
     /// yönetmek için gerekli yöntemleri sağlar.
     /// </summary>
-    public class CNHR_UnvanTypes : BaseEnum<CNHR_UnvanTypes.NHR_UnvanTypes>
+    public class CNhr_UnvanTypes : BaseEnum<CNhr_UnvanTypes.Nhr_UnvanTypes>
     {
         /// <summary>
         /// Personel unvan türlerini temsil eden bit alanı (flags) enumudur.
         /// Bu enum, farklı unvanların bir arada kullanılabilmesine olanak tanır.
         /// </summary>
         [Flags]
-        public enum NHR_UnvanTypes : byte
+        public enum Nhr_UnvanTypes : byte
         {
             /// <summary>
             /// Akademik unvanı temsil eder.
@@ -48,7 +48,7 @@
         /// </summary>
         /// <param name="wspersonel">Unvan türlerinin alınacağı personel nesnesi.</param>
         /// <returns>Personelin unvan türlerini temsil eden enum değerini döndürür.</returns>
-        public static NHR_UnvanTypes GetUnvanTypes(wspersonel wspersonel) => wspersonel.GetUnvanTypes();
+        public static Nhr_UnvanTypes GetUnvanTypes(wspersonel wspersonel) => wspersonel.GetUnvanTypes();
         /// <summary>
         /// Verilen unvan türünün açıklama metnini yerel dilde döndüren bir yöntem.
         /// </summary>
@@ -57,17 +57,17 @@
         /// <returns>Unvan türünün açıklama metnini döndürür.</returns>
         /// <exception cref="NotSupportedException">Desteklenmeyen bir enum değeri için fırlatılır.</exception>
         /// <exception cref="InvalidOperationException">Desteklenmeyen bir dil kodu için fırlatılır.</exception>
-        public static string GetDescriptionLocalizationValue(NHR_UnvanTypes value, string dil)
+        public static string GetDescriptionLocalizationValue(Nhr_UnvanTypes value, string dil)
         {
             Guard.UnSupportLanguage(dil, nameof(dil));
             if (dil == "tr") { return value.GetDescription(); }
             switch (value)
             {
-                case NHR_UnvanTypes.aka: return "Academic";
-                case NHR_UnvanTypes.ida: return "Administrative";
-                case NHR_UnvanTypes.soz: return "Contract";
-                case NHR_UnvanTypes.dig: return "Other";
-                default: throw _other.ThrowNotSupportedForEnum<NHR_UnvanTypes>();
+                case Nhr_UnvanTypes.aka: return "Academic";
+                case Nhr_UnvanTypes.ida: return "Administrative";
+                case Nhr_UnvanTypes.soz: return "Contract";
+                case Nhr_UnvanTypes.dig: return "Other";
+                default: throw _other.ThrowNotSupportedForEnum<Nhr_UnvanTypes>();
             }
         }
     }

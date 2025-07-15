@@ -18,14 +18,10 @@
             return (useragent.Contains("android") || useragent.Contains("iphone") || useragent.Contains("ipad") || useragent.Contains("mobile"));
         }
         /// <summary>
-        /// Geçerli HTTP isteğine ait tam URL&#39;yi (scheme ve host dahil) döndürür.
-        /// İsteğe bağlı olarak, URL&#39;ye yol (path) ve sorgu stringi (query string) de dahil edilebilir.
+        /// Geçerli HTTP isteğine ait tam URL&#39;yi (scheme ve host dahil) döndürür. İsteğe bağlı olarak, URL&#39;ye yol (path) ve sorgu stringi (query string) de dahil edilebilir.
         /// </summary>
         /// <param name="context">Geçerli HTTP isteğini içeren HttpContext.</param>
-        /// <param name="includesPathAndQueryString">
-        /// true ise, URL&#39;nin path ve query string bölümleri de dahil edilir; 
-        /// false ise, yalnızca scheme ve host kısmı döndürülür.
-        /// </param>
+        /// <param name="includesPathAndQueryString"><see langword="true"/> ise, URL&#39;nin path ve query string bölümleri de dahil edilir; <see langword="false"/> ise, yalnızca scheme ve host kısmı döndürülür.</param>
         /// <returns>Geçerli isteğe ait tam bir Uri nesnesi.</returns>
         public static Uri ToAbsoluteUri(this HttpContext context, bool includesPathAndQueryString)
         {

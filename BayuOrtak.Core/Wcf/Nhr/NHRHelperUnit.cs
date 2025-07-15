@@ -1,6 +1,7 @@
 ﻿namespace BayuOrtak.Core.Wcf.Nhr
 {
     using BayuOrtak.Core.Extensions;
+    using BayuOrtak.Core.Helper;
     using BayuOrtak.Core.Interface;
     using System;
     using System.ServiceModel;
@@ -37,7 +38,11 @@
                 return _Client;
             }
         }
-        public async Task<bool> IsConnectionStatusAsync(TimeSpan timeout, CancellationToken cancellationToken = default) => !(await this.client.Endpoint.Address.Uri.IsConnectionStatusAsync(timeout, cancellationToken)).statuswarning;
+        public async Task<(bool statuswarning, string error)> IsConnectionStatusAsync(TimeSpan timeout, string dil, CancellationToken cancellationToken)
+        {
+            var _t = await this.client.Endpoint.Address.Uri.IsConnectionStatusAsync(timeout, cancellationToken);
+            return (_t.statuswarning, _t.statuswarning ? GlobalConstants.webservice_connectionwarning(dil, "NHR Unit") : "");
+        }
         private async Task<wsnode[]> birimagacibytypeAsync(int typeid) => (await this.client.birimagacibytypeAsync(this.username, this.password, typeid)).@return;
         public Task<wsnode[]> birimagacibytypeAsync_akademik() => this.birimagacibytypeAsync(1);
         public Task<wsnode[]> birimagacibytypeAsync_idari() => this.birimagacibytypeAsync(2);

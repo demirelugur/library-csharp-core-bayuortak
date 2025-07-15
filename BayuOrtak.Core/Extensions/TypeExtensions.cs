@@ -1,5 +1,6 @@
 ﻿namespace BayuOrtak.Core.Extensions
 {
+    using BayuOrtak.Core.Helper;
     using BayuOrtak.Core.Helper.Results;
     using Microsoft.AspNetCore.Mvc;
     using System;
@@ -22,8 +23,7 @@
         /// <returns>Özel sınıf ise <see langword="true"/>, değilse <see langword="false"/> döner.</returns>
         public static bool IsCustomClass(this Type type) => (type != null && type.IsClass && type != typeof(string) && !type.IsArray && !typeof(Delegate).IsAssignableFrom(type) && !type.IsInterface);
         /// <summary>
-        /// Belirtilen tür için tablo adını döner.
-        /// İsteğe bağlı olarak köşeli parantezleri kullanabilir.
+        /// Belirtilen tür için tablo adını döner. İsteğe bağlı olarak köşeli parantezleri kullanabilir.
         /// </summary>
         /// <param name="type">Tablo adını alınacak tür.</param>
         /// <param name="isSquareBrackets">Köşeli parantezlerin kullanılıp kullanılmayacağı.</param>
@@ -31,6 +31,7 @@
         /// <returns>Tablo adı.</returns>
         public static string GetTableName(this Type type, bool isSquareBrackets, string schemaDefaultValue = "dbo")
         {
+            Guard.CheckNull(type, nameof(type));
             if (type.IsCustomClass())
             {
                 string ret;
@@ -55,7 +56,7 @@
         /// <returns>Denetleyici adı.</returns>
         public static string GetControllerName(this Type type)
         {
-            if (type == null) { return ""; }
+            Guard.CheckNull(type, nameof(type));
             return (typeof(Controller).IsAssignableFrom(type) ? type.Name.Replace(nameof(Controller), "") : "");
         }
         /// <summary>
@@ -63,7 +64,11 @@
         /// </summary>
         /// <param name="type">Özellikleri alınacak tür.</param>
         /// <returns>Tüm özelliklerin dizisi.</returns>
-        public static PropertyInfo[] GetAllProperties(this Type type) => (type.IsInterface ? type.GetInterfaces().Concat(new Type[] { type }).SelectMany(x => x.GetProperties()).ToArray() : type.GetProperties());
+        public static PropertyInfo[] GetAllProperties(this Type type)
+        {
+            Guard.CheckNull(type, nameof(type));
+            return (type.IsInterface ? type.GetInterfaces().Concat(new Type[] { type }).SelectMany(x => x.GetProperties()).ToArray() : type.GetProperties());
+        }
         /// <summary>
         /// Belirtilen tür için açıklama döner.
         /// </summary>
@@ -71,7 +76,7 @@
         /// <returns>Açıklama metni.</returns>
         public static string GetDescription(this Type type)
         {
-            if (type == null) { return ""; }
+            Guard.CheckNull(type, nameof(type));
             return _try.TryCustomAttribute(type, out DescriptionAttribute _de) ? _de.Description : "";
         }
         /// <summary>
@@ -81,10 +86,10 @@
         /// <returns>Enum sonuçları dizisi.</returns>
         public static EnumResult[] ToEnumArray(this Type type) => Enum.GetNames(type).Select((enumName, i) => new EnumResult(Convert.ToInt64(Enum.GetValues(type).GetValue(i)), enumName, _try.TryCustomAttribute(type.GetField(enumName), out DescriptionAttribute _outvalue) ? _outvalue.Description : "")).ToArray();
         /// <summary>
-        /// Belirtilen türün haritalanmış bir tablo olup olmadığını kontrol eder.
+        /// Verilen türün (Type) bir tabloya eşlendiğini kontrol eder. Türün, <see cref="TableAttribute"/> ile işaretlenmiş olup olmadığını kontrol ederek tabloya eşlenip eşlenmediğini döndürür.
         /// </summary>
         /// <param name="type">Kontrol edilecek tür.</param>
-        /// <returns>Haritalanmış bir tablo ise <see langword="true"/>, değilse <see langword="false"/> döner.</returns>
-        public static bool IsMappedTable(this Type type) => (type != null && type.IsCustomClass() && _try.TryCustomAttribute(type, out TableAttribute _));
+        /// <returns>Tür bir tabloya eşlenmişse <see langword="true"/>, değilse <see langword="false"/> döner.</returns>
+        public static bool IsMappedTable(this Type type) => type != null && _try.TryCustomAttribute(type, out TableAttribute _);
     }
 }

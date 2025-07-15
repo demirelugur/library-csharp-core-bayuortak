@@ -7,28 +7,36 @@
     <IsPackable>true</IsPackable>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\BayuOrtak.Core.xml</DocumentationFile>
+	  <VersionXmlContent>$([System.IO.File]::ReadAllText('$(MSBuildThisFileDirectory)nuget\version.xml'))</VersionXmlContent>
+	  <Version>$([System.Text.RegularExpressions.Regex]::Match($(VersionXmlContent), '<version>(.*)</version>').Groups[1].Value)</Version>
+	  <FileVersion>$([System.Text.RegularExpressions.Regex]::Match($(VersionXmlContent), '<version>(.*)</version>').Groups[1].Value)</FileVersion>
+	  <AssemblyVersion>$([System.Text.RegularExpressions.Regex]::Match($(VersionXmlContent), '<version>(.*)</version>').Groups[1].Value)</AssemblyVersion>
+	  <PackageReadmeFile>README.md</PackageReadmeFile>
+	  <PackageIcon>icon.png</PackageIcon>
+	  <Description>T.C. Bayburt Üniversitesi Web Servis İşlemleri, LDAP, Yardımcı Foksiyonlar</Description>
+	  <Authors>Uğur DEMİREL</Authors>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Bogus" Version="35.6.3" />
     <PackageReference Include="Dapper" Version="2.1.66" />
     <PackageReference Include="Dapper.SqlBuilder" Version="2.1.66" />
     <PackageReference Include="HtmlSanitizer" Version="9.0.886" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="9.0.6" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.6" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.6">
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="9.0.7" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.7" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.7">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="9.0.6" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.6" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.6">
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="9.0.7" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.7" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.7">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="System.DirectoryServices" Version="9.0.6" />
-    <PackageReference Include="System.DirectoryServices.AccountManagement" Version="9.0.6" />
-    <PackageReference Include="System.DirectoryServices.Protocols" Version="9.0.6" />
-    <PackageReference Include="System.Drawing.Common" Version="9.0.6" />
+    <PackageReference Include="System.DirectoryServices" Version="9.0.7" />
+    <PackageReference Include="System.DirectoryServices.AccountManagement" Version="9.0.7" />
+    <PackageReference Include="System.DirectoryServices.Protocols" Version="9.0.7" />
+    <PackageReference Include="System.Drawing.Common" Version="9.0.7" />
     <PackageReference Include="System.ServiceModel.Duplex" Version="6.0.*" />
     <PackageReference Include="System.ServiceModel.Federation" Version="8.1.2" />
     <PackageReference Include="System.ServiceModel.Http" Version="8.1.2" />

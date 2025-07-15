@@ -16,8 +16,7 @@
         /// <returns>En içteki istisna.</returns>
         public static Exception InnerEx(this Exception exception) => (exception.InnerException == null ? exception : exception.InnerException.InnerEx());
         /// <summary>
-        /// Verilen bir istisna (exception) nesnesine göre uygun HTTP durum kodunu döndüren bir genişletme yöntemidir.
-        /// Belirli istisna türleri için önceden tanımlı HTTP durum kodları eşleştirilir; eşleşme bulunamazsa varsayılan durum kodu döndürülür.
+        /// Verilen bir istisna (exception) nesnesine göre uygun HTTP durum kodunu döndüren bir genişletme yöntemidir. Belirli istisna türleri için önceden tanımlı HTTP durum kodları eşleştirilir; eşleşme bulunamazsa varsayılan durum kodu döndürülür.
         /// </summary>
         /// <param name="exception">HTTP durum kodunun belirleneceği istisna nesnesi.</param>
         /// <param name="defaultValue">Eşleşen bir durum kodu bulunamazsa döndürülecek varsayılan HTTP durum kodu (varsayılan olarak <see cref="HttpStatusCode.InternalServerError"/>).</param>
@@ -44,8 +43,7 @@
             return defaultValue;
         }
         /// <summary>
-        /// Belirtilen hatanın ve varsa iç içe geçmiş tüm hata nesnelerinin bir yığın (Stack) olarak döndürülmesini sağlar.
-        /// Bu yöntem, hata zincirindeki tüm Exception nesnelerini elde etmenize olanak tanır.
+        /// Belirtilen hatanın ve varsa iç içe geçmiş tüm hata nesnelerinin bir yığın (Stack) olarak döndürülmesini sağlar. Bu yöntem, hata zincirindeki tüm Exception nesnelerini elde etmenize olanak tanır.
         /// </summary>
         /// <param name="exception">Kök hata (Exception) nesnesi.</param>
         /// <returns>Exception nesnelerinden oluşan bir yığın (Stack).</returns>
@@ -60,8 +58,7 @@
             return r;
         }
         /// <summary>
-        /// Belirtilen hatanın ve varsa iç içe geçmiş tüm hata nesnelerinin mesajlarını bir dizi (string[]) olarak döndürür.
-        /// Bu yöntem, hata zincirindeki her bir Exception nesnesinin mesajına erişim sağlar.
+        /// Belirtilen hatanın ve varsa iç içe geçmiş tüm hata nesnelerinin mesajlarını bir dizi (string[]) olarak döndürür. Bu yöntem, hata zincirindeki her bir Exception nesnesinin mesajına erişim sağlar.
         /// </summary>
         /// <param name="exception">Kök hata (Exception) nesnesi.</param>
         /// <returns>Hata mesajlarından oluşan bir string dizisi.</returns>

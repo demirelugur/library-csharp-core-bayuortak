@@ -25,9 +25,9 @@
         /// <returns>Başarı durumu veya hata sonucu.</returns>
         protected override ValidationResult IsValid(object value, ValidationContext validationContext)
         {
-            var jsonData = value.ToStringOrEmpty();
+            var _jsondata = value.ToStringOrEmpty();
             var r = validationContext.IsRequiredAttribute();
-            if (_try.TryJson(jsonData, this.tokenType, out JToken _jt))
+            if (_try.TryJson(_jsondata, this.tokenType, out JToken _jt))
             {
                 if (_jt.Children().Any())
                 {
@@ -40,7 +40,7 @@
                     return ValidationResult.Success;
                 }
             }
-            if (!r && jsonData == "")
+            if (!r && _jsondata == "")
             {
                 validationContext.SetValidatePropertyValue(null);
                 return ValidationResult.Success;

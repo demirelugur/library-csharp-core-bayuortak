@@ -16,8 +16,7 @@
             this.bitdate = (bitdate == null ? DateTime.Today : _to.ToDateTimeFromObject(bitdate, default));
         }
         /// <summary>
-        /// İki tarih arasındaki farkı hesaplar.
-        /// Fark, yıl, ay, gün ve zaman aralığı olarak döner.
+        /// İki tarih arasındaki farkı hesaplar. Fark, yıl, ay, gün ve zaman aralığı olarak döner.
         /// </summary>
         public (int yil, int ay, int gun, TimeSpan ts) CalculateDateDifference()
         {

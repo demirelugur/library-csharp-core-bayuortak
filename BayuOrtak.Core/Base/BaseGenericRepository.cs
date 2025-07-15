@@ -15,10 +15,10 @@
     {
         TContext Context { get; }
         DbSet<T> DbSet { get; }
-        Task DeleteAsync(T entity, CancellationToken cancellationToken = default);
+        Task DeleteAsync(T entity, CancellationToken cancellationToken);
         Task DeleteByKeyAsync(CancellationToken cancellationToken, params object[] keyValues);
-        Task DeleteByPredicateAsync(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken = default);
-        Task DeleteRangeAsync(IEnumerable<T> entities, CancellationToken cancellationToken = default);
+        Task DeleteByPredicateAsync(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken);
+        Task DeleteRangeAsync(IEnumerable<T> entities, CancellationToken cancellationToken);
     }
     /// <summary>
     /// Generic bir repository&#39;nin temel implementasyonu.
@@ -33,7 +33,7 @@
         }
         public TContext Context { get; }
         public DbSet<T> DbSet => this.Context.Set<T>();
-        public virtual Task DeleteAsync(T entity, CancellationToken cancellationToken = default) // Not: cancellationToken kullanılmasa da, override edilen yerlerde gerektiğinde kullanılabilmesi için eklenmesi gerekiyor.
+        public virtual Task DeleteAsync(T entity, CancellationToken cancellationToken) // Not: cancellationToken kullanılmasa da, override edilen yerlerde gerektiğinde kullanılabilmesi için eklenmesi gerekiyor.
         {
             if (entity != null)
             {
@@ -43,7 +43,7 @@
             return Task.CompletedTask;
         }
         public async Task DeleteByKeyAsync(CancellationToken cancellationToken, params object[] keyValues) => await this.DeleteAsync(await this.DbSet.FindAsync(keyValues, cancellationToken), cancellationToken);
-        public async Task DeleteByPredicateAsync(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken = default) => await this.DeleteRangeAsync(await this.DbSet.Where(predicate).ToArrayAsync(cancellationToken), cancellationToken);
-        public Task DeleteRangeAsync(IEnumerable<T> entities, CancellationToken cancellationToken = default) => Task.WhenAll(entities.Select(x => this.DeleteAsync(x, cancellationToken)).ToArray());
+        public async Task DeleteByPredicateAsync(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken) => await this.DeleteRangeAsync(await this.DbSet.Where(predicate).ToArrayAsync(cancellationToken), cancellationToken);
+        public Task DeleteRangeAsync(IEnumerable<T> entities, CancellationToken cancellationToken) => Task.WhenAll(entities.Select(x => this.DeleteAsync(x, cancellationToken)).ToArray());
     }
 }

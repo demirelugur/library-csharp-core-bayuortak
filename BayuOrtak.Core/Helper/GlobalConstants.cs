@@ -5,7 +5,7 @@
     using System.Globalization;
     public sealed class GlobalConstants
     {
-        public const long yoksis_UNI_code = 104922;
+        public const long yoksis_UNI_code = 104922; // T.C. Bayburt Üniversitesi YÖKSİS Kurum Kodu
         public static readonly string[] filesizeunits = new string[] { "bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB" };
         public static readonly char[] turkishcharacters = new char[] { 'Ç', 'ç', 'Ğ', 'ğ', 'İ', 'ı', 'Ö', 'ö', 'Ş', 'ş', 'Ü', 'ü' };
         public static readonly JsonSerializerSettings jsonserializersettings = new JsonSerializerSettings
@@ -19,7 +19,7 @@
             }
         };
         /// <summary>
-        /// image/* uzantı değerleri:
+        /// <c>image/*</c> uzantı değerleri:
         /// <para><code>new string[] { &quot;.apng&quot;, &quot;.avif&quot;, &quot;.bmp&quot;, &quot;.dib&quot;, &quot;.gif&quot;, &quot;.heic&quot;, &quot;.heif&quot;, &quot;.ico&quot;, &quot;.jfif&quot;, &quot;.jpeg&quot;, &quot;.jpg&quot;, &quot;.pbm&quot;, &quot;.pgm&quot;, &quot;.pjp&quot;, &quot;.pjpeg&quot;, &quot;.png&quot;, &quot;.ppm&quot;, &quot;.svg&quot;, &quot;.svgz&quot;, &quot;.tif&quot;, &quot;.tiff&quot;, &quot;.webp&quot;, &quot;.xbm&quot; };</code></para>
         /// </summary>
         public static readonly string[] imageextensions = new string[] { ".apng", ".avif", ".bmp", ".dib", ".gif", ".heic", ".heif", ".ico", ".jfif", ".jpeg", ".jpg", ".pbm", ".pgm", ".pjp", ".pjpeg", ".png", ".ppm", ".svg", ".svgz", ".tif", ".tiff", ".webp", ".xbm" };
@@ -58,7 +58,7 @@
         public sealed class _maximumlength
         {
             public const int cuzdanserino = 9;
-            public const int ebyscode = 21;
+            public const int ebyscode = 16;
             public const int eposta = 50;
             public const int hash = 64;
             public const int ipaddress = 15;
@@ -128,6 +128,11 @@
             public const string stringlength_max = "{0}, en fazla {1} karakter uzunluğunda olmalıdır."; // {1} -> maksimum
             public const string stringlength_maxmin = "{0}, en az {2}, en fazla {1} karakter uzunluğunda olmalıdır!";  // {1} -> maksimum, {2} -> minimum
             public const string stringlength_maxminequal = "{0}, tam olarak {1} karakter uzunluğunda olmalıdır!"; // {1} -> maksimum
+        }
+        internal static string webservice_connectionwarning(string dil, string argument)
+        {
+            Guard.UnSupportLanguage(dil, nameof(dil));
+            return String.Format((dil == "en" ? "There was a problem connecting to the \"{0}\" web service!" : "\"{0}\" web servisine bağlanırken bir sorun oluştu!"), argument);
         }
     }
 }

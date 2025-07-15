@@ -45,7 +45,7 @@ if (match.Success)
        version = x.Attribute("Version")?.Value
    }).Where(x => !String.IsNullOrEmpty(x.include) && !String.IsNullOrEmpty(x.version)).ToArray()) { s.Add($"<dependency id=\"{item.include}\" version=\"{item.version.Replace(".*", ".0")}\" exclude=\"Build,Analyzers\" />"); }
    dependencies = String.Join("\n", s);
-   File.WriteAllText(outputFilePath, $"<?xml version=\"1.0\" encoding=\"utf-8\"?><main><version>{version}</version></main>");
+   File.WriteAllText(outputFilePath, $"<version>{version}</version>");
    //WriteLine("<!-- Lorem Ipsum -->");
 }
 #>

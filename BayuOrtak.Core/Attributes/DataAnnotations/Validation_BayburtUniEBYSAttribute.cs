@@ -32,7 +32,7 @@
                 validationContext.SetValidatePropertyValue(_ebys);
                 return ValidationResult.Success;
             }
-            if (!validationContext.IsRequiredAttribute() && ebys == "")
+            if (ebys == "" && !validationContext.IsRequiredAttribute())
             {
                 validationContext.SetValidatePropertyValue(null);
                 return ValidationResult.Success;

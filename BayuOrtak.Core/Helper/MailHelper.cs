@@ -73,7 +73,7 @@
             this.attachments = attachments ?? Array.Empty<Attachment>();
             this.priority = priority;
         }
-        private void validation()
+        private void guardvalidation()
         {
             Guard.CheckEmpty(this.subject, nameof(this.subject));
             Guard.CheckEmpty(this.body, nameof(this.body));
@@ -83,34 +83,27 @@
         /// <summary>
         /// Yapılandırılmış <see cref="MailMessage"/> nesnesini kullanarak asenkron olarak e-Posta gönderir. Bu metod, belirtilen SMTP ayarlarını kullanarak e-Posta gönderim işlemini gerçekleştirir.
         /// </summary>
-        public async Task SendAsync(SmtpSettingsHelper smtp, CancellationToken cancellationToken = default)
-        {
-            smtp = smtp ?? new SmtpSettingsHelper();
-            this.validation();
-            if (_try.TryWarningValidateObject(smtp, out string[] _errors)) { throw _errors.ToNestedException(); }
-            using (var mm = new MailMessage())
-            {
-                mm.Subject = this.subject;
-                mm.Body = this.body;
-                mm.IsBodyHtml = this.isbodyhtml;
-                mm.Priority = this.priority;
-                mm.From = new MailAddress(smtp.email);
-                foreach (var item in this.tos) { mm.To.Add(item); }
-                foreach (var item in this.ccs) { mm.CC.Add(item); }
-                foreach (var item in this.bccs) { mm.Bcc.Add(item); }
-                foreach (var item in this.attachments) { mm.Attachments.Add(item); }
-                await smtp.toSmtpClient().SendMailAsync(mm, cancellationToken);
-            }
-        }
-        /// <summary>
-        /// Belirtilen SMTP ayarlarını kullanarak bir e-Posta gönderir ve işlem sonucunu döndürür.
-        /// </summary>
-        public async Task<(bool statuswarning, Exception ex)> SendAsync_record(SmtpSettingsHelper smtp, CancellationToken cancellationToken = default)
+        public async Task<(bool statuswarning, Exception ex)> SendAsync(SmtpSettingsHelper smtp, CancellationToken cancellationToken)
         {
             try
             {
-                await this.SendAsync(smtp, cancellationToken);
-                return (false, default);
+                smtp = smtp ?? new SmtpSettingsHelper();
+                this.guardvalidation();
+                if (_try.TryWarningValidateObject(smtp, out string[] _errors)) { throw _errors.ToNestedException(); }
+                using (var mm = new MailMessage())
+                {
+                    mm.Subject = this.subject;
+                    mm.Body = this.body;
+                    mm.IsBodyHtml = this.isbodyhtml;
+                    mm.Priority = this.priority;
+                    mm.From = new MailAddress(smtp.email);
+                    foreach (var item in this.tos) { mm.To.Add(item); }
+                    foreach (var item in this.ccs) { mm.CC.Add(item); }
+                    foreach (var item in this.bccs) { mm.Bcc.Add(item); }
+                    foreach (var item in this.attachments) { mm.Attachments.Add(item); }
+                    await smtp.toSmtpClient().SendMailAsync(mm, cancellationToken);
+                    return (false, default);
+                }
             }
             catch (Exception ex) { return (true, ex); }
         }

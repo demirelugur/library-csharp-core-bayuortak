@@ -23,13 +23,13 @@
         /// <returns>Geçerli ise <see cref="ValidationResult.Success"/>; aksi takdirde hata mesajı ile birlikte <see cref="ValidationResult"/> döner.</returns>
         protected override ValidationResult IsValid(object value, ValidationContext validationContext)
         {
-            var isbn = value.ToStringOrEmpty();
+            var isbn = value.ToStringOrEmpty().ToUpper();
             if (ISBNHelper.IsValid(isbn))
             {
                 validationContext.SetValidatePropertyValue(isbn);
                 return ValidationResult.Success;
             }
-            if (!validationContext.IsRequiredAttribute() && isbn == "")
+            if (isbn == "" && !validationContext.IsRequiredAttribute())
             {
                 validationContext.SetValidatePropertyValue(null);
                 return ValidationResult.Success;

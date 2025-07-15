@@ -1,6 +1,7 @@
 ﻿namespace BayuOrtak.Core.Wcf.Yoksis
 {
     using BayuOrtak.Core.Extensions;
+    using BayuOrtak.Core.Helper;
     using BayuOrtak.Core.Interface;
     using BayuOrtak.Core.Wcf.Yoksis.Helper;
     using System;
@@ -35,7 +36,11 @@
                 return _Client;
             }
         }
-        public async Task<bool> IsConnectionStatusAsync(TimeSpan timeout, CancellationToken cancellationToken = default) => !(await this.client.Endpoint.Address.Uri.IsConnectionStatusAsync(timeout, cancellationToken)).statuswarning;
+        public async Task<(bool statuswarning, string error)> IsConnectionStatusAsync(TimeSpan timeout, string dil, CancellationToken cancellationToken)
+        {
+            var _t = await this.client.Endpoint.Address.Uri.IsConnectionStatusAsync(timeout, cancellationToken);
+            return (_t.statuswarning, _t.statuswarning ? GlobalConstants.webservice_connectionwarning(dil, "YÖKSİS, DocentlikBilgi") : "");
+        }
         public async Task<DocentlikBilgiResponse> DocentlikBilgiAsync(long tckn) => (await this.client.DocentlikBilgiAsync(new DocentlikBilgiRequestType
         {
             TcKimlikNo = tckn

@@ -35,7 +35,7 @@
         /// <summary>
         /// Belirtilen dosyalar yüklenmeden önce, varsa önce silinmesi gereken klasörler ve ardından silinmesi gereken dosyalar kaldırılır.
         /// </summary>
-        public async Task ProcessFileUploadsAndDeletionsAsync(CancellationToken cancellationToken = default)
+        public async Task ProcessFileUploadsAndDeletionsAsync(CancellationToken cancellationToken)
         {
             var delFileAny = this._delFiles.Count > 0;
             var addFileAny = this._addFiles.Count > 0;

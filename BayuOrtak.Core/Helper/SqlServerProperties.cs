@@ -5,9 +5,6 @@
     using System.Linq;
     public sealed class SqlServerProperties : IDisposable
     {
-        /// <summary>
-        /// Sınıf örneğinin kaynaklarını serbest bırakır.
-        /// </summary>
         public void Dispose() { GC.SuppressFinalize(this); }
         /// <summary>
         /// SQL Server ürün versiyonunu alır veya ayarlar.
@@ -49,16 +46,24 @@
         /// SQL Server için LCID (Locale Identifier) değerini alır veya ayarlar.
         /// </summary>
         public int? lcid { get; set; }
+        public SqlServerProperties() : this("", "", "", "", "", "", "", "", "", default) { }
+        public SqlServerProperties(string productversion, string productlevel, string edition, string buildclrversion, string collation, string servername, string instancename, string instancedefaultdatapath, string instancedefaultlogpath, int? lcid)
+        {
+            this.productversion = productversion;
+            this.productlevel = productlevel;
+            this.edition = edition;
+            this.buildclrversion = buildclrversion;
+            this.collation = collation;
+            this.servername = servername;
+            this.instancename = instancename;
+            this.instancedefaultdatapath = instancedefaultdatapath;
+            this.instancedefaultlogpath = instancedefaultlogpath;
+            this.lcid = lcid;
+        }
         /// <summary>
-        /// Yeni bir SqlServerProperties nesnesi oluşturur.
-        /// </summary>
-        public SqlServerProperties() { }
-        /// <summary>
-        /// SQL Server özelliklerini almak için gerekli SQL sorgusunu oluşturur.
-        /// Bu sorgu, sınıfın özelliklerini temsil eden SQL Server sistem işlevlerini kullanır.
-        /// 
-        /// Örnek Sorgu:
+        /// SQL Server özelliklerini almak için gerekli SQL sorgusunu oluşturur. Bu sorgu, sınıfın özelliklerini temsil eden SQL Server sistem işlevlerini kullanır.
         /// <code>
+        /// Örnek Sorgu:
         /// SELECT SERVERPROPERTY(&#39;productversion&#39;) AS [productversion],
         ///        SERVERPROPERTY(&#39;productlevel&#39;) AS [productlevel],
         ///        SERVERPROPERTY(&#39;edition&#39;) AS [edition],
@@ -70,8 +75,6 @@
         ///        SERVERPROPERTY(&#39;instancedefaultlogpath&#39;) AS [instancedefaultlogpath],
         ///        SERVERPROPERTY(&#39;lcid&#39;) AS [lcid]
         /// </code>
-        /// 
-        /// Bu sorgu, SQL Server&#39;ın çeşitli özelliklerini almak için kullanılabilir.
         /// </summary>
         /// <returns>SQL Server&#39;dan alınacak özellikleri içeren bir SQL sorgusu.</returns>
         public static string query()

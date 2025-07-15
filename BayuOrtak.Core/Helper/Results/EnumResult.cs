@@ -6,26 +6,12 @@
     public class EnumResult : IEquatable<EnumResult>
     {
         #region Equals
-        /// <summary>
-        /// Enum değerinin eşitliğini kontrol eder.
-        /// </summary>
-        /// <param name="other">Karşılaştırılacak diğer <see cref="EnumResult"/> nesnesi.</param>
-        /// <returns>Eşitlik durumu.</returns>
         public override bool Equals(object other) => this.Equals(other as EnumResult);
-        /// <summary>
-        /// Hash kodunu döndürür.
-        /// </summary>
-        /// <returns>Hash kodu.</returns>
         public override int GetHashCode() => HashCode.Combine(this.vl, this.tx, this.desc);
-        /// <summary>
-        /// Başka bir <see cref="EnumResult"/> nesnesiyle eşitliği kontrol eder.
-        /// </summary>
-        /// <param name="other">Karşılaştırılacak diğer <see cref="EnumResult"/> nesnesi.</param>
-        /// <returns>Eşitlik durumu.</returns>
         public bool Equals(EnumResult other)
         {
-            if (other == null) { return false; }
-            return (this.vl == other.vl && this.tx == other.tx && this.desc == other.desc);
+            if (other is EnumResult _er) { return this.vl == _er.vl && this.tx == _er.tx && this.desc == _er.desc; }
+            return false;
         }
         #endregion
         /// <summary>
@@ -41,19 +27,10 @@
         /// </summary>
         public string desc { get; }
         /// <summary>
-        /// Enum açıklamasını SEO dostu bir dizeye dönüştürür.
+        /// <see cref="desc"/> değerinin SEO dostu bir dizeye dönüştürür.
         /// </summary>
         public string descseo => this.desc.ToSeoFriendly();
-        /// <summary>
-        /// Yeni bir <see cref="EnumResult"/> nesnesi oluşturur. Varsayılan değerlerle başlatılır.
-        /// </summary>
         public EnumResult() : this(default, "", "") { }
-        /// <summary>
-        /// Belirtilen değerle birlikte yeni bir <see cref="EnumResult"/> nesnesi oluşturur.
-        /// </summary>
-        /// <param name="vl">Enum değerinin sayısal karşılığı.</param>
-        /// <param name="tx">Enum değerinin metin karşılığı.</param>
-        /// <param name="desc">Enum değerinin açıklaması.</param>
         public EnumResult(long vl, string tx, string desc)
         {
             this.vl = vl;

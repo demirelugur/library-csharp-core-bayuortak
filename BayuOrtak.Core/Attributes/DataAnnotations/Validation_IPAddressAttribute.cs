@@ -33,7 +33,7 @@
                 validationContext.SetValidatePropertyValue(ipaddress.MapToIPv4().ToString());
                 return ValidationResult.Success;
             }
-            if (!validationContext.IsRequiredAttribute() && ip == "")
+            if (ip == "" && !validationContext.IsRequiredAttribute())
             {
                 validationContext.SetValidatePropertyValue(null);
                 return ValidationResult.Success;

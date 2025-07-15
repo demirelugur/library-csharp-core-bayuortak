@@ -27,10 +27,9 @@
         /// <returns>Geçerli bir <see cref="DateTime"/> nesnesi veya varsayılan <see cref="DateTime"/> değeri.</returns>
         public static DateTime ToDate(this string value) => value.ParseOrDefault<DateTime>();
         /// <summary>
-        /// Verilen telefon numarasını Türk telefon biçime dönüştürür.
+        /// Verilen telefon numarasını Türk telefon biçime dönüştürür. Eğer telefon numarası geçerli bir Türk telefon numarası değilse, boş bir string döner.
         /// <para>Biçim: (###) ###-####</para>
         /// <para>Örneğin: &quot;5001112233&quot; girişi &quot;(500) 111-2233&quot; biçiminde döner.</para>
-        /// Eğer telefon numarası geçerli bir Türk telefon numarası değilse, boş bir string döner.
         /// </summary>
         /// <param name="phoneNumberTR">Dönüştürülmek istenen telefon numarası.</param>
         /// <returns>Biçimlenmiş Türk telefon numarası ya da geçerli değilse boş bir string.</returns>
@@ -150,8 +149,7 @@
             return value;
         }
         /// <summary>
-        /// Verilen string içindeki tab (\t), satır başı (\r) ve yeni satır (\n) karakterlerini tek boşlukla değiştirir,
-        /// baştaki ve sondaki boşlukları temizler ve birden fazla boşluğu tek boşluğa indirger.
+        /// Verilen string içindeki tab (\t), satır başı (\r) ve yeni satır (\n) karakterlerini tek boşlukla değiştirir, baştaki ve sondaki boşlukları temizler ve birden fazla boşluğu tek boşluğa indirger.
         /// </summary>
         /// <param name="value">İşlenecek string değer.</param>
         /// <returns>Düzenlenmiş string.</returns>
@@ -253,8 +251,7 @@
             return sb.ToString();
         }
         /// <summary>
-        /// Verilen bir dizeyi, belirtilen türde bir değere dönüştürür.
-        /// Dönüşüm başarısız olursa, varsayılan değeri döner.
+        /// Verilen bir dizeyi, belirtilen türde bir değere dönüştürür. Dönüşüm başarısız olursa, varsayılan değeri döner.
         /// </summary>
         /// <typeparam name="TKey">Dönüşüm yapılacak hedef tür.</typeparam>
         /// <param name="value">Dönüştürülecek dize değeri.</param>

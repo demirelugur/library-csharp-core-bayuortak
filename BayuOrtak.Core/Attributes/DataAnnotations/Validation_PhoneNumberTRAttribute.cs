@@ -27,7 +27,7 @@
                 validationContext.SetValidatePropertyValue(_phoneTR);
                 return ValidationResult.Success;
             }
-            if (!validationContext.IsRequiredAttribute() && phoneTR == "")
+            if (phoneTR == "" && !validationContext.IsRequiredAttribute())
             {
                 validationContext.SetValidatePropertyValue(null);
                 return ValidationResult.Success;

@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.11.35312.102
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestUI", "TestUI\TestUI.csproj", "{BFF7FA1F-C85B-4640-AD45-98CCE036EABF}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BayuOrtak.Core", "BayuOrtak.Core\BayuOrtak.Core.csproj", "{5701CE24-1A4F-48C8-B017-F61DC38FD57E}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{CA724AD6-AAC1-47E3-97B2-415CC3002CD0}"
@@ -12,7 +10,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.editorconfig = .editorconfig
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BackupYukle", "BackupYukle\BackupYukle.csproj", "{7F184DD1-68A2-4078-8938-4CD43951586E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BayuOrtak.Core.UnitTest", "BayuOrtak.Core.UnitTest\BayuOrtak.Core.UnitTest.csproj", "{0E5080CF-CCDC-4D26-8DF8-FC5439808ED8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -20,18 +18,14 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{BFF7FA1F-C85B-4640-AD45-98CCE036EABF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{BFF7FA1F-C85B-4640-AD45-98CCE036EABF}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{BFF7FA1F-C85B-4640-AD45-98CCE036EABF}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{BFF7FA1F-C85B-4640-AD45-98CCE036EABF}.Release|Any CPU.Build.0 = Release|Any CPU
 		{5701CE24-1A4F-48C8-B017-F61DC38FD57E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{5701CE24-1A4F-48C8-B017-F61DC38FD57E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5701CE24-1A4F-48C8-B017-F61DC38FD57E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5701CE24-1A4F-48C8-B017-F61DC38FD57E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{7F184DD1-68A2-4078-8938-4CD43951586E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{7F184DD1-68A2-4078-8938-4CD43951586E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{7F184DD1-68A2-4078-8938-4CD43951586E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{7F184DD1-68A2-4078-8938-4CD43951586E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0E5080CF-CCDC-4D26-8DF8-FC5439808ED8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0E5080CF-CCDC-4D26-8DF8-FC5439808ED8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0E5080CF-CCDC-4D26-8DF8-FC5439808ED8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0E5080CF-CCDC-4D26-8DF8-FC5439808ED8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

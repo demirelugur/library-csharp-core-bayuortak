@@ -1,6 +1,7 @@
 ﻿namespace BayuOrtak.Core.Wcf.Yoksis
 {
     using BayuOrtak.Core.Extensions;
+    using BayuOrtak.Core.Helper;
     using BayuOrtak.Core.Interface;
     using BayuOrtak.Core.Wcf.Yoksis.Helper;
     using System;
@@ -31,7 +32,6 @@
         Task<getSanatsalFaalV1Response> Get_SanatsalFaalV1Async(long tckn);
         Task<getirIdariGorevListesiResponse> Get_IdariGorevListesiAsync(long tckn);
         Task<getirUnvDisiDeneyimListesiResponse> Get_UnvDisiDeneyimListesiAsync(long tckn);
-        Task<getirAtifSayilariResponse> Get_AtifSayilariAsync(long tckn, int donem);
         Task<getEditorlukBilgisiV1Response> Get_EditorlukBilgisiV1Async(long tckn);
         Task<getirYabanciDilListesiResponse> Get_YabanciDilListesiAsync(long tckn);
         Task<getArastirmaSertifkaBilgisiV1Response> Get_ArastirmaSertifkaBilgisiV1Async(long tckn);
@@ -80,7 +80,11 @@
                 return _Client;
             }
         }
-        public async Task<bool> IsConnectionStatusAsync(TimeSpan timeout, CancellationToken cancellationToken = default) => !(await this.client.Endpoint.Address.Uri.IsConnectionStatusAsync(timeout, cancellationToken)).statuswarning;
+        public async Task<(bool statuswarning, string error)> IsConnectionStatusAsync(TimeSpan timeout, string dil, CancellationToken cancellationToken)
+        {
+            var _t = await this.client.Endpoint.Address.Uri.IsConnectionStatusAsync(timeout, cancellationToken);
+            return (_t.statuswarning, _t.statuswarning ? GlobalConstants.webservice_connectionwarning(dil, "YÖKSİS, OzgecmisV2") : "");
+        }
         public async Task<getirOgrenimBilgisiListesiResponse> Get_OgrenimBilgisiListesiAsync(long tckn) => (await this.client.getirOgrenimBilgisiListesiAsync(new getirOgrenimBilgisiListesiRequestType()
         {
             parametre = createParametre(tckn)
@@ -167,16 +171,6 @@
         {
             parametre = createParametre(tckn)
         })).getirUnvDisiDeneyimListesiResponse;
-        public async Task<getirAtifSayilariResponse> Get_AtifSayilariAsync(long tckn, int donem) => (await this.client.getirAtifSayilariAsync(new getirAtifSayilariRequestType
-        {
-            parametre = new parametreTesvik
-            {
-                P_KULLANICI_ID = this.usertckn.ToString(),
-                P_SIFRE = this.userpassword,
-                P_TC_KIMLIK_NO = tckn,
-                P_DONEM = donem.ToString()
-            }
-        })).getirAtifSayilariResponse;
         public async Task<getEditorlukBilgisiV1Response> Get_EditorlukBilgisiV1Async(long tckn) => (await this.client.getEditorlukBilgisiV1Async(new getEditorlukBilgisiV1RequestType
         {
             parametre = createParametre(tckn)
@@ -205,15 +199,15 @@
         {
             try // <Sonuc><SonucKod>0</SonucKod><SonucMesaj>AKADEMISYEN UNIVERSITENIZ KADROSUNDA BULUNMAMAKTADIR.</SonucMesaj></Sonuc>
             {
-                var iletisim = await Get_PersonelLinkV1Async(tckn);
-                var notbaglanti = (iletisim == null || (iletisim.Sonuc.SonucKod == 0 && iletisim.Sonuc.SonucMesaj.ToSeoFriendly() != "akademisyen-universiteniz-kadrosunda-bulunmamaktadir"));
+                var _iletisim = await Get_PersonelLinkV1Async(tckn);
+                var _notbaglanti = (_iletisim == null || (_iletisim.Sonuc.SonucKod == 0 && _iletisim.Sonuc.SonucMesaj.ToSeoFriendly() != "akademisyen-universiteniz-kadrosunda-bulunmamaktadir"));
                 docTemelAlan? temel = null;
-                if (!notbaglanti)
+                if (!_notbaglanti)
                 {
                     var _ta = await Get_TemelAlanBilgisiV1Async(tckn);
                     if (_ta != null && _ta.Sonuc.SonucKod == 1) { temel = _ta.temelAlanListe.Where(x => x.AKTIF_PASIF == "1").FirstOrDefault(); }
                 }
-                return new OzgecmisPersonelInfoResult(true, !notbaglanti, (notbaglanti ? null : iletisim.personelLinkListe.FirstOrDefault()), temel);
+                return new OzgecmisPersonelInfoResult(true, !_notbaglanti, (_notbaglanti ? null : _iletisim.personelLinkListe.FirstOrDefault()), temel);
             }
             catch { return new OzgecmisPersonelInfoResult(); }
         }

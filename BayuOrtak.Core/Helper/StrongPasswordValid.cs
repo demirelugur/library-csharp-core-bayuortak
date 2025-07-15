@@ -86,47 +86,47 @@
             var r = new List<string>();
             Guard.CheckEmpty(value, nameof(value));
             Guard.UnSupportLanguage(dil, nameof(dil));
-            var istr = dil == "tr";
+            var _istr = dil == "tr";
             if (!PasswordGenerator.IsStrongPassword(value, this.minimumlength))
             {
-                if (istr) { r.Add($"Şifre minimum {this.minimumlength.ToString()} karakter ve içerisinde en az 1 Büyük Harf, 1 Küçük Harf, 1 Rakam ve 1 Noktalama işareti olmalıdır!"); }
+                if (_istr) { r.Add($"Şifre minimum {this.minimumlength.ToString()} karakter ve içerisinde en az 1 Büyük Harf, 1 Küçük Harf, 1 Rakam ve 1 Noktalama işareti olmalıdır!"); }
                 else { r.Add($"The password must have a minimum of {this.minimumlength.ToString()} characters and contain at least 1 Uppercase Letter, 1 Lowercase Letter, 1 Number and 1 Punctuation mark!"); }
             }
             if (this.maximumlength.HasValue && value.Length > this.maximumlength.Value)
             {
-                if (istr) { r.Add($"Şifre maksimum {this.maximumlength.Value.ToString()} karakter olabilir!"); }
+                if (_istr) { r.Add($"Şifre maksimum {this.maximumlength.Value.ToString()} karakter olabilir!"); }
                 else { r.Add($"Password can be maximum {this.maximumlength.Value.ToString()} characters!"); }
             }
             if (this.isardisiksayi && ardisiksayikontrol_private(value))
             {
-                if (istr) { r.Add("Şifre içerisinde 3 ardışık sayı (123, 987 vb...) bulunmamalıdır!"); }
+                if (_istr) { r.Add("Şifre içerisinde 3 ardışık sayı (123, 987 vb...) bulunmamalıdır!"); }
                 else { r.Add("The password must not contain 3 consecutive numbers! (123, 987 etc...)"); }
             }
             if (this.isbosluk && value.Contains(' '))
             {
-                if (istr) { r.Add("Şifre içerisinde boş karakter bulunmamalıdır!"); }
+                if (_istr) { r.Add("Şifre içerisinde boş karakter bulunmamalıdır!"); }
                 else { r.Add("There should be no empty characters in the password!"); }
             }
             if (this.isturkceharf && value.Any(GlobalConstants.turkishcharacters.Contains))
             {
                 var _t = String.Join(", ", GlobalConstants.turkishcharacters);
-                if (istr) { r.Add($"Şifre içerisinde Türk diline özgü harf ({_t}) bulunmamalıdır!"); }
+                if (_istr) { r.Add($"Şifre içerisinde Türk diline özgü harf ({_t}) bulunmamalıdır!"); }
                 else { r.Add($"The password must not contain any letters specific to the Turkish language! ({_t})"); }
             }
             if (dogumtarihyil.HasValue && value.Contains(dogumtarihyil.Value.ToString()))
             {
-                if (istr) { r.Add("Şifre içerisinde doğum tarih yılınız geçmemelidir!"); }
+                if (_istr) { r.Add("Şifre içerisinde doğum tarih yılınız geçmemelidir!"); }
                 else { r.Add("The password must not contain your date and year of birth!"); }
             }
-            var password_seo = value.ToSeoFriendly();
-            if (adsoyadkontrol_private(password_seo, ad))
+            var _password_seo = value.ToSeoFriendly();
+            if (adsoyadkontrol_private(_password_seo, ad))
             {
-                if (istr) { r.Add("Şifre içerisinde adınız/adlarınız geçmemelidir!"); }
+                if (_istr) { r.Add("Şifre içerisinde adınız/adlarınız geçmemelidir!"); }
                 else { r.Add("Your name(s) must not appear in the password!"); }
             }
-            if (adsoyadkontrol_private(password_seo, soyad))
+            if (adsoyadkontrol_private(_password_seo, soyad))
             {
-                if (istr) { r.Add("Şifre içerisinde soyadınız/soyadlarınız geçmemelidir!"); }
+                if (_istr) { r.Add("Şifre içerisinde soyadınız/soyadlarınız geçmemelidir!"); }
                 else { r.Add("Your surname(s) must not appear in the password!"); }
             }
             warnings = r.ToArray();
@@ -158,10 +158,10 @@
         private static bool adsoyadkontrol_private(string password_seo, string value)
         {
             var r = false;
-            var values = value.ToStringOrEmpty().ToEnumerable().Select(x => (x == "" ? Array.Empty<string>() : x.Split(' ').Select(y => y.ToSeoFriendly()).Where(y => y != "").ToArray())).FirstOrDefault();
-            if (values.Length > 0)
+            var _values = value.ToStringOrEmpty().ToEnumerable().Select(x => (x == "" ? Array.Empty<string>() : x.Split(' ').Select(y => y.ToSeoFriendly()).Where(y => y != "").ToArray())).FirstOrDefault();
+            if (_values.Length > 0)
             {
-                foreach (var itemValue in values)
+                foreach (var itemValue in _values)
                 {
                     if (password_seo.Contains(itemValue))
                     {

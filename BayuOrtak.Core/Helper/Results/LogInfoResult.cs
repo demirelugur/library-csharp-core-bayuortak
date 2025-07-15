@@ -12,30 +12,12 @@
     public sealed class LogInfoResult : IEquatable<LogInfoResult>
     {
         #region Equals
-        /// <summary>
-        /// Diğer nesne ile karşılaştırmayı sağlar.
-        /// </summary>
-        /// <param name="other">Karşılaştırılacak nesne.</param>
-        /// <returns>Eşitlik durumu.</returns>
         public override bool Equals(object other) => this.Equals(other as LogInfoResult);
-        /// <summary>
-        /// Hash kodunu döner.
-        /// </summary>
-        /// <returns>Hash kodu.</returns>
-        public override int GetHashCode()
-        {
-            var combine = HashCode.Combine(this.portalid, this.sicilno, this.ogrencino, this.eposta, this.ad, this.soyad, this.sa, this.hash);
-            return HashCode.Combine(combine, this.sessionid);
-        }
-        /// <summary>
-        /// LogInfoResult nesneleri arasında eşitlik kontrolü yapar.
-        /// </summary>
-        /// <param name="other">Diğer LogInfoResult nesnesi.</param>
-        /// <returns>Eşitlik durumu.</returns>
+        public override int GetHashCode() => HashCode.Combine(HashCode.Combine(this.portalid, this.sicilno, this.ogrencino, this.eposta, this.ad, this.soyad, this.sa, this.hash), this.sessionid);
         public bool Equals(LogInfoResult other)
         {
-            if (other == null) { return false; }
-            return (this.portalid == other.portalid && this.sicilno == other.sicilno && this.ogrencino == other.ogrencino && this.eposta == other.eposta && this.ad == other.ad && this.soyad == other.soyad && this.hash == other.hash && this.sessionid == other.sessionid);
+            if (other is LogInfoResult _lir) { return this.portalid == _lir.portalid && this.sicilno == _lir.sicilno && this.ogrencino == _lir.ogrencino && this.eposta == _lir.eposta && this.ad == _lir.ad && this.soyad == _lir.soyad && this.sa == _lir.sa && this.hash == _lir.hash && this.sessionid == _lir.sessionid; }
+            return false;
         }
         #endregion
         /// <summary>
@@ -129,7 +111,7 @@
         /// <summary>
         /// Nesne içerisindeki belirli alanların doğrulamalarını kontrol eder.
         /// </summary>
-        public void validation()
+        public void GuardValidation()
         {
             if (this.portalid > 0) { Guard.CheckZeroOrNegative(this.portalid, nameof(this.portalid)); }
             Guard.CheckOutOfLength(this.sicilno, _nhr.sicilno, nameof(this.sicilno));

@@ -28,7 +28,7 @@
                 validationContext.SetValidatePropertyValue(outvalue); // Set edilmesinin sebebi 9 rakamlı VKN değerleri gelebilir başına 0 koyarak yeni değeri değiştirmek gerekiyor. Örnek 602883151 değeri girilmişşe property 0602883151 biçiminde set edilecek
                 return ValidationResult.Success;
             }
-            if (!validationContext.IsRequiredAttribute() && value == null) { return ValidationResult.Success; }
+            if (value == null && !validationContext.IsRequiredAttribute()) { return ValidationResult.Success; }
             return new ValidationResult(this.ErrorMessage ?? $"{validationContext.DisplayName}, T.C. Vergi Numarası biçimine uygun olmalıdır!", new List<string> { validationContext.MemberName });
         }
     }
