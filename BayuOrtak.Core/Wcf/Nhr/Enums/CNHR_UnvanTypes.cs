@@ -60,15 +60,18 @@
         public static string GetDescriptionLocalizationValue(Nhr_UnvanTypes value, string dil)
         {
             Guard.UnSupportLanguage(dil, nameof(dil));
-            if (dil == "tr") { return value.GetDescription(); }
-            switch (value)
+            if (dil == "en")
             {
-                case Nhr_UnvanTypes.aka: return "Academic";
-                case Nhr_UnvanTypes.ida: return "Administrative";
-                case Nhr_UnvanTypes.soz: return "Contract";
-                case Nhr_UnvanTypes.dig: return "Other";
-                default: throw _other.ThrowNotSupportedForEnum<Nhr_UnvanTypes>();
+                switch (value)
+                {
+                    case Nhr_UnvanTypes.aka: return "Academic";
+                    case Nhr_UnvanTypes.ida: return "Administrative";
+                    case Nhr_UnvanTypes.soz: return "Contract";
+                    case Nhr_UnvanTypes.dig: return "Other";
+                    default: throw _other.ThrowNotSupportedForEnum<Nhr_UnvanTypes>();
+                }
             }
+            return value.GetDescription();
         }
     }
 }

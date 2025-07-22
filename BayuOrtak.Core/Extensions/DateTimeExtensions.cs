@@ -52,5 +52,22 @@
         /// <param name="dateTime">İlgili tarih.</param>
         /// <returns>Ayın son günü.</returns>
         public static DateTime GetLastDayOfMonth(this DateTime dateTime) => new DateTime(dateTime.Year, dateTime.Month, DateTime.DaysInMonth(dateTime.Year, dateTime.Month));
+        /// <summary>
+        /// Active Directory&#39;de kullanılan FILETIME formatındaki bir değeri (1 Ocak 1601&#39;den itibaren 100 nanosaniye cinsinden tick) UTC zaman diliminde bir DateTime nesnesine çevirir. 
+        /// <para>
+        /// Eğer filetime değeri 0 veya <see cref="Int64.MaxValue"/> ise, hesap süresiz kabul edilir ve <see cref="DateTime.MaxValue"/> döndürülür. Geçersiz bir filetime değeri durumunda null döner.
+        /// </para>
+        /// </summary>
+        /// <param name="filetime">Çevrilecek 64 bitlik FILETIME değeri.</param>
+        /// <returns>Başarılı olursa DateTime nesnesi, süresiz hesaplar için DateTime.MaxValue, geçersiz değerler için null.</returns>
+        public static DateTime? ToFileTimeUtc(long filetime)
+        {
+            try { return DateTime.FromFileTimeUtc(filetime); }
+            catch
+            {
+                if (filetime.Includes(0, Int64.MaxValue)) { return DateTime.MaxValue; }
+                return null;
+            }
+        }
     }
 }

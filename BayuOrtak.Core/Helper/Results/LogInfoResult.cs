@@ -14,11 +14,7 @@
         #region Equals
         public override bool Equals(object other) => this.Equals(other as LogInfoResult);
         public override int GetHashCode() => HashCode.Combine(HashCode.Combine(this.portalid, this.sicilno, this.ogrencino, this.eposta, this.ad, this.soyad, this.sa, this.hash), this.sessionid);
-        public bool Equals(LogInfoResult other)
-        {
-            if (other is LogInfoResult _lir) { return this.portalid == _lir.portalid && this.sicilno == _lir.sicilno && this.ogrencino == _lir.ogrencino && this.eposta == _lir.eposta && this.ad == _lir.ad && this.soyad == _lir.soyad && this.sa == _lir.sa && this.hash == _lir.hash && this.sessionid == _lir.sessionid; }
-            return false;
-        }
+        public bool Equals(LogInfoResult other) => (other != null && this.portalid == other.portalid && this.sicilno == other.sicilno && this.ogrencino == other.ogrencino && this.eposta == other.eposta && this.ad == other.ad && this.soyad == other.soyad && this.sa == other.sa && this.hash == other.hash && this.sessionid == other.sessionid);
         #endregion
         /// <summary>
         /// Portal kimliği.

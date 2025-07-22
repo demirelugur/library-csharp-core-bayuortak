@@ -35,6 +35,30 @@ namespace BayuOrtak.Core.UnitTest.Extensions.StringExtensions
             Assert.That(result, Is.Null);
         }
         [Test]
+        public void ParseOrDefault_Decimal_Valid()
+        {
+            var d = 3.25M;
+            var result = d.ToString().ParseOrDefault<decimal>();
+            Assert.That(result, Is.EqualTo(d));
+        }
+        [Test]
+        public void ParseOrDefault_DecimalParseCommaSeparated_Valid()
+        {
+            var result = "3,25".ParseOrDefault<decimal>();
+            Assert.That(result, Is.EqualTo(3.25M));
+        }
+        [Test]
+        public void ParseOrDefault_Decimal_Invalid_ReturnsDefault()
+        {
+            Assert.That("not-a-guid".ParseOrDefault<decimal>(), Is.EqualTo(Decimal.Zero));
+        }
+        [Test]
+        public void ParseOrDefault_NullableDecimal_Invalid_ReturnsNull()
+        {
+            var result = "not-a-guid".ParseOrDefault<decimal?>();
+            Assert.That(result, Is.Null);
+        }
+        [Test]
         public void ParseOrDefault_Guid_Valid()
         {
             var guid = Guid.NewGuid();

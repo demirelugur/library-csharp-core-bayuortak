@@ -83,8 +83,8 @@
             }
             if (r.Length <= maxLength) { return r; }
             Guard.UnSupportLanguage(dil, nameof(dil));
-            if (dil == "tr") { throw new ArgumentOutOfRangeException($"Oluşturulan SEO verisi {maxLength.ToString()} karakterlik maksimum uzunluğu aşıyor!", new Exception($"Gelen değer: \"{text}\"")); }
-            throw new ArgumentOutOfRangeException($"The generated SEO data exceeds the maximum length of {maxLength.ToString()} characters!", new Exception($"Value: \"{text}\""));
+            if (dil == "en") { throw new ArgumentOutOfRangeException($"The generated SEO data exceeds the maximum length of {maxLength.ToString()} characters!", new Exception($"Value: \"{text}\"")); }
+            throw new ArgumentOutOfRangeException($"Oluşturulan SEO verisi {maxLength.ToString()} karakterlik maksimum uzunluğu aşıyor!", new Exception($"Gelen değer: \"{text}\""));
         }
     }
 }

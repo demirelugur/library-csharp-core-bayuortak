@@ -2,381 +2,335 @@
 {
     using BayuOrtak.Core.Enums;
     using BayuOrtak.Core.Extensions;
+    using BayuOrtak.Core.Helper.Results;
+    using BayuOrtak.Core.Wcf.Nhr.Helper;
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
     using System;
     using System.Collections.Generic;
     using System.DirectoryServices;
-    using static BayuOrtak.Core.Helper.CLDAPTip;
-    using static BayuOrtak.Core.Helper.GlobalConstants;
+    using System.DirectoryServices.AccountManagement;
+    using System.Text.RegularExpressions;
     using static BayuOrtak.Core.Helper.OrtakTools;
-    /// <summary>
-    /// LDAP türlerini temsil eden sınıf.
-    /// </summary>
-    public sealed class CLDAPTip
+    public interface ILDAPHelper
     {
-        /// <summary>
-        /// LDAP türlerini tanımlayan enum.
-        /// </summary>
-        [Flags]
-        public enum LDAPTip
-        {
-            personelkurum = 1,
-            uzem = 2,
-            stu = 4
-        }
-        /// <summary>
-        /// Verilen <see cref="LDAPTip"/> değerine göre LDAP yolunu döndürür.
-        /// </summary>
-        /// <param name="value">LDAP türünü temsil eden <see cref="LDAPTip"/> enum değeri.</param>
-        /// <returns>Belirtilen LDAP türüne göre oluşturulmuş LDAP yolunu döndürür.</returns>
-        public static string GetPath(LDAPTip value) => $"LDAP://192.168.10.{(value == LDAPTip.personelkurum ? "11" : "111")}";
+        (bool statuswarning, Exception ex, LDAPResult? result) Check(LDAPTip tip, string username, string password, bool istcknrequired, string dil);
+        (bool statuswarning, Exception ex, LDAPResult? result) Search(LDAPTip tip, string username, bool istcknrequired, string dil);
+        void Insert(LDAPTip tip, string path, string username, string cn, string password, Dictionary<string, object> properties, string method, string dil, out Exception outvalue, out bool inserted);
+        void Update(bool isdebug, LDAPTip tip, string username, Dictionary<string, object> properties, string method, string dil, out Exception outvalue);
+        void UpdatePassword(bool isdebug, LDAPTip tip, string username, string newpassword, string method, string dil, out Exception outvalue);
+        void TryAddUserToGroup(LDAPTip tip, string username, string groupprincipalidentityvalue, string principalcontextname, out Exception outvalue);
     }
-    public sealed class LDAPHelper
+    public sealed class LDAPHelper : ILDAPHelper
     {
-        /// <summary>
-        /// LDAP işlem sonucunu gösteren bool tipi durum. 
-        /// Eğer işlem başarılı ise <see langword="false"/>, başarısız ise <see langword="true"/> döner.
-        /// </summary>
-        public bool statuswarning { get; }
-        /// <summary>
-        /// Kullanıcının T.C. Kimlik Numarası (TCKN). 
-        /// Eğer işlem başarısız olursa varsayılan değer (0) atanır.
-        /// </summary>
-        public long tckn { get; }
-        /// <summary>
-        /// Kullanıcının LDAP sisteminde kayıtlı olan kullanıcı adı.
-        /// Eğer işlem başarısız olursa boş bir string atanır.
-        /// </summary>
-        public string kuladi { get; }
-        /// <summary>
-        /// LDAP işlemi sırasında meydana gelen hata. 
-        /// Eğer bir hata yoksa bu değer null olur.
-        /// </summary>
-        public Exception ex { get; }
-        /// <summary>
-        /// LDAP işlemiyle ilgili ek bilgilerin saklandığı, 
-        /// anahtar-değer çiftlerinden oluşan sözlük yapısı.
-        /// Eğer işlem başarısız olursa veya ek bilgi yoksa, 
-        /// boş bir sözlük atanır.
-        /// </summary>
-        public Dictionary<string, object> dictionary { get; }
-        /// <summary>
-        /// LDAP işlemi sırasında meydana gelen tüm hataların 
-        /// mesajlarını içeren bir string dizisi.
-        /// Eğer bir hata oluşmadıysa boş bir dizi döner.
-        /// </summary>
-        public string[] errors => (this.ex == null ? Array.Empty<string>() : this.ex.AllExceptionMessage());
-        public LDAPHelper() : this(default, default, "", default, default) { }
-        public LDAPHelper(bool statuswarning, long tckn, string kuladi, Exception ex, Dictionary<string, object> dictionary)
+        #region Private
+        private readonly string baydc, uzem;
+        private const string _administrator = "administrator";
+        private const string _samaccountname = "sAMAccountName";
+        private const string _islemlog = "islemlog";
+        private const string _setpassword = "SetPassword";
+        private record class record_setislemlog(string m, DateTime d);
+        private void guardvalidation(ref string username, LDAPTip tip, string dil)
         {
-            this.statuswarning = statuswarning;
-            this.tckn = tckn;
-            this.kuladi = kuladi;
-            this.ex = ex;
-            this.dictionary = dictionary ?? new Dictionary<string, object>();
-        }
-        /// <summary>
-        /// Test ortamında <paramref name="tckn"/> veya <paramref name="kuladi"/> belirtilen kullanıcı üzerinden giriş yapabilmek adına oluşturulmuştur
-        /// </summary>
-        public static LDAPHelper Set_debug(long tckn, string kuladi) => new LDAPHelper(false, tckn, kuladi, default, default);
-        /// <summary>
-        /// Kullanıcı adı ve şifre bilgileri ile LDAP sisteminde kullanıcıyı doğrular ve LDAPHelper nesnesi döner.
-        /// Kullanıcının LDAP sistemindeki varlığı sorgulanır ve sonuç döndürülür.
-        /// </summary>
-        /// <param name="userName">Kullanıcının LDAP sistemindeki kullanıcı adı.</param>
-        /// <param name="password">Kullanıcının LDAP sistemindeki şifresi.</param>
-        /// <param name="tip">LDAP sunucusunun tipi.</param>
-        /// <param name="isDescriptionTcknCheck">Açıklama alanının TCKN doğrulaması yapılıp yapılmadığını belirten parametre.</param>
-        /// <param name="dil">İşlem sırasında kullanılacak dil (örneğin: &quot;tr&quot; veya &quot;en&quot;).</param>
-        /// <returns>LDAPHelper nesnesi döner. Eğer hata oluşursa, Exception bilgisi LDAPHelper içinde saklanır.</returns>
-        public static LDAPHelper Check(string userName, string password, LDAPTip tip, bool isDescriptionTcknCheck, string dil = "tr")
-        {
-            userName = usernamedilkontrol(userName, tip, nameof(userName), dil);
-            Guard.CheckEmpty(password, nameof(password));
-            using (var mainde = new DirectoryEntry(GetPath(tip), userName, password))
-            {
-                using (var ds = new DirectorySearcher(mainde, $"(&(objectClass=user)(objectCategory=person)({_samaccountname}={userName}))", Array.Empty<string>(), SearchScope.Subtree))
-                {
-                    try { return getdata(ds.FindOne(), tip, false, isDescriptionTcknCheck, dil); }
-                    catch (Exception ex) { return set_exception(ex); }
-                }
-            }
-        }
-        /// <summary>
-        /// Admin kullanıcı bilgilerini kullanarak <c>aktif</c> bir kullanıcıyı LDAP sisteminde arar ve sonucunu döner.
-        /// Arama sonucu kullanıcı bilgileri başarılıysa, LDAPHelper nesnesi döner; aksi takdirde hata oluşur.
-        /// </summary>
-        /// <param name="searchUserName">Aranacak kullanıcının LDAP sistemindeki kullanıcı adı.</param>
-        /// <param name="adminPassword">Admin kullanıcı için LDAP sistemine giriş şifresi.</param>
-        /// <param name="tip">LDAP sunucusunun tipi.</param>
-        /// <param name="isDescriptionTcknCheck">Açıklama alanının TCKN doğrulaması yapılıp yapılmadığını belirten parametre.</param>
-        /// <param name="dil">İşlem sırasında kullanılacak dil (örneğin: &quot;tr&quot; veya &quot;en&quot;).</param>
-        /// <returns>LDAPHelper nesnesi döner. Eğer hata oluşursa, Exception bilgisi LDAPHelper içinde saklanır.</returns>
-        public static LDAPHelper Search(string searchUserName, string adminPassword, LDAPTip tip, bool isDescriptionTcknCheck, string dil = "tr")
-        {
-            searchUserName = usernamedilkontrol(searchUserName, tip, nameof(searchUserName), dil);
-            Guard.CheckEmpty(adminPassword, nameof(adminPassword));
-            using (var mainde = new DirectoryEntry(GetPath(tip), _administrator, adminPassword))
-            {
-                using (var ds = new DirectorySearcher(mainde, $"(&(objectClass=user)(objectCategory=person)({_samaccountname}={searchUserName}))", Array.Empty<string>(), SearchScope.Subtree))
-                {
-                    try { return getdata(ds.FindOne(), tip, false, isDescriptionTcknCheck, dil); }
-                    catch (Exception ex) { return set_exception(ex); }
-                }
-            }
-        }
-        /// <summary>
-        /// Admin kullanıcı bilgilerini kullanarak <c>herhangi</c> bir kullanıcıyı LDAP sisteminde arar ve sonucunu döner.
-        /// Arama sonucu kullanıcı bilgileri başarılıysa, LDAPHelper nesnesi döner; aksi takdirde hata oluşur.
-        /// </summary>
-        /// <param name="searchUserName">Aranacak kullanıcının LDAP sistemindeki kullanıcı adı.</param>
-        /// <param name="adminPassword">Admin kullanıcı için LDAP sistemine giriş şifresi.</param>
-        /// <param name="tip">LDAP sunucusunun tipi.</param>
-        /// <param name="dil">İşlem sırasında kullanılacak dil (örneğin: &quot;tr&quot; veya &quot;en&quot;).</param>
-        /// <returns>LDAPHelper nesnesi döner. Eğer hata oluşursa, Exception bilgisi LDAPHelper içinde saklanır.</returns>
-        public static LDAPHelper SearchAll(string searchUserName, string adminPassword, LDAPTip tip, string dil = "tr")
-        {
-            searchUserName = usernamedilkontrol(searchUserName, tip, nameof(searchUserName), dil);
-            Guard.CheckEmpty(adminPassword, nameof(adminPassword));
-            using (var mainde = new DirectoryEntry(GetPath(tip), _administrator, adminPassword))
-            {
-                using (var ds = new DirectorySearcher(mainde, $"(&(objectClass=user)(objectCategory=person)({_samaccountname}={searchUserName}))", Array.Empty<string>(), SearchScope.Subtree))
-                {
-                    try { return getdata(ds.FindOne(), tip, true, false, dil); }
-                    catch (Exception ex) { return set_exception(ex); }
-                }
-            }
-        }
-        /// <summary>
-        /// Bir kullanıcı şifresi güncellenirken LDAP sisteminde gerekli yetkilendirmeler yapılır.
-        /// Test ortamında işlem yapılamaz. Gerçek ortamda şifre belirleme işlemi yapılır.
-        /// </summary>
-        /// <param name="isDebug">Eğer debug modundaysa, işlem devam etmez ve hata döner.</param>
-        /// <param name="searchUsername">Şifresi değiştirilecek kullanıcının LDAP kullanıcı adı.</param>
-        /// <param name="userPassword">Yeni şifre.</param>
-        /// <param name="adminPassword">Admin kullanıcı için LDAP sistemine giriş şifresi.</param>
-        /// <param name="logMethod">Loglama metodu.</param>
-        /// <param name="tip">LDAP sunucusunun tipi.</param>
-        /// <param name="dil">İşlem sırasında kullanılacak dil (örneğin: &quot;tr&quot; veya &quot;en&quot;).</param>
-        /// <returns>İşlem sonucunda boolean tipinde işlem durumu ve varsa <see cref="Exception"/> döner.</returns>
-        public static (bool statuswarning, Exception ex) SetPassword(bool isDebug, string searchUsername, string userPassword, string adminPassword, string logMethod, LDAPTip tip, string dil = "tr")
-        {
+            Guard.CheckEmpty(username, nameof(username));
+            Guard.CheckEnumDefined<LDAPTip>(tip, nameof(tip));
             Guard.UnSupportLanguage(dil, nameof(dil));
-            if (isDebug)
+            username = username.ToLower();
+            if (tip == LDAPTip.stu && username[0] != 'o') { username = $"o{username}"; }
+        }
+        private LDAPResult getresult(LDAPTip tip, SearchResult searchresult)
+        {
+            if (searchresult?.Properties == null) { return new LDAPResult(); }
+            ADUserAccountControl useraccountcontrol = default;
+            long tckn = 0;
+            string sicilno = "", ad = "", soyad = "";
+            if (this.trygetpropertyvalue(searchresult, "useraccountcontrol", out object _o) && _o != null && Enum.TryParse(_o.ToString(), out ADUserAccountControl _useraccountcontrol)) { useraccountcontrol = _useraccountcontrol; }
+            if (this.trygetpropertyvalue(searchresult, "sicilno", out _o) && _o is String _ssicilno && NHRTools.TrySicilNo(_ssicilno, out string _sicilno)) { sicilno = _sicilno; }
+            if (this.trygetpropertyvalue(searchresult, "givenname", out _o) && _o is String _sad) { ad = _sad.ToTitleCase(true, new char[] { '.' }); }
+            if (this.trygetpropertyvalue(searchresult, "sn", out _o) && _o is String _ssoyad) { soyad = _ssoyad.ToStringOrEmpty().ToUpper(); }
+            if (this.trygetpropertyvalue(searchresult, "tckno", out _o) && _o != null)
             {
-                if (dil == "tr") { return (true, new Exception("TEST ortamında işleme devam edilemez!")); }
-                return (true, new Exception("The process cannot be continued in the TEST environment!"));
+                if (tip == LDAPTip.stu && _try.TryTCKimlikNoOrSW98(_o.ToString(), out long _tckn)) { tckn = _tckn; }
+                else if (_try.TryTCKimlikNo(_o.ToString(), out _tckn)) { tckn = _tckn; }
             }
-            userPassword = userPassword.ToStringOrEmpty();
-            Guard.CheckEmpty(userPassword, nameof(userPassword));
-            return SetProperties(searchUsername, new Dictionary<string, object> { { "SetPassword", userPassword } }, adminPassword, logMethod, tip, dil);
+            else if (this.trygetpropertyvalue(searchresult, "description", out _o) && _o != null)
+            {
+                if (tip == LDAPTip.stu && _try.TryTCKimlikNoOrSW98(_o.ToString(), out long _tckn)) { tckn = _tckn; }
+                else if (_try.TryTCKimlikNo(_o.ToString(), out _tckn)) { tckn = _tckn; }
+            }
+            var _dic = new Dictionary<string, object>();
+            foreach (string item in searchresult.Properties.PropertyNames) { _dic.Add(item, searchresult.Properties[item][0]); }
+            return new LDAPResult(useraccountcontrol, sicilno, ad, soyad, tckn, _dic.OrderBy(x => x.Key).ToDictionary());
+        }
+        private string getldappath(LDAPTip value) => $"LDAP://192.168.10.{(value == LDAPTip.personelkurum ? "11" : "111")}";
+        private bool trygetpropertyvalue(SearchResult searchresult, string propertyname, out object outvalue)
+        {
+            try
+            {
+                if (searchresult.Properties.Contains(propertyname))
+                {
+                    outvalue = searchresult.Properties[propertyname][0];
+                    return true;
+                }
+                outvalue = null;
+                return false;
+            }
+            catch
+            {
+                outvalue = null;
+                return false;
+            }
+        }
+        private bool tryparsedaperror(DirectoryServicesCOMException dscomex, out string errorcode)
+        {
+            try
+            {
+                var _pattern = @"data\s+(\w+),";
+                var _match = Regex.Match(dscomex.ExtendedErrorMessage, _pattern);
+                if (_match.Success)
+                {
+                    errorcode = _match.Groups[1].Value;
+                    return true;
+                }
+                errorcode = "";
+                return false;
+            }
+            catch
+            {
+                errorcode = "";
+                return false;
+            }
+        }
+        private string getadminpassword(LDAPTip tip) => (tip == LDAPTip.personelkurum ? this.baydc : this.uzem);
+        private Exception translateldapexception(DirectoryServicesCOMException dscomex, string dil)
+        {
+            var _errorcode = this.tryparsedaperror(dscomex, out string _e) ? _e : "";
+            if (_errorcode == "52e") { return new Exception(dil == "en" ? "Error: Invalid username or password" : "Hata: Geçersiz kullanıcı adı veya şifre"); } //8009030C: LdapErr: DSID-0C09075E, comment: AcceptSecurityContext error, data 52e, v4563
+            else if (_errorcode == "533") { return new Exception(String.Concat((dil == "en" ? "Error: User account is disabled" : "Hata: Kullanıcı hesabı devre dışı"), ", UserAccountControl: ", ADUserAccountControl.ACCOUNTDISABLE.ToString("g"))); } //8009030C: LdapErr: DSID-0C09075E, comment: AcceptSecurityContext error, data 533, v4563
+            else if (_errorcode == "701") { return new Exception(String.Concat((dil == "en" ?  "Error: User account has expired" : "Hata: Kullanıcı hesabının süresi dolmuş"), ", UserAccountControl: ", ADUserAccountControl.PASSWORD_EXPIRED.ToString("g"))); } //8009030C: LdapErr: DSID-0C09075E, comment: AcceptSecurityContext error, data 701, v4563
+            else { return new Exception(dil == "en" ? "Unknown error" : "Bilinmeyen hata", dscomex); }
+        }
+        private object setislemlog(object value, string method)
+        {
+            var _p = new record_setislemlog(method.CoalesceOrDefault($"/{nameof(LDAPHelper)}/{nameof(this.setislemlog)}"), DateTime.Now);
+            if (value != null && _try.TryJson(Convert.ToString(value), JTokenType.Object, out JObject _jo) && _jo.Count > 0)
+            {
+                var _data = new List<record_setislemlog> { _p };
+                if (_jo.TryGetValue(_islemlog, out JToken _jt) && _jt.Type == JTokenType.Array)
+                {
+                    _data.AddRange(_jt.Select(x => new
+                    {
+                        m = x[nameof(record_setislemlog.m)],
+                        d = x[nameof(record_setislemlog.d)]
+                    }).Select(x => new
+                    {
+                        m = (x.m != null && x.m.Type == JTokenType.String) ? x.m.ToStringOrEmpty() : "",
+                        d = (x.d != null && x.d.Type == JTokenType.Date) ? Convert.ToDateTime(x.d) : DateTime.MinValue
+                    }).Where(x => x.m != "" && x.d.Ticks > 0).Select(x => new record_setislemlog(x.m, x.d)).ToArray());
+                }
+                _jo[_islemlog] = JToken.FromObject(_data.OrderByDescending(x => x.d).Take(5).ToArray());
+                return _jo.ToString(Formatting.None);
+            }
+            return _to.ToJSON(new Dictionary<string, object> { { _islemlog, new record_setislemlog[] { _p } } });
+        }
+        #endregion
+        public LDAPHelper(string baydc, string uzem)
+        {
+            this.baydc = baydc;
+            this.uzem = uzem;
         }
         /// <summary>
-        /// Kullanıcının özelliklerini günceller.
+        /// Belirtilen kullanıcı adı ve şifre ile LDAP üzerinde kullanıcı doğrulama işlemini gerçekleştirir.
         /// </summary>
-        /// <param name="searchUsername">Güncellenecek kullanıcının arama adı.</param>
-        /// <param name="properties">Güncellenmesi gereken özelliklerin anahtar-değer çiftleri.</param>
-        /// <param name="adminPassword">Yönetici kullanıcı adı için şifre.</param>
-        /// <param name="logMethod">Loglama metodu.</param>
-        /// <param name="tip">LDAP tipi.</param>
-        /// <param name="dil">Hata mesajlarının döndürülmesi için kullanılan dil (varsayılan Türkçe, &quot;tr&quot; Türkçe için, &quot;en&quot; İngilizce için).</param>
-        public static (bool statuswarning, Exception ex) SetProperties(string searchUsername, Dictionary<string, object> properties, string adminPassword, string logMethod, LDAPTip tip, string dil = "tr")
+        /// <param name="tip">LDAP bağlantı tipi.</param>
+        /// <param name="username">Doğrulanacak kullanıcı adı.</param>
+        /// <param name="password">Kullanıcı şifresi.</param>
+        /// <param name="istcknrequired">T.C. Kimlik numarası kontrolünün zorunlu olup olmadığını belirtir.</param>
+        /// <param name="dil">Hata mesajlarının döndürüleceği dil.</param>
+        /// <returns>İşlem sonucu, hata (varsa) ve kullanıcı bilgilerini içeren bir tuple.</returns>
+        public (bool statuswarning, Exception ex, LDAPResult? result) Check(LDAPTip tip, string username, string password, bool istcknrequired, string dil)
         {
-            searchUsername = usernamedilkontrol(searchUsername, tip, nameof(searchUsername), dil);
-            Guard.CheckEmpty(properties, nameof(properties));
-            Guard.CheckEmpty(adminPassword, nameof(adminPassword));
-            using (var mainde = new DirectoryEntry(GetPath(tip), _administrator, adminPassword))
+            this.guardvalidation(ref username, tip, dil);
+            Guard.CheckEmpty(password, nameof(password));
+            using (var mainde = new DirectoryEntry(this.getldappath(tip), username, password))
             {
-                using (var ds = new DirectorySearcher(mainde, $"(&(objectClass=user)(objectCategory=person)({_samaccountname}={searchUsername}))", Array.Empty<string>(), SearchScope.Subtree))
+                using (var ds = new DirectorySearcher(mainde, $"(&(objectClass=user)(objectCategory=person)({_samaccountname}={username}))", Array.Empty<string>(), SearchScope.Subtree))
                 {
                     try
                     {
-                        var sr = ds.FindOne();
-                        var _t = adaccountvalidation(tip, sr, true, false, dil);
-                        if (_t.statuswarning) { return (true, _t.ex); }
-                        using (var de = sr.GetDirectoryEntry())
-                        {
-                            foreach (var item in properties)
-                            {
-                                if (item.Key == "SetPassword") { continue; }
-                                else { de.Properties[item.Key].Value = item.Value; }
-                            }
-                            de.Properties["info"].Value = SetInfo(de.Properties["info"].Value, logMethod);
-                            de.CommitChanges();
-                            if (properties.TryGetValue("SetPassword", out object _setPassword))
-                            {
-                                de.Invoke("SetPassword", new object[] { _setPassword });
-                                de.Properties["pwdLastSet"].Value = -1;
-                                de.CommitChanges();
-                            }
-                            de.RefreshCache();
-                            return (false, default);
-                        }
+                        var _data = this.getresult(tip, ds.FindOne());
+                        _data.tryiswarning(dil, istcknrequired, out Exception _ex);
+                        if (_ex == null) { return (false, default, _data); }
+                        throw _ex;
                     }
-                    catch (Exception ex) { return (true, ex); }
+                    catch (Exception ex) { return (true, (ex is DirectoryServicesCOMException dscomex ? this.translateldapexception(dscomex, dil) : ex), default); }
                 }
             }
         }
         /// <summary>
-        /// Yeni bir kullanıcı ekler.
+        /// Administrator üzerinden <paramref name="username"/> kullanıcı kontrol yapar
         /// </summary>
-        /// <param name="path">Kullanıcının eklenmesi gereken dizin yolu.</param>
-        /// <param name="userName">Eklenecek kullanıcının kullanıcı adı.</param>
-        /// <param name="cn">Kullanıcının tam adı.</param>
-        /// <param name="password">Kullanıcı için belirlenen şifre.</param>
-        /// <param name="properties">Kullanıcı ile ilişkili özellikler.</param>
-        /// <param name="tip">LDAP tipi.</param>
-        /// <param name="adminPassword">Yönetici kullanıcı adı için şifre.</param>
-        /// <param name="logMethod">Loglama metodu.</param>
-        /// <param name="userAccountControl">Kullanıcının hesap kontrol ayarları.</param>
-        /// <param name="dil">Hata mesajlarının döndürülmesi için kullanılan dil (varsayılan Türkçe, &quot;tr&quot; Türkçe için, &quot;en&quot; İngilizce için).</param>
-        public static (bool statuswarning, Exception ex, bool inserted) Insert(string path, string userName, string cn, string password, Dictionary<string, object> properties, LDAPTip tip, string adminPassword, string logMethod, ADUserAccountControl userAccountControl = ADUserAccountControl.NORMAL_ACCOUNT, string dil = "tr")
+        /// <param name="tip">LDAP bağlantı tipi.</param>
+        /// <param name="username">Arama yapılan kullanıcı</param>
+        /// <param name="istcknrequired">T.C. Kimlik numarası kontrolünün zorunlu olup olmadığını belirtir.</param>
+        /// <param name="dil">Hata mesajlarının döndürüleceği dil.</param>
+        /// <returns>İşlem sonucu, hata (varsa) ve kullanıcı bilgilerini içeren bir tuple.</returns>
+        public (bool statuswarning, Exception ex, LDAPResult? result) Search(LDAPTip tip, string username, bool istcknrequired, string dil)
+        {
+            this.guardvalidation(ref username, tip, dil);
+            using (var mainde = new DirectoryEntry(this.getldappath(tip), _administrator, this.getadminpassword(tip)))
+            {
+                using (var ds = new DirectorySearcher(mainde, $"(&(objectClass=user)(objectCategory=person)({_samaccountname}={username}))", Array.Empty<string>(), SearchScope.Subtree))
+                {
+                    try
+                    {
+                        var _data = this.getresult(tip, ds.FindOne());
+                        _data.tryiswarning(dil, istcknrequired, out Exception _ex);
+                        if (_ex == null) { return (false, default, _data); }
+                        throw _ex;
+                    }
+                    catch (Exception ex) { return (true, (ex is DirectoryServicesCOMException dscomex ? this.translateldapexception(dscomex, dil) : ex), default); }
+                }
+            }
+        }
+        /// <summary>
+        /// LDAP üzerine yeni bir kullanıcı ekler.
+        /// </summary>
+        /// <param name="tip">LDAP bağlantı tipi.</param>
+        /// <param name="path">Kullanıcının ekleneceği LDAP dizin yolu.</param>
+        /// <param name="username">Eklenecek kullanıcının kullanıcı adı.</param>
+        /// <param name="cn">Kullanıcının ortak adı (Common Name).</param>
+        /// <param name="password">Kullanıcının şifresi.</param>
+        /// <param name="properties">Kullanıcıya atanacak özelliklerin bilgileri</param>
+        /// <param name="method">Çağrıyı yapan metodun adı (log için).</param>
+        /// <param name="dil">Hata mesajlarının döndürüleceği dil.</param>
+        /// <param name="outvalue">Olası hata durumunda döndürülecek istisna.</param>
+        /// <param name="inserted">Ekleme işleminin başarılı olup olmadığını belirtir.</param>
+        public void Insert(LDAPTip tip, string path, string username, string cn, string password, Dictionary<string, object> properties, string method, string dil, out Exception outvalue, out bool inserted)
         {
             Guard.CheckEmpty(path, nameof(path));
-            userName = usernamedilkontrol(userName, tip, nameof(userName), dil);
+            this.guardvalidation(ref username, tip, dil);
             Guard.CheckEmpty(cn, nameof(cn));
             Guard.CheckEmpty(password, nameof(password));
             Guard.CheckEmpty(properties, nameof(properties));
-            Guard.CheckEmpty(adminPassword, nameof(adminPassword)); // userAccountControl için bir kontrol konulmamalıdır!
             try
             {
-                var inserted = false;
+                inserted = false;
                 if (path[0] != '/') { path = $"/{path}"; }
-                using (var mainde = new DirectoryEntry(String.Concat(GetPath(tip), path), _administrator, adminPassword))
+                using (var mainde = new DirectoryEntry(String.Concat(this.getldappath(tip), path), _administrator, this.getadminpassword(tip)))
                 {
-                    using (var ds = new DirectorySearcher(mainde, $"(&(objectClass=user)(objectCategory=person)({_samaccountname}={userName}))", Array.Empty<string>(), SearchScope.Subtree))
+                    using (var ds = new DirectorySearcher(mainde, $"(&(objectClass=user)(objectCategory=person)({_samaccountname}={username}))", Array.Empty<string>(), SearchScope.Subtree))
                     {
-                        var sr = ds.FindOne();
-                        if (sr == null)
+                        if (ds.FindOne() == null)
                         {
-                            var newDirEntry = mainde.Children.Add($"CN={cn.ToUpper()}", "User");
-                            properties.Upsert(_samaccountname, userName);
-                            foreach (var item in properties) { newDirEntry.Properties[item.Key].Value = item.Value; }
-                            newDirEntry.Properties["info"].Value = SetInfo(null, logMethod);
-                            newDirEntry.CommitChanges();
-                            newDirEntry.Invoke("SetPassword", new object[] { password });
-                            newDirEntry.Properties["userAccountControl"].Value = Convert.ToInt32(userAccountControl);
-                            newDirEntry.CommitChanges();
+                            var _newde = mainde.Children.Add($"CN={cn.ToUpper()}", "User");
+                            properties.Upsert(_samaccountname, username);
+                            foreach (var item in properties) { _newde.Properties[item.Key].Value = item.Value; }
+                            if (_newde.Properties.Contains(_islemlog)) { _newde.Properties[_islemlog].Value = this.setislemlog(null, method); }
+                            _newde.CommitChanges();
+                            _newde.Invoke("SetPassword", new object[] { password });
+                            _newde.Properties["userAccountControl"].Value = (int)ADUserAccountControl.NORMAL_ACCOUNT;
+                            _newde.CommitChanges();
                             mainde.CommitChanges();
                             inserted = true;
                         }
                     }
                 }
-                return (false, default, inserted);
+                outvalue = null;
             }
             catch (Exception ex)
             {
-                if (ex is DirectoryServicesCOMException exp)
-                {
-                    if (dil == "tr") { return (true, new Exception($"Hata Kodu: \"{exp.ExtendedError.ToString()}\"", new Exception($"Hata Mesajı: \"{exp.ExtendedErrorMessage}\"", ex)), false); }
-                    return (true, new Exception($"Error Code: \"{exp.ExtendedError.ToString()}\"", new Exception($"Error Message: \"{exp.ExtendedErrorMessage}\"", ex)), false);
-                }
-                else { return (true, ex, false); }
+                outvalue = (ex is DirectoryServicesCOMException dscomex ? this.translateldapexception(dscomex, dil) : ex);
+                inserted = false;
             }
         }
         /// <summary>
-        /// Loglama bilgilerini JSON biçimine döndürür.
+        /// LDAP üzerindeki bir kullanıcının özelliklerini günceller.
         /// </summary>
-        /// <param name="value">Loglama için kullanılacak değer. Eğer null ise varsayılan değerler kullanılır.</param>
-        /// <param name="logmethod">Loglama yöntemi bilgisi.</param>
-        /// <returns>
-        /// JSON biçimindeki loglama verilerini içeren bir string döner.
-        /// </returns>
-        public static string SetInfo(object value, string logmethod)
+        /// <param name="isdebug">Hata ayıklama modunun açık olup olmadığını belirtir.</param>
+        /// <param name="tip">LDAP bağlantı tipi.</param>
+        /// <param name="username">Özellikleri güncellenecek kullanıcı adı.</param>
+        /// <param name="properties">Güncellenecek özelliklerin anahtar-değer çiftleri.</param>
+        /// <param name="method">Çağrıyı yapan metodun adı (log için).</param>
+        /// <param name="dil">Hata mesajlarının döndürüleceği dil.</param>
+        /// <param name="outvalue">Olası hata durumunda döndürülecek istisna.</param>
+        public void Update(bool isdebug, LDAPTip tip, string username, Dictionary<string, object> properties, string method, string dil, out Exception outvalue)
         {
-            var p = new
+            this.guardvalidation(ref username, tip, dil);
+            Guard.CheckEmpty(properties, nameof(properties));
+            if (isdebug) { outvalue = null; }
+            using (var mainde = new DirectoryEntry(this.getldappath(tip), _administrator, this.getadminpassword(tip)))
             {
-                m = logmethod.CoalesceOrDefault($"/{typeof(LDAPHelper).FullName}/{nameof(SetInfo)}"),
-                d = DateTime.Now
-            };
-            if (value != null && _try.TryJson(Convert.ToString(value), JTokenType.Object, out JObject _jo) && _jo.Count > 0)
-            {
-                if (_jo.TryGetValue("logdata", out JToken _jt) && _jt.Type == JTokenType.Array)
+                using (var ds = new DirectorySearcher(mainde, $"(&(objectClass=user)(objectCategory=person)({_samaccountname}={username}))", Array.Empty<string>(), SearchScope.Subtree))
                 {
-                    var jts = _jt.Select(x => new
+                    try
                     {
-                        m = x["m"],
-                        d = x["d"]
-                    }).Select(x => new
-                    {
-                        m = (x.m != null && x.m.Type == JTokenType.String) ? x.m.ToStringOrEmpty() : "",
-                        d = (x.d != null && x.d.Type == JTokenType.Date) ? Convert.ToDateTime(x.d) : DateTime.MinValue
-                    }).Where(x => x.m != "" && x.d.Ticks > 0).ToList();
-                    jts.Add(p);
-                    _jo["logdata"] = JToken.FromObject(jts.OrderByDescending(x => x.d).Take(5).Select(x => new
-                    {
-                        x.m,
-                        x.d
-                    }).ToArray());
+                        var _searchresult = ds.FindOne();
+                        using (var de = _searchresult.GetDirectoryEntry())
+                        {
+                            foreach (var item in properties)
+                            {
+                                if (item.Key == _setpassword) { continue; }
+                                else { de.Properties[item.Key].Value = item.Value; }
+                            }
+                            if (de.Properties.Contains(_islemlog)) { de.Properties[_islemlog].Value = this.setislemlog(de.Properties[_islemlog].Value, method); }
+                            de.CommitChanges();
+                            if (properties.TryGetValue(_setpassword, out object _setPassword))
+                            {
+                                de.Invoke(_setpassword, new object[] { _setPassword });
+                                de.Properties["pwdLastSet"].Value = -1;
+                                de.CommitChanges();
+                            }
+                            de.RefreshCache();
+                            outvalue = null;
+                        }
+                    }
+                    catch (Exception ex) { outvalue = (ex is DirectoryServicesCOMException dscomex ? this.translateldapexception(dscomex, dil) : ex); }
                 }
-                else { _jo["logdata"] = JToken.FromObject(new object[] { p }); }
-                return _jo.ToString(Formatting.None);
             }
-            return _to.ToJSON(new
-            {
-                logdata = new object[] { p }
-            });
         }
-        #region Private
-        private const string _administrator = "administrator";
-        private const string _samaccountname = "sAMAccountName";
-        private static LDAPHelper set_exception(Exception ex) => new LDAPHelper(true, default, "", ex, default);
-        private static LDAPHelper getdata(SearchResult searchresult, LDAPTip tip, bool issearchall, bool isdescriptiontckncheck, string dil)
+        /// <summary>
+        /// LDAP üzerindeki bir kullanıcının şifresini günceller.
+        /// </summary>
+        /// <param name="isdebug">Hata ayıklama modunun açık olup olmadığını belirtir.</param>
+        /// <param name="tip">LDAP bağlantı tipi.</param>
+        /// <param name="username">Şifresi güncellenecek kullanıcı adı.</param>
+        /// <param name="newpassword">Yeni şifre.</param>
+        /// <param name="method">Çağrıyı yapan metodun adı (log için).</param>
+        /// <param name="dil">Hata mesajlarının döndürüleceği dil.</param>
+        /// <param name="outvalue">Olası hata durumunda döndürülecek istisna.</param>
+        public void UpdatePassword(bool isdebug, LDAPTip tip, string username, string newpassword, string method, string dil, out Exception outvalue)
         {
-            var _t = adaccountvalidation(tip, searchresult, issearchall, isdescriptiontckncheck, dil);
-            if (_t.statuswarning) { return set_exception(_t.ex); }
-            var dic = new Dictionary<string, object>();
-            foreach (string item in searchresult.Properties.PropertyNames) { dic.Add(item, searchresult.Properties[item][0]); }
-            return new LDAPHelper(false, _t.tckn, Convert.ToString(dic[_samaccountname.ToLower()]), default, dic.OrderBy(x => x.Key).ToDictionary());
+            newpassword = newpassword.ToStringOrEmpty();
+            Guard.CheckEmpty(newpassword, nameof(newpassword));
+            this.Update(isdebug, tip, username, new Dictionary<string, object> { { _setpassword, newpassword } }, method, dil, out outvalue);
         }
-        private static (bool statuswarning, long tckn, Exception ex) adaccountvalidation(LDAPTip tip, SearchResult searchresult, bool issearchall, bool isdescriptiontckncheck, string dil)
+        /// <summary>
+        /// Bir kullanıcıyı LDAP üzerindeki bir gruba ekler.
+        /// </summary>
+        /// <param name="tip">LDAP bağlantı tipi.</param>
+        /// <param name="username">Gruba eklenecek kullanıcı adı.</param>
+        /// <param name="groupprincipalidentityvalue">Hedef grup adı.</param>
+        /// <param name="principalcontextname"><see cref="PrincipalContext.Name"/> değeri</param>
+        /// <param name="outvalue">Olası hata durumunda döndürülecek istisna.</param>
+        public void TryAddUserToGroup(LDAPTip tip, string username, string groupprincipalidentityvalue, string principalcontextname, out Exception outvalue)
         {
-            long tckn = 0;
-            if (searchresult == null) { return (true, tckn, searchresultnotfoundexception(dil)); }
-            string message;
-            var _sDesc = searchresult.Properties["description"];
-            if (!Enum.TryParse(searchresult.Properties["useraccountcontrol"][0].ToStringOrEmpty(), out ADUserAccountControl _aduac)) { message = "USERACCOUNTCONTROL"; }
-            else if (issearchall) { message = ""; } // Not: Pasif Hesapların yakalabilmesi için alttaki kontrol es geçilmeli
-            else if (isdescriptiontckncheck && tip != LDAPTip.stu && !_try.TryTCKimlikNo(((_sDesc == null || _sDesc.Count == 0) ? "" : _sDesc[0].ToStringOrEmpty()), out tckn)) { message = "DESCRIPTION"; }
-            else if (isdescriptiontckncheck && tip == LDAPTip.stu && !_try.TryTCKimlikNoOrSW98(((_sDesc == null || _sDesc.Count == 0) ? "" : _sDesc[0].ToStringOrEmpty()), out tckn)) { message = "DESCRIPTION"; }
-            else if (_aduac.HasFlag(ADUserAccountControl.PASSWORD_EXPIRED)) { message = ADUserAccountControl.PASSWORD_EXPIRED.ToString("g"); }
-            else if (_aduac.HasFlag(ADUserAccountControl.ACCOUNTDISABLE)) { message = ADUserAccountControl.ACCOUNTDISABLE.ToString("g"); }
-            else
+            try
             {
-                var dt = getaccountexpires(searchresult);
-                if (dt.HasValue && dt.Value <= DateTime.Today) { message = $"ACCOUNTEXPIRES ({dt.Value.ToString(_date.ddMMyyyy)})"; }
-                else { message = ""; }
+                using (var pc = new PrincipalContext(ContextType.Domain, principalcontextname, _administrator, this.getadminpassword(tip)))
+                {
+                    using (var gp = GroupPrincipal.FindByIdentity(pc, groupprincipalidentityvalue))
+                    {
+                        if (gp != null && !gp.Members.Any(x => x.SamAccountName == username))
+                        {
+                            gp.Members.Add(pc, IdentityType.SamAccountName, username);
+                            gp.Save();
+                        }
+                    }
+                }
+                outvalue = default;
             }
-            if (message == "") { return (false, tckn, default(Exception)); }
-            if (dil == "tr") { return (true, tckn, new Exception($"Hata Sebebi: \"LDAP, {message}\"", new Exception(_title.iletisim_bilgiislem))); }
-            return (true, tckn, new Exception($"Error Cause: \"LDAP, {message}\"", new Exception("Please contact the Department of Information Technologies")));
+            catch (Exception ex) { outvalue = ex; }
         }
-        private static DateTime? getaccountexpires(SearchResult searchresult)
-        {
-            var _ae = "accountExpires"; // 01.01.1601 02:00:00(DateTime.FromFileTime Başlangıç tarihi)
-            var _p = searchresult.Properties;
-            if (_p != null && _p.Contains(_ae) && _p[_ae].Count > 0 && Int64.TryParse(_p[_ae][0].ToString(), out long _v) && _v > 0)
-            {
-                try { return DateTime.FromFileTime(_v); }
-                catch { return null; }
-            }
-            return null;
-        }
-        private static Exception searchresultnotfoundexception(string dil)
-        {
-            if (dil == "tr") { return new Exception($"e-Posta kaydı bulunamadı!", new Exception($"Hata Sebebi: \"LDAP, {_samaccountname}, {typeof(SearchResult).FullName}\"", new Exception(_title.iletisim_bilgiislem))); }
-            return new Exception("e-Mail record not found!", new Exception($"Error Reason: \"LDAP, {_samaccountname}, {typeof(SearchResult).FullName}\"", new Exception("Please contact the Department of Information Technologies")));
-        }
-        private static string usernamedilkontrol(string username, LDAPTip tip, string usernameargname, string dil)
-        {
-            Guard.CheckEmpty(username, usernameargname);
-            Guard.CheckEnumDefined<LDAPTip>(tip, nameof(tip));
-            Guard.UnSupportLanguage(dil, nameof(dil));
-            username = username.ToLower();
-            if (tip == LDAPTip.stu && username[0] != 'o') { return $"o{username}"; }
-            return username;
-        }
-        #endregion
     }
 }

@@ -15,11 +15,7 @@
         #region Equals
         public override bool Equals(object other) => this.Equals(other as SmtpSettingsHelper);
         public override int GetHashCode() => HashCode.Combine(this.email, this.password, this.host, this.port, this.enablessl, this.usedefaultcredentials, this.deliverymethod, this.timeout);
-        public bool Equals(SmtpSettingsHelper other)
-        {
-            if (other is SmtpSettingsHelper _ssh) { return this.email == _ssh.email && this.password == _ssh.password && this.host == _ssh.host && this.port == _ssh.port && this.enablessl == _ssh.enablessl && this.usedefaultcredentials == _ssh.usedefaultcredentials && this.deliverymethod == _ssh.deliverymethod && this.timeout == _ssh.timeout; }
-            return false;
-        }
+        public bool Equals(SmtpSettingsHelper other) => (other != null && this.email == other.email && this.password == other.password && this.host == other.host && this.port == other.port && this.enablessl == other.enablessl && this.usedefaultcredentials == other.usedefaultcredentials && this.deliverymethod == other.deliverymethod && this.timeout == other.timeout);
         #endregion
         [Validation_Required]
         [EmailAddress(ErrorMessage = _validationerrormessage.email)]

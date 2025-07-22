@@ -8,11 +8,7 @@
         #region Equals
         public override bool Equals(object other) => this.Equals(other as EnumResult);
         public override int GetHashCode() => HashCode.Combine(this.vl, this.tx, this.desc);
-        public bool Equals(EnumResult other)
-        {
-            if (other is EnumResult _er) { return this.vl == _er.vl && this.tx == _er.tx && this.desc == _er.desc; }
-            return false;
-        }
+        public bool Equals(EnumResult other) => other != null && this.vl == other.vl && this.tx == other.tx && this.desc == other.desc;
         #endregion
         /// <summary>
         /// Enum değerinin sayısal karşılığını alır.

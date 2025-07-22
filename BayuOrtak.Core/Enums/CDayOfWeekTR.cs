@@ -43,18 +43,21 @@
         public static string GetDescriptionLocalizationValue(DayOfWeekTR value, string dil)
         {
             Guard.UnSupportLanguage(dil, nameof(dil));
-            if (dil == "tr") { return value.GetDescription(); }
-            switch (value)
+            if (dil == "en")
             {
-                case DayOfWeekTR.pzr: return "Sunday";
-                case DayOfWeekTR.pzts: return "Monday";
-                case DayOfWeekTR.sali: return "Tuesday";
-                case DayOfWeekTR.car: return "Wednesday";
-                case DayOfWeekTR.per: return "Thursday";
-                case DayOfWeekTR.cuma: return "Friday";
-                case DayOfWeekTR.cmrts: return "Saturday";
-                default: throw _other.ThrowNotSupportedForEnum<DayOfWeekTR>();
+                switch (value)
+                {
+                    case DayOfWeekTR.pzr: return "Sunday";
+                    case DayOfWeekTR.pzts: return "Monday";
+                    case DayOfWeekTR.sali: return "Tuesday";
+                    case DayOfWeekTR.car: return "Wednesday";
+                    case DayOfWeekTR.per: return "Thursday";
+                    case DayOfWeekTR.cuma: return "Friday";
+                    case DayOfWeekTR.cmrts: return "Saturday";
+                    default: throw _other.ThrowNotSupportedForEnum<DayOfWeekTR>();
+                }
             }
+            return value.GetDescription();
         }
         /// <summary>
         /// Belirtilen <see cref="DayOfWeekTR"/> değerinin hafta içi günlerinden biri olup olmadığını kontrol eder.

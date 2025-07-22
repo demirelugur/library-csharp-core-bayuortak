@@ -192,8 +192,8 @@
             public static CultureInfo GetCultureInfo(string dil)
             {
                 Guard.UnSupportLanguage(dil, nameof(dil));
-                if (dil == "tr") { return new CultureInfo("tr-TR"); }
-                return new CultureInfo("en-US");
+                if (dil == "en") { return new CultureInfo("en-US"); }
+                return new CultureInfo("tr-TR");
             }
             /// <summary>
             /// Verilen nesneden &quot;isldate&quot; ve &quot;isluser&quot; bilgilerini çıkarır ve bu bilgileri belirtilen tarih formatında birleştirerek string olarak döndürür. Nesne tipi IFormCollection, JToken veya bir enumerable koleksiyon olabilir. Eğer nesne null ise, &quot;isldate&quot; geçerli bir tarih değilse veya &quot;isluser&quot; boşsa, boş string döndürür.
@@ -487,11 +487,16 @@
                 {
                     value = value.ToStringOrEmpty();
                     if (value == "") { return (default, default); }
-                    _ = _try.TryTypeIsNullable(propertyType, out Type genericBaseType);
-                    if (genericBaseType.IsEnum) { return (((Enum.TryParse(genericBaseType, value, out object _enum) && Enum.IsDefined(genericBaseType, _enum)) ? _enum : null), genericBaseType); }
-                    if (genericBaseType == typeof(bool)) { return ((Boolean.TryParse(Int32.TryParse(value, out int _vint) ? (_vint == 0 ? Boolean.FalseString : Boolean.TrueString) : value, out bool _vbool) ? _vbool : null), genericBaseType); }
-                    if (value.IndexOf('.') > -1 && genericBaseType.Includes(typeof(float), typeof(double), typeof(decimal))) { value = value.Replace(".", ",", StringComparison.InvariantCulture); }
-                    return (TypeDescriptor.GetConverter(propertyType).ConvertFrom(value), genericBaseType);
+                    _ = _try.TryTypeIsNullable(propertyType, out Type _genericBaseType);
+                    if (_genericBaseType.IsEnum) { return (((Enum.TryParse(_genericBaseType, value, out object _enum) && Enum.IsDefined(_genericBaseType, _enum)) ? _enum : null), _genericBaseType); }
+                    if (_genericBaseType == typeof(bool))
+                    {
+                        if (value == "0") { return (false, _genericBaseType); }
+                        if (value == "1") { return (true, _genericBaseType); }
+                        return (Boolean.TryParse(value, out bool _booleanresult) ? _booleanresult : null, _genericBaseType);
+                    }
+                    if (value.IndexOf('.') > -1 && _genericBaseType.Includes(typeof(float), typeof(double), typeof(decimal))) { value = value.Replace(".", ",", StringComparison.InvariantCulture); }
+                    return (TypeDescriptor.GetConverter(propertyType).ConvertFrom(value), _genericBaseType);
                 }
                 catch { return (default, default); }
             }

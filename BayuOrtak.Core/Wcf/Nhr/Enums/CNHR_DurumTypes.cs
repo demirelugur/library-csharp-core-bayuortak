@@ -60,15 +60,18 @@
         public static string GetDescriptionLocalizationValue(Nhr_DurumTypes value, string dil)
         {
             Guard.UnSupportLanguage(dil, nameof(dil));
-            if (dil == "tr") { return value.GetDescription(); }
-            switch (value)
+            if (dil == "en")
             {
-                case Nhr_DurumTypes.madde35ilegiden: return "Assigned under Article 35";
-                case Nhr_DurumTypes.idarigorevgelen: return "Administrative Staff Incoming";
-                case Nhr_DurumTypes.yabanciuyruklutamzamanli: return "Foreign National - Full Time";
-                case Nhr_DurumTypes.engelli: return "Disabled";
-                default: throw _other.ThrowNotSupportedForEnum<Nhr_DurumTypes>();
+                switch (value)
+                {
+                    case Nhr_DurumTypes.madde35ilegiden: return "Assigned under Article 35";
+                    case Nhr_DurumTypes.idarigorevgelen: return "Administrative Staff Incoming";
+                    case Nhr_DurumTypes.yabanciuyruklutamzamanli: return "Foreign National - Full Time";
+                    case Nhr_DurumTypes.engelli: return "Disabled";
+                    default: throw _other.ThrowNotSupportedForEnum<Nhr_DurumTypes>();
+                }
             }
+            return value.GetDescription();
         }
     }
 }

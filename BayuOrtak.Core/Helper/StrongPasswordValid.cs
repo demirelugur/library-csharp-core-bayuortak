@@ -83,54 +83,54 @@
         /// <returns>Geçerli bir şifre değilse <see langword="true"/>, aksi takdirde <see langword="false"/> döner.</returns>
         public bool TryIsWarning(string value, int? dogumtarihyil, string ad, string soyad, string dil, out string[] warnings)
         {
-            var r = new List<string>();
+            var _r = new List<string>();
             Guard.CheckEmpty(value, nameof(value));
             Guard.UnSupportLanguage(dil, nameof(dil));
-            var _istr = dil == "tr";
+            var _isen = dil == "en";
             if (!PasswordGenerator.IsStrongPassword(value, this.minimumlength))
             {
-                if (_istr) { r.Add($"Şifre minimum {this.minimumlength.ToString()} karakter ve içerisinde en az 1 Büyük Harf, 1 Küçük Harf, 1 Rakam ve 1 Noktalama işareti olmalıdır!"); }
-                else { r.Add($"The password must have a minimum of {this.minimumlength.ToString()} characters and contain at least 1 Uppercase Letter, 1 Lowercase Letter, 1 Number and 1 Punctuation mark!"); }
+                if (_isen) { _r.Add($"The password must have a minimum of {this.minimumlength.ToString()} characters and contain at least 1 Uppercase Letter, 1 Lowercase Letter, 1 Number and 1 Punctuation mark!"); }
+                else { _r.Add($"Şifre minimum {this.minimumlength.ToString()} karakter ve içerisinde en az 1 Büyük Harf, 1 Küçük Harf, 1 Rakam ve 1 Noktalama işareti olmalıdır!"); }
             }
             if (this.maximumlength.HasValue && value.Length > this.maximumlength.Value)
             {
-                if (_istr) { r.Add($"Şifre maksimum {this.maximumlength.Value.ToString()} karakter olabilir!"); }
-                else { r.Add($"Password can be maximum {this.maximumlength.Value.ToString()} characters!"); }
+                if (_isen) { _r.Add($"Password can be maximum {this.maximumlength.Value.ToString()} characters!"); }
+                else  { _r.Add($"Şifre maksimum {this.maximumlength.Value.ToString()} karakter olabilir!"); }
             }
             if (this.isardisiksayi && ardisiksayikontrol_private(value))
             {
-                if (_istr) { r.Add("Şifre içerisinde 3 ardışık sayı (123, 987 vb...) bulunmamalıdır!"); }
-                else { r.Add("The password must not contain 3 consecutive numbers! (123, 987 etc...)"); }
+                if (_isen) { _r.Add("The password must not contain 3 consecutive numbers! (123, 987 etc...)"); }
+                else { _r.Add("Şifre içerisinde 3 ardışık sayı (123, 987 vb...) bulunmamalıdır!"); }
             }
             if (this.isbosluk && value.Contains(' '))
             {
-                if (_istr) { r.Add("Şifre içerisinde boş karakter bulunmamalıdır!"); }
-                else { r.Add("There should be no empty characters in the password!"); }
+                if (_isen) { _r.Add("There should be no empty characters in the password!"); }
+                else { _r.Add("Şifre içerisinde boş karakter bulunmamalıdır!"); }
             }
             if (this.isturkceharf && value.Any(GlobalConstants.turkishcharacters.Contains))
             {
                 var _t = String.Join(", ", GlobalConstants.turkishcharacters);
-                if (_istr) { r.Add($"Şifre içerisinde Türk diline özgü harf ({_t}) bulunmamalıdır!"); }
-                else { r.Add($"The password must not contain any letters specific to the Turkish language! ({_t})"); }
+                if (_isen) { _r.Add($"The password must not contain any letters specific to the Turkish language! ({_t})"); }
+                else { _r.Add($"Şifre içerisinde Türk diline özgü harf ({_t}) bulunmamalıdır!"); }
             }
             if (dogumtarihyil.HasValue && value.Contains(dogumtarihyil.Value.ToString()))
             {
-                if (_istr) { r.Add("Şifre içerisinde doğum tarih yılınız geçmemelidir!"); }
-                else { r.Add("The password must not contain your date and year of birth!"); }
+                if (_isen) { _r.Add("The password must not contain your date and year of birth!"); }
+                else { _r.Add("Şifre içerisinde doğum tarih yılınız geçmemelidir!"); }
             }
             var _password_seo = value.ToSeoFriendly();
             if (adsoyadkontrol_private(_password_seo, ad))
             {
-                if (_istr) { r.Add("Şifre içerisinde adınız/adlarınız geçmemelidir!"); }
-                else { r.Add("Your name(s) must not appear in the password!"); }
+                if (_isen) { _r.Add("Your name(s) must not appear in the password!"); }
+                else { _r.Add("Şifre içerisinde adınız/adlarınız geçmemelidir!"); }
             }
             if (adsoyadkontrol_private(_password_seo, soyad))
             {
-                if (_istr) { r.Add("Şifre içerisinde soyadınız/soyadlarınız geçmemelidir!"); }
-                else { r.Add("Your surname(s) must not appear in the password!"); }
+                if (_isen) { _r.Add("Your surname(s) must not appear in the password!"); }
+                else { _r.Add("Şifre içerisinde soyadınız/soyadlarınız geçmemelidir!"); }
             }
-            warnings = r.ToArray();
-            return r.Count > 0;
+            warnings = _r.ToArray();
+            return _r.Count > 0;
         }
         private static bool ardisiksayikontrol_private(string password)
         {

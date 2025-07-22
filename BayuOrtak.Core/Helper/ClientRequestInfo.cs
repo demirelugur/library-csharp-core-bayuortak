@@ -37,14 +37,7 @@
         {
             if (value == null) { return new ClientRequestInfo(); }
             if (value is ClientRequestInfo _c) { return _c; }
-            if (value is HttpContext context)
-            {
-                return ToEntityFromObject(new
-                {
-                    ismobil = context.IsMobileDevice(),
-                    ipaddress = context.GetIPAddress()
-                });
-            }
+            if (value is HttpContext context) { return new ClientRequestInfo(context.IsMobileDevice(), context.GetIPAddress()); }
             if (value is IFormCollection _form)
             {
                 return ToEntityFromObject(new

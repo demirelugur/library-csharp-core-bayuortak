@@ -138,7 +138,7 @@
         public static Bitmap Resize(this Image image, Size size)
         {
             if (size.IsEmpty) { throw new ArgumentException($"{nameof(size)} parametresi geçerli olmalıdır!", nameof(size)); }
-            var bm = new Bitmap(size.Width, size.Height); // using kullanılırsa bitmap değerleri iletilmemekte
+            var bm = new Bitmap(size.Width, size.Height); // Not: using kullanılırsa bitmap değerleri iletilmemekte
             using (var g = Graphics.FromImage(bm))
             {
                 g.CompositingQuality = CompositingQuality.HighQuality;

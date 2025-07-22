@@ -79,12 +79,12 @@
         /// </summary>
         /// <param name="value">Kontrol edilecek dize (JSON).</param>
         /// <param name="jTokenType">Kontrol edilecek JToken türü.</param>
-        /// <param name="requiresChildrenCheck">Çocukların kontrol edilip edilmeyeceğini belirten bir değer.</param>
+        /// <param name="hasChildren">Çocukların kontrol edilip edilmeyeceğini belirten bir değer.</param>
         /// <returns><see langword="true"/>, eğer dize geçerli bir JSON ise; aksi takdirde <see langword="false"/>.</returns>
-        public static bool IsJson(this string value, JTokenType jTokenType, bool requiresChildrenCheck)
+        public static bool IsJson(this string value, JTokenType jTokenType, bool hasChildren)
         {
             var r = _try.TryJson(value, jTokenType, out JToken _jt);
-            if (r && requiresChildrenCheck) { return _jt.Children().Any(); }
+            if (r && hasChildren) { return _jt.Children().Any(); }
             return r;
         }
         /// <summary>
@@ -135,15 +135,15 @@
         {
             HashSet<string> arm;
             string f;
-            foreach (var p_info in typeof(T).GetProperties(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance).ToArray())
+            foreach (var item in typeof(T).GetProperties(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance).ToArray())
             {
                 arm = new HashSet<string>();
-                foreach (Match itemMatch in Regex.Matches(value, String.Concat(@"\{", p_info.Name, @"(\:.*?)?\}")))
+                foreach (Match itemMatch in Regex.Matches(value, String.Concat(@"\{", item.Name, @"(\:.*?)?\}")))
                 {
                     if (arm.Contains(itemMatch.Value)) { continue; }
                     arm.Add(itemMatch.Value);
                     f = String.Concat("{0", itemMatch.Groups[1].Value, "}");
-                    value = value.Replace(itemMatch.Value, String.Format(f, p_info.GetValue(argument)));
+                    value = value.Replace(itemMatch.Value, String.Format(f, item.GetValue(argument)));
                 }
             }
             return value;

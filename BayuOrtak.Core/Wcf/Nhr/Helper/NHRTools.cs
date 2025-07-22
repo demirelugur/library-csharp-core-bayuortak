@@ -28,8 +28,8 @@
         public static string TcknNotFound(long tckn, string dil)
         {
             Guard.UnSupportLanguage(dil, nameof(dil));
-            if (dil == "tr") { return $"Personel Otomasyonunda(NHR) \"{tckn}\" T.C. Kimlik Numarası üzerine kayıt bulunamadı. ${_title.name_personeldb} veya ${_title.name_bidb} ile iletişime geçiniz!"; }
-            return $"No record was found for the Türkiye Republic Identity Number \"{tckn}\" in the Personnel Automation System (NHR). Please contact the Personnel Department or the Information Technology Department!";
+            if (dil == "en") { return $"No record was found for the Türkiye Republic Identity Number \"{tckn}\" in the Personnel Automation System (NHR). Please contact the Personnel Department or the Information Technology Department!"; }
+            return $"Personel Otomasyonunda(NHR) \"{tckn}\" T.C. Kimlik Numarası üzerine kayıt bulunamadı. ${_title.name_personeldb} veya ${_title.name_bidb} ile iletişime geçiniz!";
         }
         /// <summary>
         /// Personelin 657 Sayılı Kanun 4/B kapsamında sözleşmeli personel olup olmadığını kontrol eder.

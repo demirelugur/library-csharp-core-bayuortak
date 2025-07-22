@@ -2,7 +2,7 @@
 <package>
 	<metadata>
 		<id>BayuOrtak.Core</id>
-		<version>0.9.14.3</version>
+		<version>0.9.18.2</version>
 		<title>Ortak Projeler Yönetim Modülü</title>
 		<authors>Uğur DEMİREL</authors>
 		<owners>T.C. Bayburt Üniversitesi</owners>
@@ -33,7 +33,6 @@
 				<dependency id="System.ServiceModel.Http" version="8.1.2" exclude="Build,Analyzers" />
 				<dependency id="System.ServiceModel.NetTcp" version="8.1.2" exclude="Build,Analyzers" />
 				<dependency id="System.ServiceModel.Security" version="6.0.0" exclude="Build,Analyzers" />
-				<dependency id="System.ServiceModel.Primitives" version="8.0" exclude="Build,Analyzers" />
 			</group>
 		</dependencies>
 	</metadata>

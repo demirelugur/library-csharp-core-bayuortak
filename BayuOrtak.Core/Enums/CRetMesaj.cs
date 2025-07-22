@@ -52,19 +52,22 @@
         public static string GetDescriptionLocalizationValue(RetMesaj value, string dil)
         {
             Guard.UnSupportLanguage(dil, nameof(dil));
-            if (dil == "tr") { return value.GetDescription(); }
-            switch (value)
+            if (dil == "en")
             {
-                case RetMesaj.basari: return "Your request has been completed successfully.";
-                case RetMesaj.hata: return "An unexpected result occurred during the process! Contact the administrator.";
-                case RetMesaj.kayityok: return "No records matching the parameters were found.";
-                case RetMesaj.tarih: return "The entered value does not comply with the date format! Please check.";
-                case RetMesaj.unethical: return "\"Prohibited\" words appear in the text! Contact the administrator.";
-                case RetMesaj.unauthority: return "You are not authorized for the transaction! Contact the administrator.";
-                case RetMesaj.unconnection: return "Cannot communicate with the server computer! Contact the administrator.";
-                case RetMesaj.maxlength: return "The maximum character limit that can be entered has been exceeded! Contact the administrator.";
-                default: throw _other.ThrowNotSupportedForEnum<RetMesaj>();
+                switch (value)
+                {
+                    case RetMesaj.basari: return "Your request has been completed successfully.";
+                    case RetMesaj.hata: return "An unexpected result occurred during the process! Contact the administrator.";
+                    case RetMesaj.kayityok: return "No records matching the parameters were found.";
+                    case RetMesaj.tarih: return "The entered value does not comply with the date format! Please check.";
+                    case RetMesaj.unethical: return "\"Prohibited\" words appear in the text! Contact the administrator.";
+                    case RetMesaj.unauthority: return "You are not authorized for the transaction! Contact the administrator.";
+                    case RetMesaj.unconnection: return "Cannot communicate with the server computer! Contact the administrator.";
+                    case RetMesaj.maxlength: return "The maximum character limit that can be entered has been exceeded! Contact the administrator.";
+                    default: throw _other.ThrowNotSupportedForEnum<RetMesaj>();
+                }
             }
+            return value.GetDescription();
         }
     }
 }

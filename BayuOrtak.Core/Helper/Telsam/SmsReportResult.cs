@@ -9,11 +9,7 @@
         #region Equals
         public override bool Equals(object other) => this.Equals(other as SmsReportResult);
         public override int GetHashCode() => HashCode.Combine(this.error, this.state, this.target, this.setstate);
-        public bool Equals(SmsReportResult other)
-        {
-            if (other is SmsReportResult _ssr) { return this.error == _ssr.error && this.state == _ssr.state && this.target == _ssr.target && this.setstate == _ssr.setstate; }
-            return false;
-        }
+        public bool Equals(SmsReportResult other) => (other != null && this.error == other.error && this.state == other.state && this.target == other.target && this.setstate == other.setstate);
         #endregion
         public string error { get; set; }
         public StateTypes? state { get; set; }

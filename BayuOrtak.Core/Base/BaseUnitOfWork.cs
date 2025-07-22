@@ -18,7 +18,7 @@
         DbConnection GetDbConnection();
         Task<SqlServerProperties> ServerPropertyAsync(CancellationToken cancellationToken);
         Task<int> ExecuteRawAsync(string query, object parameters, CancellationToken cancellationToken);
-        Task<bool> TableReseedAsync(bool isdebug, CancellationToken cancellationToken, params Type[] types);
+        Task<int> TableReseedAsync(bool isdebug, CancellationToken cancellationToken, params Type[] mappedtables);
     }
     public class BaseUnitOfWork<TContext> : IUnitOfWork<TContext> where TContext : DbContext
     {
@@ -54,30 +54,26 @@
         public DbConnection GetDbConnection() => this.Context.Database.GetDbConnection();
         public Task<SqlServerProperties> ServerPropertyAsync(CancellationToken cancellationToken) => this.Context.Database.SqlQueryRaw<SqlServerProperties>(SqlServerProperties.query()).FirstOrDefaultAsync(cancellationToken);
         public Task<int> ExecuteRawAsync(string sql, object parameters, CancellationToken cancellationToken) => this.Context.Database.ExecuteSqlRawAsync(sql, _to.ToSqlParameterFromObject(parameters), cancellationToken);
-        public async Task<bool> TableReseedAsync(bool isdebug, CancellationToken cancellationToken, params Type[] types)
+        public Task<int> TableReseedAsync(bool isdebug, CancellationToken cancellationToken, params Type[] mappedtables)
         {
-            if (!isdebug)
+            mappedtables = mappedtables ?? Array.Empty<Type>();
+            if (isdebug || mappedtables.Length == 0 || !mappedtables.All(x => x.IsMappedTable())) { return Task.FromResult(0); }
+            var _sb = new StringBuilder();
+            var _index = 0;
+            foreach (var type in mappedtables)
             {
-                types = types ?? Array.Empty<Type>();
-                if (types.Length == 0 || !types.All(x => x.IsMappedTable())) { return false; }
-                var _sb = new StringBuilder();
-                var _index = 0;
-                foreach (var type in types)
-                {
-                    var _pkinfo = this.getPrimaryKeyInfo(type);
-                    if (_pkinfo.columnname == "" || _pkinfo.sqldbtypename == "") { continue; }
-                    var _tablename = type.GetTableName(true);
-                    var _variablename = $"@MAXID_{_index}";
-                    _sb.AppendLine($"DECLARE {_variablename} {_pkinfo.sqldbtypename}");
-                    _sb.AppendLine($"SELECT {_variablename} = MAX([{_pkinfo.columnname}]) FROM {_tablename}");
-                    _sb.AppendLine($"SET {_variablename} = ISNULL({_variablename}, 0)");
-                    _sb.AppendLine($"DBCC CHECKIDENT ('{_tablename}', RESEED, {_variablename})");
-                    _index++;
-                }
-                if (_sb.Length == 0) { return false; }
-                await this.ExecuteRawAsync(_sb.ToString(), null, cancellationToken);
+                var _pkinfo = this.getPrimaryKeyInfo(type);
+                if (_pkinfo.columnname == "" || _pkinfo.sqldbtypename == "") { continue; }
+                var _tablename = type.GetTableName(true);
+                var _variablename = $"@MAXID_{_index}";
+                _sb.AppendLine($"DECLARE {_variablename} {_pkinfo.sqldbtypename}");
+                _sb.AppendLine($"SELECT {_variablename} = MAX([{_pkinfo.columnname}]) FROM {_tablename}");
+                _sb.AppendLine($"SET {_variablename} = ISNULL({_variablename}, 0)");
+                _sb.AppendLine($"DBCC CHECKIDENT ('{_tablename}', RESEED, {_variablename})");
+                _index++;
             }
-            return true;
+            if (_sb.Length == 0) { return Task.FromResult(0); }
+            return this.ExecuteRawAsync(_sb.ToString(), null, cancellationToken);
         }
         private (string columnname, string sqldbtypename) getPrimaryKeyInfo(Type type)
         {

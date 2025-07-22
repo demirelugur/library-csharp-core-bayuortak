@@ -13,6 +13,7 @@
     using System.ComponentModel.DataAnnotations.Schema;
     using System.Data;
     using System.Diagnostics;
+    using System.DirectoryServices;
     using System.Globalization;
     using System.Linq.Expressions;
     using System.Net.Mail;
@@ -43,7 +44,6 @@
         /// </summary>
         public static async Task<T> SetCompositeKeyAsync<T, TKey>(this DbContext dbContext, bool isSaveChanges, T oldEntity, Expression<Func<T, TKey>> compositeKey, TKey compositeKeyValue, string dil, CancellationToken cancellationToken) where T : class, new()
         {
-            Guard.UnSupportLanguage(dil, nameof(dil));
             var _t = typeof(T);
             var _tablename = _t.GetTableName(false);
             var _c = compositeKey.GetExpressionName();
@@ -53,6 +53,7 @@
                 setcolumn = x.Name == _c,
                 iscompositekey = x.IsPK() && x.GetDatabaseGeneratedOption() == DatabaseGeneratedOption.None
             }).ToArray();
+            Guard.UnSupportLanguage(dil, nameof(dil));
             if (_props.Where(x => x.iscompositekey).Count() < 2)
             {
                 if (dil == "en") { throw new KeyNotFoundException($"The \"{_tablename}\" table must contain at least 2 properties with \"{typeof(KeyAttribute).FullName}\" or \"{typeof(DatabaseGeneratedAttribute).FullName}\" attributes to continue processing!"); }
