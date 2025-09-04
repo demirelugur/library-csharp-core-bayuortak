@@ -1,6 +1,7 @@
 ﻿namespace BayuOrtak.Core.Extensions
 {
     using BayuOrtak.Core.Helper;
+    using BayuOrtak.Core.Helper.Results;
     using Ganss.Xss;
     using Newtonsoft.Json.Linq;
     using System;
@@ -31,9 +32,9 @@
         /// <para>Biçim: (###) ###-####</para>
         /// <para>Örneğin: &quot;5001112233&quot; girişi &quot;(500) 111-2233&quot; biçiminde döner.</para>
         /// </summary>
-        /// <param name="phoneNumberTR">Dönüştürülmek istenen telefon numarası.</param>
+        /// <param name="phonenumberTR">Dönüştürülmek istenen telefon numarası.</param>
         /// <returns>Biçimlenmiş Türk telefon numarası ya da geçerli değilse boş bir string.</returns>
-        public static string BeautifyPhoneNumberTR(this string phoneNumberTR) => (_try.TryPhoneNumberTR(phoneNumberTR, out string _s) ? $"({_s.Substring(0, 3)}) {_s.Substring(3, 3)}-{_s.Substring(6, 4)}" : "");
+        public static string BeautifyPhoneNumberTR(this string phonenumberTR) => (_try.TryPhoneNumberTR(phonenumberTR, out string _s) ? $"({_s.Substring(0, 3)}) {_s.Substring(3, 3)}-{_s.Substring(6, 4)}" : "");
         /// <summary>
         /// Verilen dize değerinin null veya boş olup olmadığını kontrol eder.
         /// </summary>
@@ -44,20 +45,20 @@
         /// String verilerinde null-coalescing operatörünün (null birleştirme operatörünün) etkili bir şekilde kullanılabilmesi için, eğer string değeri null veya boşsa (trimlenmiş haliyle) sağdaki değeri döndüren bir fonksiyon oluşturulmuştur
         /// </summary>
         /// <param name="value">Kontrol edilecek string.</param>
-        /// <param name="defaultValue">Eğer value null veya boşsa dönecek olan değer.</param>
-        /// <returns>value string&#39;i veya defaultValue.</returns>
-        public static string CoalesceOrDefault(this string value, string defaultValue)
+        /// <param name="defaultvalue">Eğer value null veya boşsa dönecek olan değer.</param>
+        /// <returns>value string&#39;i veya defaultvalue.</returns>
+        public static string CoalesceOrDefault(this string value, string defaultvalue)
         {
             value = value.ToStringOrEmpty();
-            return (value == "" ? defaultValue.ToStringOrEmpty() : value);
+            return (value == "" ? defaultvalue.ToStringOrEmpty() : value);
         }
         /// <summary>
         /// Verilen dize değerinin sayısal bir değere dönüştürülüp dönüştürülemeyeceğini kontrol eder.
         /// </summary>
         /// <param name="value">Kontrol edilecek dize.</param>
-        /// <param name="numberStyles">Sayının biçimlendirilmesi için kullanılacak sayı stilleri.</param>
+        /// <param name="numberstyles">Sayının biçimlendirilmesi için kullanılacak sayı stilleri.</param>
         /// <returns><see langword="true"/>, eğer dize bir sayıya dönüştürülebiliyorsa; aksi takdirde <see langword="false"/>.</returns>
-        public static bool IsNumeric(this string value, NumberStyles numberStyles = NumberStyles.Integer) => BigInteger.TryParse(value.ToStringOrEmpty(), numberStyles, NumberFormatInfo.InvariantInfo, out _);
+        public static bool IsNumeric(this string value, NumberStyles numberstyles = NumberStyles.Integer) => BigInteger.TryParse(value.ToStringOrEmpty(), numberstyles, NumberFormatInfo.InvariantInfo, out _);
         /// <summary>
         /// Belirtilen string değerinin geçerli bir e-Posta adresi olup olmadığını kontrol eder.
         /// </summary>
@@ -78,14 +79,14 @@
         /// Verilen dize değerinin geçerli bir JSON olup olmadığını kontrol eder.
         /// </summary>
         /// <param name="value">Kontrol edilecek dize (JSON).</param>
-        /// <param name="jTokenType">Kontrol edilecek JToken türü.</param>
-        /// <param name="hasChildren">Çocukların kontrol edilip edilmeyeceğini belirten bir değer.</param>
+        /// <param name="jtokentype">Kontrol edilecek JToken türü.</param>
+        /// <param name="haschildren">Çocukların kontrol edilip edilmeyeceğini belirten bir değer.</param>
         /// <returns><see langword="true"/>, eğer dize geçerli bir JSON ise; aksi takdirde <see langword="false"/>.</returns>
-        public static bool IsJson(this string value, JTokenType jTokenType, bool hasChildren)
+        public static bool IsJson(this string value, JTokenType jtokentype, bool haschildren)
         {
-            var r = _try.TryJson(value, jTokenType, out JToken _jt);
-            if (r && hasChildren) { return _jt.Children().Any(); }
-            return r;
+            var _r = _try.TryJson(value, jtokentype, out JToken _jt);
+            if (_r && haschildren) { return _jt.Children().Any(); }
+            return _r;
         }
         /// <summary>
         /// Verilen dize değerinin geçerli bir URI olup olmadığını kontrol eder.
@@ -93,7 +94,7 @@
         /// <param name="value">Kontrol edilecek dize (URI).</param>
         /// <returns><see langword="true"/>, eğer dize geçerli bir URI ise; aksi takdirde <see langword="false"/>.</returns>
         public static bool IsUri(this string value) => _try.TryUri(value, out _);
-        private static readonly Dictionary<char, char> charReplacements = new Dictionary<char, char>
+        private static readonly Dictionary<char, char> _charreplacements = new Dictionary<char, char>
         {
             { 'ş', 's' }, { 'Ş', 's' },
             { 'ö', 'o' }, { 'Ö', 'o' },
@@ -102,7 +103,7 @@
             { 'ğ', 'g' }, { 'Ğ', 'g' },
             { 'ı', 'i' }, { 'I', 'i' }, { 'İ', 'i' }
         };
-        private static readonly char[] charsToRemove = new char[] { '?', '/', '.', '\'', '"', '#', '%', '&', '*', '!', '@', '+' };
+        private static readonly char[] _charstoremove = new char[] { '?', '/', '.', '\'', '"', '#', '%', '&', '*', '!', '@', '+' };
         /// <summary>
         /// Verilen dizeyi SEO dostu bir hale getirir.
         /// </summary>
@@ -113,11 +114,11 @@
             value = value.ToStringOrEmpty();
             if (value == "") { return ""; }
             var sb = new StringBuilder(value.Length);
-            foreach (var itemChar in value.ToCharArray())
+            foreach (var item in value.ToCharArray())
             {
-                if (charReplacements.TryGetValue(itemChar, out char _v)) { sb.Append(_v); }
-                else if (itemChar == ' ') { sb.Append('-'); }
-                else if (Array.IndexOf(charsToRemove, itemChar) == -1) { sb.Append(itemChar); }
+                if (_charreplacements.TryGetValue(item, out char _v)) { sb.Append(_v); }
+                else if (item == ' ') { sb.Append('-'); }
+                else if (Array.IndexOf(_charstoremove, item) == -1) { sb.Append(item); }
             }
             value = sb.ToString().ToLower().Trim();
             value = Regex.Replace(value, @"[^a-z0-9-]", "-");
@@ -135,18 +136,31 @@
         {
             HashSet<string> arm;
             string f;
-            foreach (var item in typeof(T).GetProperties(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance).ToArray())
+            foreach (var pi in typeof(T).GetProperties(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance).ToArray())
             {
                 arm = new HashSet<string>();
-                foreach (Match itemMatch in Regex.Matches(value, String.Concat(@"\{", item.Name, @"(\:.*?)?\}")))
+                foreach (Match item in Regex.Matches(value, String.Concat(@"\{", pi.Name, @"(\:.*?)?\}")))
                 {
-                    if (arm.Contains(itemMatch.Value)) { continue; }
-                    arm.Add(itemMatch.Value);
-                    f = String.Concat("{0", itemMatch.Groups[1].Value, "}");
-                    value = value.Replace(itemMatch.Value, String.Format(f, item.GetValue(argument)));
+                    if (arm.Contains(item.Value)) { continue; }
+                    arm.Add(item.Value);
+                    f = String.Concat("{0", item.Groups[1].Value, "}");
+                    value = value.Replace(item.Value, String.Format(f, pi.GetValue(argument)));
                 }
             }
             return value;
+        }
+        /// <summary>
+        /// Verilen metot ismi ve tip bilgisi kullanılarak bir route ismi oluşturur.
+        /// </summary>
+        /// <typeparam name="T">Route&#39;un ilişkilendirileceği sınıf tipi (class olmalıdır)</typeparam>
+        /// <param name="methodname">Route ile ilişkilendirilecek metot ismi</param>
+        /// <param name="usefulltypename">Tam tip ismi (<see cref="Type.FullName"/>) kullanılacak mı? <see langword="false"/> ise kısa tip ismi (<see cref="MemberInfo.Name"/>) kullanılır</param>
+        /// <returns>Biçimli route string&#39;i (örn: &quot;/ControllerName/Method&quot; veya &quot;/Namespace.ControllerName/Method&quot;)</returns>
+        /// <exception cref="ArgumentException">method parametresi boş veya null olduğunda fırlatılır</exception>
+        public static string GetRouteName<T>(this string methodname, bool usefulltypename) where T : class
+        {
+            Guard.CheckEmpty(methodname, nameof(methodname));
+            return $"/{(usefulltypename ? typeof(T).FullName : typeof(T).Name)}/{methodname}";
         }
         /// <summary>
         /// Verilen string içindeki tab (\t), satır başı (\r) ve yeni satır (\n) karakterlerini tek boşlukla değiştirir, baştaki ve sondaki boşlukları temizler ve birden fazla boşluğu tek boşluğa indirger.
@@ -183,6 +197,7 @@
             value = value.ToStringOrEmpty();
             return (value.Length > length ? value.Substring(0, length).Trim() : value);
         }
+        private static ArgumentNullException _setargumentnullexception(string argname) => new ArgumentNullException($"\"{argname}\" değeri boş geçilemez!", new Exception(_title.xss)); // HttpUtility.HtmlEncode(value)
         /// <summary>
         /// Verilen bir dizeyi HTML sanitizasyon işleminden geçirir ve gerekli kontrolleri yapar. Eğer dize boşsa ve isrequired true ise, bir hata fırlatır. Sanitizasyon işlemi sırasında script etiketleri kaldırılır, yalnızca https şemasına izin verilir ve veri öznitelikleri kabul edilir.
         /// </summary>
@@ -195,30 +210,29 @@
             value = value.ToStringOrEmpty();
             if (value == "")
             {
-                if (isrequired) { throw setArgumentNullException_private(argname); }
+                if (isrequired) { throw _setargumentnullexception(argname); }
                 return null;
             }
             string v;
             try
             {
-                var hs = new HtmlSanitizer
+                var _hs = new HtmlSanitizer
                 {
                     AllowDataAttributes = true
                 };
-                hs.AllowedTags.Remove("script");
-                hs.AllowedSchemes.Add("https");
-                hs.AllowedSchemes.Remove("javascript");
-                v = hs.Sanitize(value).Trim();
+                _hs.AllowedTags.Remove("script");
+                _hs.AllowedSchemes.Add("https");
+                _hs.AllowedSchemes.Remove("javascript");
+                v = _hs.Sanitize(value).Trim();
             }
             catch { v = ""; }
             if (v == "")
             {
-                if (isrequired) { throw setArgumentNullException_private(argname); }
+                if (isrequired) { throw _setargumentnullexception(argname); }
                 return null;
             }
             return v;
         }
-        private static ArgumentNullException setArgumentNullException_private(string argname)  => new ArgumentNullException($"\"{argname}\" değeri boş geçilemez!", new Exception(_title.xss)); // HttpUtility.HtmlEncode(value)
         /// <summary>
         /// Bir string&#39;i belirtilen noktalama işaretleri kurallarına göre Başlık Durumuna dönüştürür.
         /// </summary>
@@ -232,23 +246,23 @@
             if (value == "") { return ""; }
             if (value.Length == 1) { return value.ToUpper(); }
             punctuations = (punctuations ?? Array.Empty<char>()).Where(Char.IsPunctuation).ToArray();
-            bool haspunc = punctuations.Length > 0, newword = true;
-            var sb = new StringBuilder();
-            foreach (var itemChar in value.ToCharArray())
+            bool _haspunc = punctuations.Length > 0, newword = true;
+            var _sb = new StringBuilder();
+            foreach (var item in value.ToCharArray())
             {
-                if ((iswhitespace && Char.IsWhiteSpace(itemChar)) || (haspunc && punctuations.Contains(itemChar)))
+                if ((iswhitespace && Char.IsWhiteSpace(item)) || (_haspunc && punctuations.Contains(item)))
                 {
-                    sb.Append(itemChar);
+                    _sb.Append(item);
                     newword = true;
                 }
                 else if (newword)
                 {
-                    sb.Append(Convert.ToString(itemChar).ToUpper());
+                    _sb.Append(Convert.ToString(item).ToUpper());
                     newword = false;
                 }
-                else { sb.Append(Convert.ToString(itemChar).ToLower()); }
+                else { _sb.Append(Convert.ToString(item).ToLower()); }
             }
-            return sb.ToString();
+            return _sb.ToString();
         }
         /// <summary>
         /// Verilen bir dizeyi, belirtilen türde bir değere dönüştürür. Dönüşüm başarısız olursa, varsayılan değeri döner.
@@ -264,5 +278,13 @@
             try { return (TKey)Convert.ChangeType(_pd.value, _pd.genericbasetype); }
             catch { return default; }
         }
+        /// <summary>
+        /// Verilen hata mesajını başarısız sonucu temsil edecek şekilde döndürür.
+        /// </summary>
+        public static IslemSonucResult<T> ReturnFailed<T>(this string error) => new string[] { error }.ReturnFailed<T>();
+        /// <summary>
+        /// Verilen hata mesajını başarısız sonucu temsil edecek şekilde döndürür.
+        /// </summary>
+        public static IslemSonucResult<object[]> ReturnFailedObjectArray(this string error) => new string[] { error }.ReturnFailedObjectArray();
     }
 }

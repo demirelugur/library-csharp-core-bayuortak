@@ -3,59 +3,57 @@
     using BayuOrtak.Core.Extensions;
     using Microsoft.AspNetCore.Http;
     using System.Collections.Generic;
-    using static BayuOrtak.Core.Enums.CRetMesaj;
     using static BayuOrtak.Core.Helper.OrtakTools;
     public sealed class FileUploadHelper
     {
-        private readonly HashSet<string> _delDirectoryFiles = new HashSet<string>();
-        private readonly HashSet<string> _delFiles = new HashSet<string>();
-        private readonly Dictionary<string, object> _addFiles = new Dictionary<string, object>();
+        private readonly HashSet<string> _deldirectories = new HashSet<string>();
+        private readonly HashSet<string> _delfiles = new HashSet<string>();
+        private readonly Dictionary<string, object> _addfiles = new Dictionary<string, object>();
         /// <summary>
         /// Silinmesi gereken klasörlerin fiziksel yolunu ekler
         /// </summary>
-        /// <param name="physicallyDirectoryPaths">Silinmesi gereken klasörün fiziksel yolu.</param>
-        public void RemoveDirectory(params string[] physicallyDirectoryPaths) => _delDirectoryFiles.AddRangeOptimized(physicallyDirectoryPaths ?? Array.Empty<string>());
+        /// <param name="physicallydirectorypaths">Silinmesi gereken klasörün fiziksel yolu.</param>
+        public void RemoveDirectory(params string[] physicallydirectorypaths) => _deldirectories.AddRangeOptimized(physicallydirectorypaths ?? Array.Empty<string>());
         /// <summary>
         /// Silinmesi gereken bir dosyanın fiziksel yolunu ekler.
         /// </summary>
-        /// <param name="physicallyPaths">Silinmesi gereken dosyanın fiziksel yolu.</param>
-        public void RemoveFile(params string[] physicallyPaths) => _delFiles.AddRangeOptimized(physicallyPaths ?? Array.Empty<string>());
+        /// <param name="physicallypaths">Silinmesi gereken dosyanın fiziksel yolu.</param>
+        public void RemoveFile(params string[] physicallypaths) => _delfiles.AddRangeOptimized(physicallypaths ?? Array.Empty<string>());
         /// <summary>
         /// Eklenmesi gereken bir dosyanın fiziksel yolunu ve dosya nesnesini ekler.
         /// </summary>
-        /// <param name="physicallyPath">Eklenmesi gereken dosyanın fiziksel yolu.</param>
+        /// <param name="physicallypath">Eklenmesi gereken dosyanın fiziksel yolu.</param>
         /// <param name="file">Eklenmesi gereken dosya nesnesi.</param>
-        public void Add(string physicallyPath, IFormFile file) => _addFiles.Upsert(physicallyPath, file);
+        public void Add(string physicallypath, IFormFile file) => _addfiles.Upsert(physicallypath, file);
         /// <summary>
         /// Eklenmesi gereken bir dosyanın fiziksel yolunu ve bayt dizisini ekler.
         /// </summary>
-        /// <param name="physicallyPath">Eklenmesi gereken dosyanın fiziksel yolu.</param>
+        /// <param name="physicallypath">Eklenmesi gereken dosyanın fiziksel yolu.</param>
         /// <param name="bytes">Eklenmesi gereken dosyanın bayt dizisi.</param>
-        public void Add(string physicallyPath, byte[] bytes) => _addFiles.Upsert(physicallyPath, bytes);
+        public void Add(string physicallypath, byte[] bytes) => _addfiles.Upsert(physicallypath, bytes);
         /// <summary>
         /// Belirtilen dosyalar yüklenmeden önce, varsa önce silinmesi gereken klasörler ve ardından silinmesi gereken dosyalar kaldırılır.
         /// </summary>
-        public async Task ProcessFileUploadsAndDeletionsAsync(CancellationToken cancellationToken)
+        public async Task ProcessFileUploadsAndDeletionsAsync(CancellationToken cancellationtoken)
         {
-            var delFileAny = _delFiles.Count > 0;
-            var addFileAny = _addFiles.Count > 0;
-            if (_delDirectoryFiles.Count > 0)
+            var _delfileany = _delfiles.Count > 0;
+            var _addfileany = _addfiles.Count > 0;
+            if (_deldirectories.Count > 0)
             {
-                foreach (var item in _delDirectoryFiles) { _file.DirectoryExiststhenDelete(item, true); }
-                if (delFileAny || addFileAny) { await Task.Delay(300, cancellationToken); }
+                foreach (var item in _deldirectories) { _file.DirectoryExiststhenDelete(item, true); }
+                if (_delfileany || _addfileany) { await Task.Delay(300, cancellationtoken); }
             }
-            if (delFileAny)
+            if (_delfileany)
             {
-                foreach (var itemDeleteFile in _delFiles) { _file.FileExiststhenDelete(itemDeleteFile); }
-                if (addFileAny) { await Task.Delay(300, cancellationToken); }
+                foreach (var item in _delfiles) { _file.FileExiststhenDelete(item); }
+                if (_addfileany) { await Task.Delay(300, cancellationtoken); }
             }
-            if (addFileAny)
+            if (_addfileany)
             {
-                foreach (var itemAddFile in _addFiles)
+                foreach (var item in _addfiles)
                 {
-                    if (itemAddFile.Value is IFormFile _f) { await _f.FileUploadAsync(itemAddFile.Key, cancellationToken); }
-                    else if (itemAddFile.Value is byte[] _b) { await _b.FileUploadAsync(itemAddFile.Key, cancellationToken); }
-                    else { throw new Exception(RetMesaj.hata.GetDescription()); } // Not: Bu ihtimalin gelme durumu olmamasına rağmen ne olur olmaz yazılan kontrol
+                    if (item.Value is IFormFile _f) { await _f.FileUploadAsync(item.Key, cancellationtoken); }
+                    else { await ((byte[])item.Value).FileUploadAsync(item.Key, cancellationtoken); }
                 }
             }
         }

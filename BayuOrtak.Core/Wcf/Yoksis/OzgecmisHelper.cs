@@ -73,16 +73,16 @@
             {
                 if (_Client == null)
                 {
-                    _Client = new OzgecmisV1PortClient(YoksisTools.basicHttpBinding, new EndpointAddress("http://servisler.yok.gov.tr/ws/OzgecmisV2?wsdl")); // Not: EndpointAddress uri yolu http ile başlamalıdır!
+                    _Client = new OzgecmisV1PortClient(YoksisTools.basichttpbinding, new EndpointAddress("http://servisler.yok.gov.tr/ws/OzgecmisV2?wsdl")); // Not: EndpointAddress uri yolu http ile başlamalıdır!
                     _Client.ClientCredentials.UserName.UserName = yoksis_UNI_code.ToString();
                     _Client.ClientCredentials.UserName.Password = this.password;
                 }
                 return _Client;
             }
         }
-        public async Task<(bool statuswarning, string error)> IsConnectionStatusAsync(TimeSpan timeout, string dil, CancellationToken cancellationToken)
+        public async Task<(bool statuswarning, string error)> IsConnectionStatusAsync(TimeSpan timeout, string dil, CancellationToken cancellationtoken)
         {
-            var _t = await this.client.Endpoint.Address.Uri.IsConnectionStatusAsync(timeout, cancellationToken);
+            var _t = await this.client.Endpoint.Address.Uri.IsConnectionStatusAsync(timeout, cancellationtoken);
             return (_t.statuswarning, _t.statuswarning ? GlobalConstants.webservice_connectionwarning(dil, "YÖKSİS, OzgecmisV2") : "");
         }
         public async Task<getirOgrenimBilgisiListesiResponse> Get_OgrenimBilgisiListesiAsync(long tckn) => (await this.client.getirOgrenimBilgisiListesiAsync(new getirOgrenimBilgisiListesiRequestType()
@@ -201,13 +201,13 @@
             {
                 var _iletisim = await Get_PersonelLinkV1Async(tckn);
                 var _notbaglanti = (_iletisim == null || (_iletisim.Sonuc.SonucKod == 0 && _iletisim.Sonuc.SonucMesaj.ToSeoFriendly() != "akademisyen-universiteniz-kadrosunda-bulunmamaktadir"));
-                docTemelAlan? temel = null;
+                docTemelAlan? _temel = null;
                 if (!_notbaglanti)
                 {
                     var _ta = await Get_TemelAlanBilgisiV1Async(tckn);
-                    if (_ta != null && _ta.Sonuc.SonucKod == 1) { temel = _ta.temelAlanListe.Where(x => x.AKTIF_PASIF == "1").FirstOrDefault(); }
+                    if (_ta != null && _ta.Sonuc.SonucKod == 1) { _temel = _ta.temelAlanListe.Where(x => x.AKTIF_PASIF == "1").FirstOrDefault(); }
                 }
-                return new OzgecmisPersonelInfoResult(true, !_notbaglanti, (_notbaglanti ? null : _iletisim.personelLinkListe.FirstOrDefault()), temel);
+                return new OzgecmisPersonelInfoResult(true, !_notbaglanti, (_notbaglanti ? null : _iletisim.personelLinkListe.FirstOrDefault()), _temel);
             }
             catch { return new OzgecmisPersonelInfoResult(); }
         }

@@ -22,10 +22,10 @@
         /// <summary>
         /// Yeni bir <see cref="Validation_MinDateOnlyAttribute"/> örneği oluşturur ve belirtilen tarih dizesini minimum tarih olarak ayarlar.
         /// </summary>
-        /// <param name="minDate">Minimum tarih dizesi (yyyy-MM-dd biçiminde).</param>
-        public Validation_MinDateOnlyAttribute(string minDate)
+        /// <param name="mindate">Minimum tarih dizesi (yyyy-MM-dd biçiminde).</param>
+        public Validation_MinDateOnlyAttribute(string mindate)
         {
-            this.mindate = DateOnly.Parse(minDate);
+            this.mindate = DateOnly.Parse(mindate);
         }
         /// <summary>
         /// Yeni bir <see cref="Validation_MinDateOnlyAttribute"/> örneği oluşturur ve belirtilen yıl, ay ve gün değerlerine göre minimum tarihi ayarlar.

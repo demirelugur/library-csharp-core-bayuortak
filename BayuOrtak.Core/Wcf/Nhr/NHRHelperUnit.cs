@@ -38,9 +38,9 @@
                 return _Client;
             }
         }
-        public async Task<(bool statuswarning, string error)> IsConnectionStatusAsync(TimeSpan timeout, string dil, CancellationToken cancellationToken)
+        public async Task<(bool statuswarning, string error)> IsConnectionStatusAsync(TimeSpan timeout, string dil, CancellationToken cancellationtoken)
         {
-            var _t = await this.client.Endpoint.Address.Uri.IsConnectionStatusAsync(timeout, cancellationToken);
+            var _t = await this.client.Endpoint.Address.Uri.IsConnectionStatusAsync(timeout, cancellationtoken);
             return (_t.statuswarning, _t.statuswarning ? GlobalConstants.webservice_connectionwarning(dil, "NHR Unit") : "");
         }
         private async Task<wsnode[]> birimagacibytypeAsync(int typeid) => (await this.client.birimagacibytypeAsync(this.username, this.password, typeid)).@return;

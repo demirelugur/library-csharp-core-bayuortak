@@ -52,6 +52,7 @@
         public string tel { get; set; }
         public short? dahili { get; set; }
         public string gender { get; set; }
+        public bool isrektor { get; set; }
         public bool ismadde35ilegiden { get; set; }
         public bool isidarigorevligelen { get; set; }
         public bool isyabanciuyruklutamzamanli { get; set; }
@@ -84,8 +85,23 @@
         [JsonIgnore]
         [IgnoreDataMember]
         public Uri? profilpage => (this.seo.IsNullOrEmpty_string() ? null : new Uri($"https://bayburt.edu.tr/personel/{this.seo}"));
-        public PersonelInformation() : this(default, "", "", "", "", "", default, "", default, default, "", "", "", "", default, default, default, default, "", default, "", default, default, default, default, default, default, "", "", default, default, default, "", "", default, "", default, "", default) { }
-        public PersonelInformation(int uyeid, string seo, string ad, string soyad, string kuladi, string kuladiuzem, long tckn, string sicilno, bool sa, int depid, string deptreecode, string imagetype, string imagepartialpath, string unvanid, decimal unvansirano, DateTime basdate, DateTime? bitdate, bool durum, string tel, short? dahili, string gender, bool ismadde35ilegiden, bool isidarigorevligelen, bool isyabanciuyruklutamzamanli, bool isengelli, DateTime nhr_dogumtarihi, Nvi_KimlikTypes? nhr_nvikimliktipi, string nhr_cuzdanserino, string nhr_jobrecordalttipi, short? nhr_dahili, Nhr_UnvanTypes nhr_unvantip, int nhr_unvanid, string nhr_unvanadi, string nhr_unvankisa, int nhr_birimid, string nhr_birimadi, int? nhr_fiilibirimid, string nhr_fiilibirimadi, YokInformation? yokinfo) : base(uyeid, seo, ad, soyad, kuladi, kuladiuzem, tckn, sicilno)
+        public PersonelInformation() : this(default, "", "", "", "", "", default, "",
+            default, default, "", "", "",
+            "", default, default, default, default,
+            "", default, "", default, default,
+            default, default, default, default, default,
+            "", "", default, default, default,
+            "", "", default, "", default,
+            "", default)
+        { }
+        public PersonelInformation(int uyeid, string seo, string ad, string soyad, string kuladi, string kuladiuzem, long tckn, string sicilno,
+            bool sa, int depid, string deptreecode, string imagetype, string imagepartialpath,
+            string unvanid, decimal unvansirano, DateTime basdate, DateTime? bitdate, bool durum,
+            string tel, short? dahili, string gender, bool isrektor, bool ismadde35ilegiden,
+            bool isidarigorevligelen, bool isyabanciuyruklutamzamanli, bool isengelli, DateTime nhr_dogumtarihi, Nvi_KimlikTypes? nhr_nvikimliktipi,
+            string nhr_cuzdanserino, string nhr_jobrecordalttipi, short? nhr_dahili, Nhr_UnvanTypes nhr_unvantip, int nhr_unvanid,
+            string nhr_unvanadi, string nhr_unvankisa, int nhr_birimid, string nhr_birimadi, int? nhr_fiilibirimid,
+            string nhr_fiilibirimadi, YokInformation? yokinfo) : base(uyeid, seo, ad, soyad, kuladi, kuladiuzem, tckn, sicilno)
         {
             this.sa = sa;
             this.depid = depid;
@@ -100,6 +116,7 @@
             this.tel = tel;
             this.dahili = dahili;
             this.gender = gender;
+            this.isrektor = isrektor;
             this.ismadde35ilegiden = ismadde35ilegiden;
             this.isidarigorevligelen = isidarigorevligelen;
             this.isyabanciuyruklutamzamanli = isyabanciuyruklutamzamanli;

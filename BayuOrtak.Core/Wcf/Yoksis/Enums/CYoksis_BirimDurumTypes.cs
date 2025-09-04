@@ -9,11 +9,11 @@
             [Description("Pasif")]
             pasif = 0,
             [Description("Aktif")]
-            aktif = 1,
+            aktif,
             [Description("Yarı Pasif")]
-            yari = 2,
+            yari,
             [Description("Kapatılmış")]
-            closed = 3
+            closed
         }
     }
 }

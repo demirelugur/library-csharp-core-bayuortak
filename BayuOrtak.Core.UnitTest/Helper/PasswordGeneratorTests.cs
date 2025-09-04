@@ -37,4 +37,4 @@ namespace BayuOrtak.Core.UnitTest.Helper
             Assert.That(PasswordGenerator.IsStrongPassword(password, minLen), Is.False);
         }
     }
-} 
+}

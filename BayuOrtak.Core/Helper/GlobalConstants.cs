@@ -8,6 +8,11 @@
         public const long yoksis_UNI_code = 104922; // T.C. Bayburt Üniversitesi YÖKSİS Kurum Kodu
         public static readonly string[] filesizeunits = new string[] { "bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB" };
         public static readonly char[] turkishcharacters = new char[] { 'Ç', 'ç', 'Ğ', 'ğ', 'İ', 'ı', 'Ö', 'ö', 'Ş', 'ş', 'Ü', 'ü' };
+        /// <summary>
+        /// <code>
+        /// new JsonSerializerSettings{MetadataPropertyHandling=MetadataPropertyHandling.Ignore,DateParseHandling=DateParseHandling.None,NullValueHandling=NullValueHandling.Include,Converters={new IsoDateTimeConverter{DateTimeStyles=DateTimeStyles.AssumeUniversal},new StringEnumConverter()}};
+        /// </code>
+        /// </summary>
         public static readonly JsonSerializerSettings jsonserializersettings = new JsonSerializerSettings
         {
             MetadataPropertyHandling = MetadataPropertyHandling.Ignore,
@@ -15,7 +20,8 @@
             NullValueHandling = NullValueHandling.Include,
             Converters =
             {
-                new IsoDateTimeConverter { DateTimeStyles = DateTimeStyles.AssumeUniversal }
+                new IsoDateTimeConverter { DateTimeStyles = DateTimeStyles.AssumeUniversal },
+                new StringEnumConverter()
             }
         };
         /// <summary>
@@ -48,12 +54,10 @@
         public sealed class _domain
         {
             public const string bayburtuni = "https://bayburt.edu.tr";
-            public const string bilgiislemdb = "https://bayburt.edu.tr/bilgi-islem";
-            public const string example = "https://example.com";
-            public const string personeldb = "https://bayburt.edu.tr/personel";
-            public const string ogrencidb = "https://bayburt.edu.tr/ogrenci-isleri";
+            public const string koordinat_bayburtuni = "https://maps.google.com/?q=40.250230335582955,40.23025617808133";
             public const string sifredegistir_ogrenci = "https://sorgula.bayburt.edu.tr/ogrenci-sifre-degistir";
             public const string sifredegistir_personel = "https://sorgula.bayburt.edu.tr/personel-kurum-sifre-degistir";
+            public const string example = "https://example.com";
         }
         public sealed class _maximumlength
         {
@@ -71,6 +75,7 @@
             public const int sifre = 256;
             public const int sms_singlemaxlength = 150;
             public const int sms_messagelength = 4000;
+            public const int yoksis_authorid = 16;
         }
         public sealed class _nhr
         {
@@ -102,19 +107,9 @@
         }
         public sealed class _title
         {
-            public const string koordinat_bayburtuniversitesi = "40.250230335582955,40.23025617808133";
             public const string ebys = "EBYS(Elektronik Belge Yönetim Sistemi)";
-            public const string iletisim_bilgiislem = "Bilgi İşlem Daire Başkanlığı ile iletişime geçiniz!";
-            public const string iletisim_bilgiislem_sistem = "Bilgi İşlem Daire Başkanlığı Sistem ekibi ile iletişime geçiniz!";
-            public const string iletisim_bilgiislem_webyazilim = "Bilgi İşlem Daire Başkanlığı Web - Yazılım ekibi ile iletişime geçiniz!";
-            public const string iletisim_personeldb = "Personel Daire Başkanlığı ile iletişime geçiniz!";
-            public const string iletisim_ogrencidb = "Öğrenci İşleri Daire Başkanlığı ile iletişime geçiniz!";
             public const string isbn = "ISBN(Uluslararası Standart Kitap Numarası)";
             public const string mac = "MAC(Media Access Control)";
-            public const string name_bayburtuniversitesi = "Bayburt Üniversitesi";
-            public const string name_bidb = "Bilgi İşlem Daire Başkanlığı";
-            public const string name_personeldb = "Personel Daire Başkanlığı";
-            public const string name_ogrencidb = "Öğrenci İşleri Daire Başkanlığı";
             public const string xss = "XSS(Cross - Site Scripting)";
         }
         public sealed class _validationerrormessage

@@ -4,7 +4,6 @@
     using BayuOrtak.Core.Wcf.Nhr.Helper;
     using System;
     using System.ComponentModel.DataAnnotations;
-    using static BayuOrtak.Core.Helper.GlobalConstants;
     /// <summary>
     /// T.C. Bayburt Üniversitesi Kurum Sicil Numarasını doğrulamak için kullanılan özel bir doğrulama niteliği.
     /// <para>Bu nitelik, verilen sicil numarasının geçerli bir biçimde olup olmadığını kontrol eder.</para>
@@ -38,7 +37,7 @@
                 validationContext.SetValidatePropertyValue(null);
                 return ValidationResult.Success;
             }
-            return new ValidationResult(ErrorMessage ?? $"{validationContext.DisplayName}, T.C. {_title.name_bayburtuniversitesi} Kurum Sicil Numarasına uygun biçimde olmalıdır!", new List<string> { validationContext.MemberName });
+            return new ValidationResult(ErrorMessage ?? $"{validationContext.DisplayName}, T.C. Bayburt Üniversitesi Kurum Sicil Numarasına uygun biçimde olmalıdır!", new List<string> { validationContext.MemberName });
         }
     }
 }

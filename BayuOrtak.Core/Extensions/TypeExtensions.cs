@@ -23,31 +23,25 @@
         /// <returns>Özel sınıf ise <see langword="true"/>, değilse <see langword="false"/> döner.</returns>
         public static bool IsCustomClass(this Type type) => (type != null && type.IsClass && type != typeof(string) && !type.IsArray && !typeof(Delegate).IsAssignableFrom(type) && !type.IsInterface);
         /// <summary>
-        /// Belirtilen tür için tablo adını döner. İsteğe bağlı olarak köşeli parantezleri kullanabilir.
+        /// Belirtilen <see cref="Type"/> için tanımlı <see cref="TableAttribute"/> özniteliğini kullanarak tablo adını döndürür. Varsayılan olarak şema adı &quot;dbo&quot; kabul edilir. <paramref name="issquarebrackets"/> true ise tablo ve şema adları köşeli parantez içerisine alınır.
         /// </summary>
-        /// <param name="type">Tablo adını alınacak tür.</param>
-        /// <param name="isSquareBrackets">Köşeli parantezlerin kullanılıp kullanılmayacağı.</param>
-        /// <param name="schemaDefaultValue">Varsayılan şema adı.</param>
-        /// <returns>Tablo adı.</returns>
-        public static string GetTableName(this Type type, bool isSquareBrackets, string schemaDefaultValue = "dbo")
+        /// <param name="type">Tabloya karşılık gelen sınıf tipi.</param>
+        /// <param name="issquarebrackets">Tablo ve şema adlarının köşeli parantez içerisine alınıp alınmayacağını belirtir.</param>
+        /// <returns>Şema ve tablo adını içeren tam tablo adı.</returns>
+        /// <exception cref="NotSupportedException">
+        /// Eğer belirtilen tip üzerinde <see cref="TableAttribute"/> özniteliği bulunmazsa fırlatılır.
+        /// </exception>
+        public static string GetTableName(this Type type, bool issquarebrackets)
         {
             Guard.CheckNull(type, nameof(type));
-            if (type.IsCustomClass())
+            if (_try.TryCustomAttribute(type, out TableAttribute _ta))
             {
-                string ret;
-                if (_try.TryCustomAttribute(type, out TableAttribute _ta))
-                {
-                    var schema = _ta.Schema.ToStringOrEmpty();
-                    var names = _ta.Name.ToStringOrEmpty().Split('.').Where(x => x != "").ToArray();
-                    if (names.Length == 2 && schema == "") { ret = String.Join(".", names); }
-                    else if (names.Length == 1) { ret = String.Join(".", (schema == "" ? schemaDefaultValue : schema), names[0]); }
-                    else if (names.Length == 0 && schema != "") { ret = String.Join(".", schema, type.Name); } // Not: Bu ihtimalin gelme durumu olmamasına rağmen ne olur olmaz yazılan kontrol
-                    else { ret = String.Join(".", schemaDefaultValue, type.Name); }
-                }
-                else { ret = String.Join(".", schemaDefaultValue, type.Name); }
-                return (isSquareBrackets ? String.Join(".", ret.Split('.').Select(x => $"[{x}]").ToArray()) : ret);
+                Guard.CheckEmpty(_ta.Name, nameof(_ta.Name));
+                var _r = new List<string> { _ta.Schema.CoalesceOrDefault("dbo"), _ta.Name };
+                if (issquarebrackets) { return String.Join(".", _r.Select(x => $"[{x}]").ToArray()); }
+                return String.Join(".", _r);
             }
-            throw new NotSupportedException($"{nameof(type)} tipi class olmalıdır!");
+            throw new NotSupportedException($"\"{type.FullName}\" tipi üzerinde \"{typeof(TableAttribute).FullName}\" özniteliği bulunmamaktadır. ", new Exception("Tablo adını alabilmek için ilgili sınıfa [Table(\"TabloAdi\")] özniteliği eklenmelidir."));
         }
         /// <summary>
         /// Belirtilen türün denetleyici adı döner.

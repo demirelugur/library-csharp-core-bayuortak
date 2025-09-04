@@ -8,7 +8,7 @@
         [Description("Lisans")]
         lisans = 900002,
         [Description("Yüksek Lisans")]
-        ylisans = 900003,
+        yukseklisans = 900003,
         [Description("Doktora")]
         doktora = 900004
     }

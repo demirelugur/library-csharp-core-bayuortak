@@ -5,8 +5,7 @@
     using System.ComponentModel.DataAnnotations;
     using static BayuOrtak.Core.Helper.OrtakTools;
     /// <summary>
-    /// Türkiye Cumhuriyeti Vergi Kimlik Numarası (T.C. Vergi Kimlik No) doğrulaması yapan <see cref="ValidationAttribute"/> sınıfıdır.
-    /// Bu sınıf, verilen vergi kimlik numarasının geçerliliğini kontrol eder.
+    /// Türkiye Cumhuriyeti Vergi Kimlik Numarası (T.C. Vergi Kimlik No) doğrulaması yapan <see cref="ValidationAttribute"/> sınıfıdır. Bu sınıf, verilen vergi kimlik numarasının geçerliliğini kontrol eder.
     /// </summary>
     [AttributeUsage(AttributeTargets.Property | AttributeTargets.Parameter, AllowMultiple = false)]
     public sealed class Validation_VknAttribute : ValidationAttribute
@@ -23,13 +22,14 @@
         /// <returns>Geçerli ise <see cref="ValidationResult.Success"/>; aksi takdirde hata mesajı döner.</returns>
         protected override ValidationResult IsValid(object value, ValidationContext validationContext)
         {
-            if (_try.TryVergiKimlikNo(value.ToStringOrEmpty(), out long outvalue))
+            var _l = value.ToLong();
+            if (_is.IsVergiKimlikNo(_l))
             {
-                validationContext.SetValidatePropertyValue(outvalue); // Set edilmesinin sebebi 9 rakamlı VKN değerleri gelebilir başına 0 koyarak yeni değeri değiştirmek gerekiyor. Örnek 602883151 değeri girilmişşe property 0602883151 biçiminde set edilecek
+                validationContext.SetValidatePropertyValue(_l);
                 return ValidationResult.Success;
             }
             if (value == null && !validationContext.IsRequiredAttribute()) { return ValidationResult.Success; }
-            return new ValidationResult(this.ErrorMessage ?? $"{validationContext.DisplayName}, T.C. Vergi Numarası biçimine uygun olmalıdır!", new List<string> { validationContext.MemberName });
+            return new ValidationResult(this.ErrorMessage ?? $"{validationContext.DisplayName}, T.C. Vergi Kimlik Numarası biçimine uygun olmalıdır!", new List<string> { validationContext.MemberName });
         }
     }
 }

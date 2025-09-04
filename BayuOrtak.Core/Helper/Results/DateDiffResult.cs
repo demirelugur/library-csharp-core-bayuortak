@@ -21,25 +21,25 @@
         public (int yil, int ay, int gun, TimeSpan ts) CalculateDateDifference()
         {
             if (this.basdate == this.bitdate || Math.Abs(this.bitdate.Ticks - this.basdate.Ticks) < TimeSpan.TicksPerMillisecond) { return (0, 0, 0, TimeSpan.Zero); }
-            int yil = this.bitdate.Year - this.basdate.Year, ay = this.bitdate.Month - this.basdate.Month, gun = this.bitdate.Day - this.basdate.Day;
-            var ts = (this.bitdate.TimeOfDay - this.basdate.TimeOfDay);
-            var tsIsNegative = ts < TimeSpan.Zero;
-            if (tsIsNegative) { gun--; }
-            if (gun < 0)
+            int _yil = this.bitdate.Year - this.basdate.Year, _ay = this.bitdate.Month - this.basdate.Month, _gun = this.bitdate.Day - this.basdate.Day;
+            var _ts = (this.bitdate.TimeOfDay - this.basdate.TimeOfDay);
+            var _tsisnegative = _ts < TimeSpan.Zero;
+            if (_tsisnegative) { _gun--; }
+            if (_gun < 0)
             {
-                if (yil == 0 && ay == 0) { gun = 0; }
+                if (_yil == 0 && _ay == 0) { _gun = 0; }
                 else
                 {
-                    ay--;
-                    gun = (DateTime.DaysInMonth(this.basdate.Year, this.basdate.Month) - this.basdate.Day + this.bitdate.Day);
+                    _ay--;
+                    _gun = (DateTime.DaysInMonth(this.basdate.Year, this.basdate.Month) - this.basdate.Day + this.bitdate.Day);
                 }
             }
-            if (ay < 0)
+            if (_ay < 0)
             {
-                yil--;
-                ay = 12 + ay;
+                _yil--;
+                _ay = 12 + _ay;
             }
-            return (yil, ay, gun, ((this.bitdate > this.basdate && tsIsNegative) ? new TimeSpan(TimeSpan.TicksPerDay - ts.Negate().Ticks) : ts));
+            return (_yil, _ay, _gun, ((this.bitdate > this.basdate && _tsisnegative) ? new TimeSpan(TimeSpan.TicksPerDay - _ts.Negate().Ticks) : _ts));
         }
         /// <summary>
         /// Tarih farkını yıl, ay ve gün olarak Türkçe formatta birleştirir.
@@ -53,12 +53,12 @@
             Guard.CheckEmpty(p0, nameof(p0));
             Guard.CheckEmpty(p1, nameof(p1));
             Guard.CheckEmpty(p2, nameof(p2));
-            var r = new List<string>();
+            var _r = new List<string>();
             var _v = this.CalculateDateDifference();
-            if (_v.yil > 0) { r.Add(String.Join(" ", _v.yil.ToString(), p0)); }
-            if (_v.ay > 0) { r.Add(String.Join(" ", _v.ay.ToString(), p1)); }
-            if (_v.gun > 0) { r.Add(String.Join(" ", _v.gun.ToString(), p2)); }
-            return (r.Count > 0 ? String.Join(", ", r) : "");
+            if (_v.yil > 0) { _r.Add(String.Join(" ", _v.yil.ToString(), p0)); }
+            if (_v.ay > 0) { _r.Add(String.Join(" ", _v.ay.ToString(), p1)); }
+            if (_v.gun > 0) { _r.Add(String.Join(" ", _v.gun.ToString(), p2)); }
+            return (_r.Count > 0 ? String.Join(", ", _r) : "");
         }
     }
 }

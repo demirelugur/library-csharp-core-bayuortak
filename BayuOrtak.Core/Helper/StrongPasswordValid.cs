@@ -4,43 +4,35 @@
     public sealed class StrongPasswordValid
     {
         /// <summary>
-        /// Varsayılan güçlü şifre ayarlarını temsil eden örnek.
-        /// Varsayılan minimum uzunluk 8, maksimum uzunluk 16, ardışık rakam, boşluk ve Türkçe karakter kontrolleri aktif durumdadır. <code>new StrongPasswordValid(8, 16, true, true, true);</code>
+        /// Varsayılan güçlü şifre ayarlarını temsil eden örnek. Varsayılan minimum uzunluk 8, maksimum uzunluk 16, ardışık rakam, boşluk ve Türkçe karakter kontrolleri aktif durumdadır. <code>new StrongPasswordValid(8, 16, true, true, true);</code>
         /// </summary>
         public static readonly StrongPasswordValid Default = new StrongPasswordValid(8, 16, true, true, true);
         /// <summary>
-        /// Şifrenin minimum uzunluğunu belirtir.
-        /// Kullanıcı tarafından belirlenen minimum karakter sayısıdır.
+        /// Şifrenin minimum uzunluğunu belirtir. Kullanıcı tarafından belirlenen minimum karakter sayısıdır.
         /// </summary>
         public int minimumlength { get; }
         /// <summary>
-        /// Şifrenin maksimum uzunluğunu belirtir.
-        /// Kullanıcı tarafından belirlenen maksimum karakter sayısıdır. Eğer belirtilmezse null değer alır.
+        /// Şifrenin maksimum uzunluğunu belirtir. Kullanıcı tarafından belirlenen maksimum karakter sayısıdır. Eğer belirtilmezse null değer alır.
         /// </summary>
         public int? maximumlength { get; }
         /// <summary>
-        /// Şifre içinde ardışık üç rakam bulunup bulunmadığını kontrol eder.
-        /// Eğer true ise, şifre kontrolü sırasında ardışık rakam kontrolü yapılacaktır.
+        /// Şifre içinde ardışık üç rakam bulunup bulunmadığını kontrol eder. Eğer <see langword="true"/> ise, şifre kontrolü sırasında ardışık rakam kontrolü yapılacaktır.
         /// </summary>
         public bool isardisiksayi { get; }
         /// <summary>
-        /// Şifre içinde boşluk karakterinin bulunup bulunmadığını kontrol eder.
-        /// Eğer true ise, şifre kontrolü sırasında boşluk kontrolü yapılacaktır.
+        /// Şifre içinde boşluk karakterinin bulunup bulunmadığını kontrol eder. Eğer <see langword="true"/> ise, şifre kontrolü sırasında boşluk kontrolü yapılacaktır.
         /// </summary>
         public bool isbosluk { get; }
         /// <summary>
-        /// Şifre içinde Türkçe karakterlerin bulunup bulunmadığını kontrol eder.
-        /// Eğer true ise, Türkçe karakterler kontrol edilecektir.
+        /// Şifre içinde Türkçe karakterlerin bulunup bulunmadığını kontrol eder. Eğer <see langword="true"/> ise, Türkçe karakterler kontrol edilecektir.
         /// </summary>
         public bool isturkceharf { get; }
         /// <summary>
-        /// Kullanıcının adını temsil eder.
-        /// Şifre kontrolü sırasında, adın şifre içinde geçip geçmediği kontrol edilecektir.
+        /// Kullanıcının adını temsil eder. Şifre kontrolü sırasında, adın şifre içinde geçip geçmediği kontrol edilecektir.
         /// </summary>
         public string ad { get; }
         /// <summary>
-        /// Kullanıcının soyadını temsil eder.
-        /// Şifre kontrolü sırasında, soyadın şifre içinde geçip geçmediği kontrol edilecektir.
+        /// Kullanıcının soyadını temsil eder. Şifre kontrolü sırasında, soyadın şifre içinde geçip geçmediği kontrol edilecektir.
         /// </summary>
         public string soyad { get; }
         /// <summary>
@@ -71,21 +63,19 @@
         ///     <item><description>Doğum yılı kontrolü.</description></item>
         ///     <item><description>Ad ve Soyad kontrolü.</description></item>
         /// </list>
-        /// <para>Uyarılar, geçersiz şifre durumlarına göre döner. 
-        /// Eğer şifre güçlü ise uyarılar boş bir dizi olarak dönecektir.</para>
+        /// <para>Uyarılar, geçersiz şifre durumlarına göre döner. Eğer şifre güçlü ise uyarılar boş bir dizi olarak dönecektir.</para>
         /// </summary>
         /// <param name="value">Kontrol edilecek şifre.</param>
-        /// <param name="dogumtarihyil">Kullanıcının doğum yılı.</param>
         /// <param name="ad">Kullanıcının adı.</param>
         /// <param name="soyad">Kullanıcının soyadı.</param>
         /// <param name="dil">Dil kodu (örneğin: &quot;tr&quot; veya &quot;en&quot;).</param>
-        /// <param name="warnings">Olumsuz durumlara ait uyarıları içeren dizi.</param>
+        /// <param name="errors">Olumsuz durumlara ait uyarıları içeren dizi.</param>
         /// <returns>Geçerli bir şifre değilse <see langword="true"/>, aksi takdirde <see langword="false"/> döner.</returns>
-        public bool TryIsWarning(string value, int? dogumtarihyil, string ad, string soyad, string dil, out string[] warnings)
+        public bool TryIsWarning(string value, string ad, string soyad, string dil, out string[] errors)
         {
-            var _r = new List<string>();
             Guard.CheckEmpty(value, nameof(value));
             Guard.UnSupportLanguage(dil, nameof(dil));
+            var _r = new List<string>();
             var _isen = dil == "en";
             if (!PasswordGenerator.IsStrongPassword(value, this.minimumlength))
             {
@@ -95,7 +85,7 @@
             if (this.maximumlength.HasValue && value.Length > this.maximumlength.Value)
             {
                 if (_isen) { _r.Add($"Password can be maximum {this.maximumlength.Value.ToString()} characters!"); }
-                else  { _r.Add($"Şifre maksimum {this.maximumlength.Value.ToString()} karakter olabilir!"); }
+                else { _r.Add($"Şifre maksimum {this.maximumlength.Value.ToString()} karakter olabilir!"); }
             }
             if (this.isardisiksayi && ardisiksayikontrol_private(value))
             {
@@ -113,11 +103,6 @@
                 if (_isen) { _r.Add($"The password must not contain any letters specific to the Turkish language! ({_t})"); }
                 else { _r.Add($"Şifre içerisinde Türk diline özgü harf ({_t}) bulunmamalıdır!"); }
             }
-            if (dogumtarihyil.HasValue && value.Contains(dogumtarihyil.Value.ToString()))
-            {
-                if (_isen) { _r.Add("The password must not contain your date and year of birth!"); }
-                else { _r.Add("Şifre içerisinde doğum tarih yılınız geçmemelidir!"); }
-            }
             var _password_seo = value.ToSeoFriendly();
             if (adsoyadkontrol_private(_password_seo, ad))
             {
@@ -129,12 +114,12 @@
                 if (_isen) { _r.Add("Your surname(s) must not appear in the password!"); }
                 else { _r.Add("Şifre içerisinde soyadınız/soyadlarınız geçmemelidir!"); }
             }
-            warnings = _r.ToArray();
+            errors = _r.ToArray();
             return _r.Count > 0;
         }
         private static bool ardisiksayikontrol_private(string password)
         {
-            var r = false;
+            var _r = false;
             if (password.Length > 2)
             {
                 int i, sayi1, sayi2, sayi3, l = password.Length - 2;
@@ -147,30 +132,30 @@
                         sayi3 = (password[i + 2] - '0');
                         if ((sayi2 == (sayi1 + 1) && sayi3 == (sayi2 + 1)) || (sayi2 == (sayi1 - 1) && sayi3 == (sayi2 - 1)))
                         {
-                            r = true;
+                            _r = true;
                             break;
                         }
                     }
                 }
             }
-            return r;
+            return _r;
         }
-        private static bool adsoyadkontrol_private(string password_seo, string value)
+        private static bool adsoyadkontrol_private(string passwordseo, string value)
         {
-            var r = false;
+            var _r = false;
             var _values = value.ToStringOrEmpty().ToEnumerable().Select(x => (x == "" ? Array.Empty<string>() : x.Split(' ').Select(y => y.ToSeoFriendly()).Where(y => y != "").ToArray())).FirstOrDefault();
             if (_values.Length > 0)
             {
-                foreach (var itemValue in _values)
+                foreach (var item in _values)
                 {
-                    if (password_seo.Contains(itemValue))
+                    if (passwordseo.Contains(item))
                     {
-                        r = true;
+                        _r = true;
                         break;
                     }
                 }
             }
-            return r;
+            return _r;
         }
     }
 }

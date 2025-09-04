@@ -16,9 +16,9 @@
         TContext Context { get; }
         IDapperHelper Dapper { get; }
         DbConnection GetDbConnection();
-        Task<SqlServerProperties> ServerPropertyAsync(CancellationToken cancellationToken);
-        Task<int> ExecuteRawAsync(string query, object parameters, CancellationToken cancellationToken);
-        Task<int> TableReseedAsync(bool isdebug, CancellationToken cancellationToken, params Type[] mappedtables);
+        Task<SqlServerProperties> ServerPropertyAsync(CancellationToken cancellationtoken);
+        Task<int> ExecuteRawAsync(string query, object parameters, CancellationToken cancellationtoken);
+        Task<int> TableReseedAsync(bool isdebug, CancellationToken cancellationtoken, params Type[] mappedtables);
     }
     public class BaseUnitOfWork<TContext> : IUnitOfWork<TContext> where TContext : DbContext
     {
@@ -52,9 +52,13 @@
         public TContext Context { get; }
         public IDapperHelper Dapper => new DapperHelper(this.Context);
         public DbConnection GetDbConnection() => this.Context.Database.GetDbConnection();
-        public Task<SqlServerProperties> ServerPropertyAsync(CancellationToken cancellationToken) => this.Context.Database.SqlQueryRaw<SqlServerProperties>(SqlServerProperties.query()).FirstOrDefaultAsync(cancellationToken);
-        public Task<int> ExecuteRawAsync(string sql, object parameters, CancellationToken cancellationToken) => this.Context.Database.ExecuteSqlRawAsync(sql, _to.ToSqlParameterFromObject(parameters), cancellationToken);
-        public Task<int> TableReseedAsync(bool isdebug, CancellationToken cancellationToken, params Type[] mappedtables)
+        public Task<SqlServerProperties> ServerPropertyAsync(CancellationToken cancellationtoken) => this.Context.Database.SqlQueryRaw<SqlServerProperties>(SqlServerProperties.query()).FirstOrDefaultAsync(cancellationtoken);
+        public Task<int> ExecuteRawAsync(string sql, object parameters, CancellationToken cancellationtoken) => this.Context.Database.ExecuteSqlRawAsync(sql, _to.ToSqlParameterFromObject(parameters), cancellationtoken);
+        /// <summary>
+        /// Identity (sıralı artan) sayısal PK değerine sahip tablolarda kimlik değerini resetlemek için kullanılan metot.
+        /// <code>DBCC CHECKIDENT (&#39;[dbo].[LoremIpsum]&#39;, RESEED, 0)</code>
+        /// </summary>
+        public Task<int> TableReseedAsync(bool isdebug, CancellationToken cancellationtoken, params Type[] mappedtables)
         {
             mappedtables = mappedtables ?? Array.Empty<Type>();
             if (isdebug || mappedtables.Length == 0 || !mappedtables.All(x => x.IsMappedTable())) { return Task.FromResult(0); }
@@ -73,23 +77,20 @@
                 _index++;
             }
             if (_sb.Length == 0) { return Task.FromResult(0); }
-            return this.ExecuteRawAsync(_sb.ToString(), null, cancellationToken);
+            return this.ExecuteRawAsync(_sb.ToString(), null, cancellationtoken);
         }
         private (string columnname, string sqldbtypename) getPrimaryKeyInfo(Type type)
         {
-            if (_try.TryTableisKeyAttribute(type, out PropertyInfo[] _pks) && _pks.Length == 1 && _pks[0].GetDatabaseGeneratedOption() == DatabaseGeneratedOption.Identity)
-            {
-                var _propertytype = _pks[0].PropertyType;
-                if (_propertytype.IsEnum) { _propertytype = Enum.GetUnderlyingType(_propertytype); }
-                var _sqldbtypename = "";
-                if (_propertytype == typeof(byte)) { _sqldbtypename = "TINYINT"; }
-                else if (_propertytype == typeof(short)) { _sqldbtypename = "SMALLINT"; }
-                else if (_propertytype == typeof(int)) { _sqldbtypename = "INT"; }
-                else if (_propertytype == typeof(long)) { _sqldbtypename = "BIGINT"; }
-                if (_sqldbtypename == "") { return ("", ""); }
-                return (_pks[0].GetColumnName(), _sqldbtypename);
-            }
-            return ("", "");
+            if (!(_try.TryTableisKeyAttribute(type, out PropertyInfo[] _pks) && _pks.Length == 1 && _pks[0].IsPK() && _pks[0].GetDatabaseGeneratedOption() == DatabaseGeneratedOption.Identity)) { return ("", ""); }
+            var _propertytype = _pks[0].PropertyType;
+            if (_propertytype.IsEnum) { _propertytype = Enum.GetUnderlyingType(_propertytype); }
+            var _sqldbtypename = "";
+            if (_propertytype == typeof(byte)) { _sqldbtypename = "TINYINT"; }
+            else if (_propertytype == typeof(short)) { _sqldbtypename = "SMALLINT"; }
+            else if (_propertytype == typeof(int)) { _sqldbtypename = "INT"; }
+            else if (_propertytype == typeof(long)) { _sqldbtypename = "BIGINT"; }
+            if (_sqldbtypename == "") { return ("", ""); }
+            return (_pks[0].GetColumnName(), _sqldbtypename);
         }
     }
 }

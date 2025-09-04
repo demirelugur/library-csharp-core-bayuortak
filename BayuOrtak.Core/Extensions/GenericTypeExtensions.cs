@@ -39,19 +39,19 @@
         /// <returns>Enum açıklaması; açıklama yoksa boş dize döner.</returns>
         public static string GetDescription<T>(this T value) where T : Enum
         {
-            var t = typeof(T);
-            try { return (_try.TryCustomAttribute(t.GetField(Enum.GetName(t, value)), out DescriptionAttribute _d) ? _d.Description : ""); }
+            var _t = typeof(T);
+            try { return (_try.TryCustomAttribute(_t.GetField(Enum.GetName(_t, value)), out DescriptionAttribute _d) ? _d.Description : ""); }
             catch { return ""; }
         }
         /// <summary>
         /// Tekil bir değeri enumerable (koleksiyon) olarak döner.
         /// </summary>
         /// <typeparam name="T">Değer türü.</typeparam>
-        /// <param name="source">Kaynak değer.</param>
+        /// <param name="value">Kaynak değer.</param>
         /// <returns>Koleksiyon.</returns>
-        public static IEnumerable<T> ToEnumerable<T>(this T source)
+        public static IEnumerable<T> ToEnumerable<T>(this T value)
         {
-            yield return source;
+            yield return value;
         }
     }
 }

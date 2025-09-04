@@ -12,6 +12,6 @@
         /// <summary>
         /// Eski Nüfus Cüzdanları için uygun enum seçeneği
         /// </summary>
-        eski = 2
+        eski
     }
 }

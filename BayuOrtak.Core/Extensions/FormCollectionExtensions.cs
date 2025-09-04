@@ -77,9 +77,9 @@
         public static IFormCollection Upsert(this IFormCollection form, string key, StringValues value)
         {
             if (key.IsNullOrEmpty_string()) { return form; }
-            var dic = new Dictionary<string, StringValues>(form);
-            if (!dic.TryAdd(key, value)) { dic[key] = value; }
-            return new FormCollection(dic, form.Files);
+            var _dic = new Dictionary<string, StringValues>(form);
+            if (!_dic.TryAdd(key, value)) { _dic[key] = value; }
+            return new FormCollection(_dic, form.Files);
         }
     }
 }

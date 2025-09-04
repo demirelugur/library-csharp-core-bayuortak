@@ -5,6 +5,6 @@
     /// </summary>
     public interface IConnectionStatus
     {
-        Task<(bool statuswarning, string error)> IsConnectionStatusAsync(TimeSpan timeout, string dil, CancellationToken cancellationToken);
+        Task<(bool statuswarning, string error)> IsConnectionStatusAsync(TimeSpan timeout, string dil, CancellationToken cancellationtoken);
     }
 }

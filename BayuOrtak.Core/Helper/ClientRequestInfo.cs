@@ -38,14 +38,7 @@
             if (value == null) { return new ClientRequestInfo(); }
             if (value is ClientRequestInfo _c) { return _c; }
             if (value is HttpContext context) { return new ClientRequestInfo(context.IsMobileDevice(), context.GetIPAddress()); }
-            if (value is IFormCollection _form)
-            {
-                return ToEntityFromObject(new
-                {
-                    ismobil = _form.ToKeyValueParseOrDefault_formcollection<bool>(nameof(ismobil)),
-                    ipaddress = _form.ToKeyValueParseOrDefault_formcollection<string>(nameof(ipaddress))
-                });
-            }
+            if (value is IFormCollection _form) { return new ClientRequestInfo(_form.ToKeyValueParseOrDefault_formcollection<bool>(nameof(ismobil)), _form.ToKeyValueParseOrDefault_formcollection<string>(nameof(ipaddress))); }
             return value.ToEnumerable().Select(x => x.ToDynamic()).Select(x => new ClientRequestInfo((bool)x.ismobil, (object)x.ipaddress)).FirstOrDefault();
         }
     }

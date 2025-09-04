@@ -9,14 +9,14 @@
     using static Dapper.SqlMapper;
     public interface IDapperHelper : IDisposable, IAsyncDisposable
     {
-        Task EnsureConnectionOpenAsync(CancellationToken cancellationToken);
+        Task EnsureConnectionOpenAsync(CancellationToken cancellationtoken);
         Task EnsureConnectionCloseAsync();
-        Task<IEnumerable<T>> QueryAsync<T>(string commandtext, object parameters, int? commandtimeout, CommandType commandtype, CancellationToken cancellationToken) where T : class;
-        Task<IEnumerable<dynamic>> QueryDynamicAsync(string commandtext, object parameters, int? commandtimeout, CommandType commandtype, CancellationToken cancellationToken);
-        Task<GridReader> QueryMultipleAsync(string commandtext, object parameters, int? commandTimeout, CommandType commandType, CancellationToken cancellationToken);
-        Task<int> ExecuteAsync(string commandtext, object parameters, int? commandTimeout, CommandType commandType, CancellationToken cancellationToken);
-        Task<DbDataReader> ExecuteReaderAsync(string commandtext, object parameters, int? commandTimeout, CommandType commandType, CommandBehavior commandBehavior, CancellationToken cancellationToken);
-        Task<T> ExecuteScalarAsync<T>(string commandtext, object parameters, int? commandtimeout, CommandType commandtype, CancellationToken cancellationToken);
+        Task<IEnumerable<T>> QueryAsync<T>(string commandtext, object parameters, int? commandtimeout, CommandType commandtype, CancellationToken cancellationtoken) where T : class;
+        Task<IEnumerable<dynamic>> QueryDynamicAsync(string commandtext, object parameters, int? commandtimeout, CommandType commandtype, CancellationToken cancellationtoken);
+        Task<GridReader> QueryMultipleAsync(string commandtext, object parameters, int? commandtimeout, CommandType commandtype, CancellationToken cancellationtoken);
+        Task<int> ExecuteAsync(string commandtext, object parameters, int? commandtimeout, CommandType commandtype, CancellationToken cancellationtoken);
+        Task<DbDataReader> ExecuteReaderAsync(string commandtext, object parameters, int? commandtimeout, CommandType commandtype, CommandBehavior commandBehavior, CancellationToken cancellationtoken);
+        Task<T> ExecuteScalarAsync<T>(string commandtext, object parameters, int? commandtimeout, CommandType commandtype, CancellationToken cancellationtoken);
     }
     public sealed class DapperHelper : IDapperHelper
     {
@@ -47,11 +47,11 @@
             this.con = con;
             this.dbtransaction = dbtransaction;
         }
-        public async Task EnsureConnectionOpenAsync(CancellationToken cancellationToken)
+        public async Task EnsureConnectionOpenAsync(CancellationToken cancellationtoken)
         {
             if (this.con.State != ConnectionState.Open)
             {
-                await this.con.OpenAsync(cancellationToken);
+                await this.con.OpenAsync(cancellationtoken);
             }
         }
         public async Task EnsureConnectionCloseAsync()
@@ -61,35 +61,35 @@
                 await this.con.CloseAsync();
             }
         }
-        public async Task<IEnumerable<T>> QueryAsync<T>(string commandtext, object parameters, int? commandtimeout, CommandType commandtype, CancellationToken cancellationToken) where T : class
+        public async Task<IEnumerable<T>> QueryAsync<T>(string commandtext, object parameters, int? commandtimeout, CommandType commandtype, CancellationToken cancellationtoken) where T : class
         {
-            await this.EnsureConnectionOpenAsync(cancellationToken);
-            return await this.con.QueryAsync<T>(new CommandDefinition(commandtext, parameters, this.dbtransaction, commandtimeout, commandtype, CommandFlags.Buffered, cancellationToken));
+            await this.EnsureConnectionOpenAsync(cancellationtoken);
+            return await this.con.QueryAsync<T>(new CommandDefinition(commandtext, parameters, this.dbtransaction, commandtimeout, commandtype, CommandFlags.Buffered, cancellationtoken));
         }
-        public async Task<IEnumerable<dynamic>> QueryDynamicAsync(string commandtext, object parameters, int? commandtimeout, CommandType commandtype, CancellationToken cancellationToken)
+        public async Task<IEnumerable<dynamic>> QueryDynamicAsync(string commandtext, object parameters, int? commandtimeout, CommandType commandtype, CancellationToken cancellationtoken)
         {
-            await this.EnsureConnectionOpenAsync(cancellationToken);
-            return await this.con.QueryAsync(new CommandDefinition(commandtext, parameters, this.dbtransaction, commandtimeout, commandtype, CommandFlags.Buffered, cancellationToken));
+            await this.EnsureConnectionOpenAsync(cancellationtoken);
+            return await this.con.QueryAsync(new CommandDefinition(commandtext, parameters, this.dbtransaction, commandtimeout, commandtype, CommandFlags.Buffered, cancellationtoken));
         }
-        public async Task<GridReader> QueryMultipleAsync(string commandtext, object parameters, int? commandtimeout, CommandType commandtype, CancellationToken cancellationToken)
+        public async Task<GridReader> QueryMultipleAsync(string commandtext, object parameters, int? commandtimeout, CommandType commandtype, CancellationToken cancellationtoken)
         {
-            await this.EnsureConnectionOpenAsync(cancellationToken);
-            return await this.con.QueryMultipleAsync(new CommandDefinition(commandtext, parameters, this.dbtransaction, commandtimeout, commandtype, CommandFlags.Buffered, cancellationToken));
+            await this.EnsureConnectionOpenAsync(cancellationtoken);
+            return await this.con.QueryMultipleAsync(new CommandDefinition(commandtext, parameters, this.dbtransaction, commandtimeout, commandtype, CommandFlags.Buffered, cancellationtoken));
         }
-        public async Task<int> ExecuteAsync(string commandtext, object parameters, int? commandtimeout, CommandType commandtype, CancellationToken cancellationToken)
+        public async Task<int> ExecuteAsync(string commandtext, object parameters, int? commandtimeout, CommandType commandtype, CancellationToken cancellationtoken)
         {
-            await this.EnsureConnectionOpenAsync(cancellationToken);
-            return await this.con.ExecuteAsync(new CommandDefinition(commandtext, parameters, this.dbtransaction, commandtimeout, commandtype, CommandFlags.Buffered, cancellationToken));
+            await this.EnsureConnectionOpenAsync(cancellationtoken);
+            return await this.con.ExecuteAsync(new CommandDefinition(commandtext, parameters, this.dbtransaction, commandtimeout, commandtype, CommandFlags.Buffered, cancellationtoken));
         }
-        public async Task<DbDataReader> ExecuteReaderAsync(string commandtext, object parameters, int? commandtimeout, CommandType commandtype, CommandBehavior commandbehavior, CancellationToken cancellationToken)
+        public async Task<DbDataReader> ExecuteReaderAsync(string commandtext, object parameters, int? commandtimeout, CommandType commandtype, CommandBehavior commandbehavior, CancellationToken cancellationtoken)
         {
-            await this.EnsureConnectionOpenAsync(cancellationToken);
-            return await this.con.ExecuteReaderAsync(new CommandDefinition(commandtext, parameters, this.dbtransaction, commandtimeout, commandtype, CommandFlags.Buffered, cancellationToken), commandbehavior);
+            await this.EnsureConnectionOpenAsync(cancellationtoken);
+            return await this.con.ExecuteReaderAsync(new CommandDefinition(commandtext, parameters, this.dbtransaction, commandtimeout, commandtype, CommandFlags.Buffered, cancellationtoken), commandbehavior);
         }
-        public async Task<T> ExecuteScalarAsync<T>(string commandtext, object parameters, int? commandtimeout, CommandType commandtype, CancellationToken cancellationToken)
+        public async Task<T> ExecuteScalarAsync<T>(string commandtext, object parameters, int? commandtimeout, CommandType commandtype, CancellationToken cancellationtoken)
         {
-            await this.EnsureConnectionOpenAsync(cancellationToken);
-            return await this.con.ExecuteScalarAsync<T>(new CommandDefinition(commandtext, parameters, this.dbtransaction, commandtimeout, commandtype, CommandFlags.Buffered, cancellationToken));
+            await this.EnsureConnectionOpenAsync(cancellationtoken);
+            return await this.con.ExecuteScalarAsync<T>(new CommandDefinition(commandtext, parameters, this.dbtransaction, commandtimeout, commandtype, CommandFlags.Buffered, cancellationtoken));
         }
     }
 }

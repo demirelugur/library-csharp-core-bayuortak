@@ -11,12 +11,12 @@
     [AttributeUsage(AttributeTargets.Property | AttributeTargets.Parameter, AllowMultiple = false)]
     public sealed class Validation_JsonAttribute : ValidationAttribute
     {
-        private readonly JTokenType tokenType;
+        private readonly JTokenType jtokentype;
         /// <summary>
         /// Yeni bir <see cref="Validation_JsonAttribute"/> örneği oluşturur.
         /// </summary>
-        /// <param name="tokenType">Geçerli JSON token türünü belirtir.</param>
-        public Validation_JsonAttribute(JTokenType tokenType) { this.tokenType = tokenType; }
+        /// <param name="jtokentype">Geçerli JSON token türünü belirtir.</param>
+        public Validation_JsonAttribute(JTokenType jtokentype) { this.jtokentype = jtokentype; }
         /// <summary>
         /// Verilen değerin geçerli bir JSON biçiminde olup olmadığını doğrular.
         /// </summary>
@@ -26,26 +26,26 @@
         protected override ValidationResult IsValid(object value, ValidationContext validationContext)
         {
             var _jsondata = value.ToStringOrEmpty();
-            var r = validationContext.IsRequiredAttribute();
-            if (_try.TryJson(_jsondata, this.tokenType, out JToken _jt))
+            var _r = validationContext.IsRequiredAttribute();
+            if (_try.TryJson(_jsondata, this.jtokentype, out JToken _jt))
             {
                 if (_jt.Children().Any())
                 {
                     validationContext.SetValidatePropertyValue(_jt.ToString(Formatting.None));
                     return ValidationResult.Success;
                 }
-                if (!r)
+                if (!_r)
                 {
                     validationContext.SetValidatePropertyValue(null);
                     return ValidationResult.Success;
                 }
             }
-            if (!r && _jsondata == "")
+            if (_jsondata == "" && !_r)
             {
                 validationContext.SetValidatePropertyValue(null);
                 return ValidationResult.Success;
             }
-            return new ValidationResult(this.ErrorMessage ?? $"{validationContext.DisplayName}, JSON biçimine ({this.tokenType.ToString("g")}) uygun olmalıdır!", new List<string> { validationContext.MemberName });
+            return new ValidationResult(this.ErrorMessage ?? $"{validationContext.DisplayName}, JSON biçimine ({this.jtokentype.ToString("g")}) uygun olmalıdır!", new List<string> { validationContext.MemberName });
         }
     }
 }

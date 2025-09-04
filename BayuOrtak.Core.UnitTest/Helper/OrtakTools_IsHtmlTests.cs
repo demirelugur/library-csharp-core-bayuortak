@@ -3,7 +3,7 @@ namespace BayuOrtak.Core.UnitTest.Helper
     using NUnit.Framework;
     using static BayuOrtak.Core.Helper.OrtakTools;
     [TestFixture]
-    public class OrtakTools_OtherIsHtmlTests
+    public class OrtakTools_IsHtmlTests
     {
         [TestCase("", false)]
         [TestCase("   ", false)]
@@ -18,7 +18,7 @@ namespace BayuOrtak.Core.UnitTest.Helper
         [TestCase("<input type='text' value='val' />", true)]
         public void IsHtml_VariousInputs_ReturnsExpected(string input, bool expected)
         {
-            var result = _other.IsHtml(input);
+            var result = _is.IsHtml(input);
             Assert.That(result, Is.EqualTo(expected));
         }
     }

@@ -4,14 +4,8 @@
     using BayuOrtak.Core.Helper;
     using System.ComponentModel;
     using static BayuOrtak.Core.Helper.OrtakTools;
-    /// <summary>
-    /// Geri dönüş mesajlarını temsil eden sınıf.
-    /// </summary>
     public sealed class CRetMesaj
     {
-        /// <summary>
-        /// Geri dönüş mesajlarını temsil eden enum.
-        /// </summary>
         public enum RetMesaj : byte
         {
             /// <summary>İsteğiniz başarılı bir şekilde sonuçlandı.</summary>
@@ -39,16 +33,6 @@
             [Description("Girilebilecek maksimum karakter sınırı aşıldı! Yönetici ile iletişime geçiniz.")]
             maxlength
         }
-        /// <summary>
-        /// Verilen geri dönüş mesajı için yerelleştirilmiş açıklama değerini döndürür.
-        /// </summary>
-        /// <param name="value">Geri dönüş mesajı enum değeri.</param>
-        /// <param name="dil">Dil kodu; Türkçe için, &quot;en&quot; İngilizce için.</param>
-        /// <returns>Yerelleştirilmiş mesajı döndürür.</returns>
-        /// <exception cref="NotSupportedException">
-        /// Eğer <paramref name="value"/> geçerli bir <see cref="RetMesaj"/> değeri değilse 
-        /// veya desteklenmeyen bir dil girildiyse fırlatılır.
-        /// </exception>
         public static string GetDescriptionLocalizationValue(RetMesaj value, string dil)
         {
             Guard.UnSupportLanguage(dil, nameof(dil));

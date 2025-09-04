@@ -9,9 +9,7 @@
     using static BayuOrtak.Core.Wcf.Nhr.Enums.CNhr_DurumTypes;
     using static BayuOrtak.Core.Wcf.Nhr.Enums.CNhr_UnvanTypes;
     /// <summary>
-    /// Personel Otomasyonu için NHRExtensions sınıfı, wspersonel objesine ve ilgili türlere çeşitli yardımcı ve kontrol metotları sağlar.
-    /// Bu sınıf, personel objeleri üzerinde null kontrolü, aktiflik durumu, unvan ve durum tipleri gibi 
-    /// çeşitli bilgiler elde etmeye yönelik genişletme (extension) metotları içerir.
+    /// Personel Otomasyonu için NHRExtensions sınıfı, wspersonel objesine ve ilgili türlere çeşitli yardımcı ve kontrol metotları sağlar. Bu sınıf, personel objeleri üzerinde null kontrolü, aktiflik durumu, unvan ve durum tipleri gibi çeşitli bilgiler elde etmeye yönelik genişletme (extension) metotları içerir.
     /// </summary>
     public static class NHRExtensions
     {
@@ -70,17 +68,17 @@
         /// <returns>Kimlik tipi ve seri numarasını döner</returns>
         public static (Nvi_KimlikTypes? tip, string serino) GetKimlikInfo(this wspersonel wspersonel)
         {
-            var _k = String.Concat(wspersonel.personelKpscuzdanseri.ToStringOrEmpty(), wspersonel.personelKpscuzdanno.ToStringOrEmpty()).ToUpper();
-            if (NVIHelperTR.TryValidate_YeniKimlikSeriNo(_k, out _)) { return (Nvi_KimlikTypes.yeni, _k); }
-            if (NVIHelperTR.TryValidate_EskiNufusCuzdaniSeriNo(_k, out _, out _)) { return (Nvi_KimlikTypes.eski, _k); }
+            var _serino = String.Concat(wspersonel.personelKpscuzdanseri.ToStringOrEmpty(), wspersonel.personelKpscuzdanno.ToStringOrEmpty());
+            if (NVIHelperTR.IsValidate(ref _serino, Nvi_KimlikTypes.yeni)) { return (Nvi_KimlikTypes.yeni, _serino); }
+            if (NVIHelperTR.IsValidate(ref _serino, Nvi_KimlikTypes.eski)) { return (Nvi_KimlikTypes.eski, _serino); }
             return (null, "");
         }
         /// <summary>
         /// Personelin aktif fiili görevini döner. Personelin birim ID&#39;sine göre geçerli fiili görev aranır.
         /// </summary>
         /// <param name="wsfiiligorevs">Personelin fiili görevleri</param>
-        /// <param name="personelBirimid">Personelin bağlı olduğu birim ID&#39;si</param>
+        /// <param name="personelbirimid">Personelin bağlı olduğu birim ID&#39;si</param>
         /// <returns>Aktif fiili görev objesi</returns>
-        public static wsfiiligorev GetAktifFiiliGorev(this wsfiiligorev[] wsfiiligorevs, int personelBirimid) => (wsfiiligorevs ?? Array.Empty<wsfiiligorev>()).Where(x => x.fiiligorevMasterbirimid > 0 && x.fiiligorevMasterbirimid != personelBirimid && DateTime.Today > x.fiiligorevBastar.Date && (x.fiiligorevBittar == DateTime.MinValue || x.fiiligorevBittar.Date > DateTime.Today)).OrderByDescending(x => x.fiiligorevBastar).FirstOrDefault() ?? new wsfiiligorev { };
+        public static wsfiiligorev GetAktifFiiliGorev(this wsfiiligorev[] wsfiiligorevs, int personelbirimid) => (wsfiiligorevs ?? Array.Empty<wsfiiligorev>()).Where(x => x.fiiligorevMasterbirimid > 0 && x.fiiligorevMasterbirimid != personelbirimid && DateTime.Today > x.fiiligorevBastar.Date && (x.fiiligorevBittar == DateTime.MinValue || x.fiiligorevBittar.Date > DateTime.Today)).OrderByDescending(x => x.fiiligorevBastar).FirstOrDefault() ?? new wsfiiligorev { };
     }
 }

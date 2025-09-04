@@ -2,9 +2,7 @@
 {
     using System;
     /// <summary>
-    /// Active Directory kullanıcı hesap özelliklerini belirten enum değerleri.
-    /// Bu enum, kullanıcı hesapları üzerinde çeşitli özellikleri ve durumları tanımlamak için kullanılır.
-    /// Daha fazla bilgi için <see href="https://learn.microsoft.com/en-us/troubleshoot/windows-server/identity/useraccountcontrol-manipulate-account-properties">buraya</see> göz atabilirsiniz.
+    /// Active Directory kullanıcı hesap özelliklerini belirten enum değerleri. Bu enum, kullanıcı hesapları üzerinde çeşitli özellikleri ve durumları tanımlamak için kullanılır. Daha fazla bilgi için <see href="https://learn.microsoft.com/en-us/troubleshoot/windows-server/identity/useraccountcontrol-manipulate-account-properties">buraya</see> göz atabilirsiniz.
     /// </summary>
     [Flags]
     public enum ADUserAccountControl

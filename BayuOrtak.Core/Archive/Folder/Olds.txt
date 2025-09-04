@@ -257,12 +257,12 @@ public static EndpointNotFoundException CreateEndpointNotFoundException(this Uri
 /// <summary>
 /// Belirtilen değerleri güncelleyerek asenkron olarak bir entity&#39;yi günceller.
 /// </summary>
-/// <param name="isSaveChanges">Değişikliklerin kaydedilip kaydedilmeyeceğini belirtir.</param>
+/// <param name="issavechanges">Değişikliklerin kaydedilip kaydedilmeyeceğini belirtir.</param>
 /// <param name="keyValue">Güncellenecek entity&#39;nin anahtar değeri.</param>
 /// <param name="values">Güncellenmesi gereken değerler.</param>
 /// <param name="columns">Güncellenmesi gereken property&#39;ler.</param>
 /// <returns>Güncellenen entity.</returns>
-public async Task<T> UpdateAsync(bool isSaveChanges, object keyValue, object[] values, params Expression<Func<T, object>>[] columns)
+public async Task<T> UpdateAsync(bool issavechanges, object keyValue, object[] values, params Expression<Func<T, object>>[] columns)
 {
     Guard.CheckNull(keyValue, nameof(keyValue));
     Guard.CheckEqualCount(values, columns);
@@ -273,7 +273,7 @@ public async Task<T> UpdateAsync(bool isSaveChanges, object keyValue, object[] v
         n = column.GetExpressionName(),
         v = values[i]
     })) { _other.SetPropertyValue(entity, item.n, item.v); }
-    if (isSaveChanges) { await this.Context.SaveChangesAsync(); }
+    if (issavechanges) { await this.Context.SaveChangesAsync(); }
     return entity;
 }
 ************************
@@ -2128,4 +2128,22 @@ public sealed class LDAPHelper
     }
     #endregion
 }
+************************
+/// <summary>
+/// Verilen bir JSON Web Token (JWT) için belirtilen bir özelliğin son kullanma tarihini alır.
+/// <code>DateTimeOffset.FromUnixTimeSeconds(_to.ToJObjectFromToken(token)[&quot;exp&quot;].Value&lt;long&gt;()).UtcDateTime;</code>
+/// </summary>
+/// <param name="token">Son kullanma tarihi alınacak JWT.</param>
+/// <returns>JWT&#39;nin Unix zaman damgasına göre belirlenen UTC tarih ve saat.</returns>
+/// <exception cref="ArgumentNullException">Verilen token null ise.</exception>
+/// <exception cref="FormatException">Token geçerli bir JWT formatında değilse.</exception>
+/// <exception cref="KeyNotFoundException">Token içindeki belirtilen anahtar mevcut değilse.</exception>
+public static DateTime GetExpValueFromToken(string token) => DateTimeOffset.FromUnixTimeSeconds(_to.ToJObjectFromToken(token)["exp"].Value<long>()).UtcDateTime;
+************************		
+/// <summary>
+/// JWT token içindeki yük verilerinden bir JObject oluşturur.
+/// </summary>
+/// <param name="token">İşlenecek JWT token.</param>
+/// <returns>Token yük verilerini içeren JObject.</returns>
+public static JObject ToJObjectFromToken(string token) => JObject.FromObject(new JwtSecurityTokenHandler().ReadJwtToken(token).Payload);
 ************************

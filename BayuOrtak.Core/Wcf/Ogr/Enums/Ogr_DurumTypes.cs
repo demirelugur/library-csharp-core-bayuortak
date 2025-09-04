@@ -12,6 +12,6 @@
         [Description("Mezun")]
         mezun = 905004,
         [Description("İlişkisi Kesilmiş")]
-        ilisigikesilmis = 905005
+        iliskisikesilmis = 905005
     }
 }

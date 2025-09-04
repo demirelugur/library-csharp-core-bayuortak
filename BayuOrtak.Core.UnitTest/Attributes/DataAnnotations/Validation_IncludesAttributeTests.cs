@@ -2,9 +2,9 @@ namespace BayuOrtak.Core.UnitTest.Attributes.DataAnnotations
 {
     using BayuOrtak.Core.Attributes.DataAnnotations;
     using BayuOrtak.Core.Enums;
-    using System.ComponentModel.DataAnnotations;
     using NUnit.Framework;
     using System.Collections.Generic;
+    using System.ComponentModel.DataAnnotations;
     [TestFixture]
     public class Validation_IncludesAttributeTests
     {

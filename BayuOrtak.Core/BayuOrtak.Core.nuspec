@@ -2,7 +2,7 @@
 <package>
 	<metadata>
 		<id>BayuOrtak.Core</id>
-		<version>0.9.18.2</version>
+		<version>0.11.2.1</version>
 		<title>Ortak Projeler Yönetim Modülü</title>
 		<authors>Uğur DEMİREL</authors>
 		<owners>T.C. Bayburt Üniversitesi</owners>
@@ -18,16 +18,16 @@
 				<dependency id="Dapper" version="2.1.66" exclude="Build,Analyzers" />
 				<dependency id="Dapper.SqlBuilder" version="2.1.66" exclude="Build,Analyzers" />
 				<dependency id="HtmlSanitizer" version="9.0.886" exclude="Build,Analyzers" />
-				<dependency id="Microsoft.AspNetCore.Mvc.NewtonsoftJson" version="9.0.7" exclude="Build,Analyzers" />
-				<dependency id="Microsoft.EntityFrameworkCore" version="9.0.7" exclude="Build,Analyzers" />
-				<dependency id="Microsoft.EntityFrameworkCore.Design" version="9.0.7" exclude="Build,Analyzers" />
-				<dependency id="Microsoft.EntityFrameworkCore.Relational" version="9.0.7" exclude="Build,Analyzers" />
-				<dependency id="Microsoft.EntityFrameworkCore.SqlServer" version="9.0.7" exclude="Build,Analyzers" />
-				<dependency id="Microsoft.EntityFrameworkCore.Tools" version="9.0.7" exclude="Build,Analyzers" />
-				<dependency id="System.DirectoryServices" version="9.0.7" exclude="Build,Analyzers" />
-				<dependency id="System.DirectoryServices.AccountManagement" version="9.0.7" exclude="Build,Analyzers" />
-				<dependency id="System.DirectoryServices.Protocols" version="9.0.7" exclude="Build,Analyzers" />
-				<dependency id="System.Drawing.Common" version="9.0.7" exclude="Build,Analyzers" />
+				<dependency id="Microsoft.AspNetCore.Mvc.NewtonsoftJson" version="9.0.8" exclude="Build,Analyzers" />
+				<dependency id="Microsoft.EntityFrameworkCore" version="9.0.8" exclude="Build,Analyzers" />
+				<dependency id="Microsoft.EntityFrameworkCore.Design" version="9.0.8" exclude="Build,Analyzers" />
+				<dependency id="Microsoft.EntityFrameworkCore.Relational" version="9.0.8" exclude="Build,Analyzers" />
+				<dependency id="Microsoft.EntityFrameworkCore.SqlServer" version="9.0.8" exclude="Build,Analyzers" />
+				<dependency id="Microsoft.EntityFrameworkCore.Tools" version="9.0.8" exclude="Build,Analyzers" />
+				<dependency id="System.DirectoryServices" version="9.0.8" exclude="Build,Analyzers" />
+				<dependency id="System.DirectoryServices.AccountManagement" version="9.0.8" exclude="Build,Analyzers" />
+				<dependency id="System.DirectoryServices.Protocols" version="9.0.8" exclude="Build,Analyzers" />
+				<dependency id="System.Drawing.Common" version="9.0.8" exclude="Build,Analyzers" />
 				<dependency id="System.ServiceModel.Duplex" version="6.0.0" exclude="Build,Analyzers" />
 				<dependency id="System.ServiceModel.Federation" version="8.1.2" exclude="Build,Analyzers" />
 				<dependency id="System.ServiceModel.Http" version="8.1.2" exclude="Build,Analyzers" />

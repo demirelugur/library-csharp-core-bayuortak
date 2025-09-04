@@ -82,26 +82,26 @@
             this.timeout = timeout;
         }
         /// <summary>
-        /// Gmail için SMTP ayarlarını oluşturur. <code>new SmtpSettingsHelper(mailAddress.Address, password, &quot;smtp.gmail.com&quot;, 587, true, true, SmtpDeliveryMethod.Network, 0);</code>
+        /// Gmail için SMTP ayarlarını oluşturur. <code>new SmtpSettingsHelper(mailaddress.Address, password, &quot;smtp.gmail.com&quot;, 587, true, true, SmtpDeliveryMethod.Network, 0);</code>
         /// </summary>
-        /// <param name="mailAddress">e-Posta adresi.</param>
+        /// <param name="mailaddress">e-Posta adresi.</param>
         /// <param name="password">Parola.</param>
         /// <returns>Oluşturulan SMTP ayarları.</returns>
-        public static SmtpSettingsHelper CreateSmtpSettings_gmail(MailAddress mailAddress, string password) => new SmtpSettingsHelper(mailAddress.Address, password, "smtp.gmail.com", 587, true, true, SmtpDeliveryMethod.Network, 0);
+        public static SmtpSettingsHelper CreateSmtpSettings_gmail(MailAddress mailaddress, string password) => new SmtpSettingsHelper(mailaddress.Address, password, "smtp.gmail.com", 587, true, true, SmtpDeliveryMethod.Network, 0);
         /// <summary>
-        /// Outlook için SMTP ayarlarını oluşturur. <code>new SmtpSettingsHelper(mailAddress.Address, password, &quot;smtp.office365.com&quot;, 587, true, false, SmtpDeliveryMethod.Network, 0);</code>
+        /// Outlook için SMTP ayarlarını oluşturur. <code>new SmtpSettingsHelper(mailaddress.Address, password, &quot;smtp.office365.com&quot;, 587, true, false, SmtpDeliveryMethod.Network, 0);</code>
         /// </summary>
-        /// <param name="mailAddress">e-Posta adresi.</param>
+        /// <param name="mailaddress">e-Posta adresi.</param>
         /// <param name="password">Parola.</param>
         /// <returns>Oluşturulan SMTP ayarları.</returns>
-        public static SmtpSettingsHelper CreateSmtpSettings_outlook(MailAddress mailAddress, string password) => new SmtpSettingsHelper(mailAddress.Address, password, "smtp.office365.com", 587, true, false, SmtpDeliveryMethod.Network, 0);
+        public static SmtpSettingsHelper CreateSmtpSettings_outlook(MailAddress mailaddress, string password) => new SmtpSettingsHelper(mailaddress.Address, password, "smtp.office365.com", 587, true, false, SmtpDeliveryMethod.Network, 0);
         /// <summary>
-        /// T.C. Bayburt Üniversitesi için SMTP ayarlarını oluşturur. <code>new SmtpSettingsHelper(mailAddress.Address, password, &quot;posta.bayburt.edu.tr&quot;, 25, false, false, SmtpDeliveryMethod.Network, 0);</code>
+        /// T.C. Bayburt Üniversitesi için SMTP ayarlarını oluşturur. <code>new SmtpSettingsHelper(mailaddress.Address, password, &quot;posta.bayburt.edu.tr&quot;, 25, false, false, SmtpDeliveryMethod.Network, 0);</code>
         /// </summary>
-        /// <param name="mailAddress">e-Posta adresi.</param>
+        /// <param name="mailaddress">e-Posta adresi.</param>
         /// <param name="password">Parola.</param>
         /// <returns>Oluşturulan SMTP ayarları.</returns>
-        public static SmtpSettingsHelper CreateSmtpSettings_bayburtuni(MailAddress mailAddress, string password) => new SmtpSettingsHelper(mailAddress.Address, password, "posta.bayburt.edu.tr", 25, true, true, SmtpDeliveryMethod.Network, 0);
+        public static SmtpSettingsHelper CreateSmtpSettings_bayburtuni(MailAddress mailaddress, string password) => new SmtpSettingsHelper(mailaddress.Address, password, "posta.bayburt.edu.tr", 25, true, true, SmtpDeliveryMethod.Network, 0);
         /// <summary>
         /// value için tanımlanan nesneler: SmtpSettingsHelper, IFormCollection, String(JTokenType.Object), AnonymousObjectClass
         /// </summary>
@@ -125,7 +125,7 @@
             }
             if (value is String _s)
             {
-                if (_try.TryJson(_s, JTokenType.Object, out JObject _jo) && _jo.ToObject<SmtpSettingsHelper>() is SmtpSettingsHelper _sj) { return _sj; }
+                if (_try.TryJson(_s, JTokenType.Object, out JObject _jo)) { return _jo.ToObject<SmtpSettingsHelper>(); }
                 return new SmtpSettingsHelper();
             }
             return value.ToEnumerable().Select(x => x.ToDynamic()).Select(x => new SmtpSettingsHelper((string)x.email, (string)x.password, (string)x.host, (int)x.port, (bool)x.enablessl, (bool)x.usedefaultcredentials, (SmtpDeliveryMethod)x.deliverymethod, (int)x.timeout)).FirstOrDefault();

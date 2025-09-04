@@ -9,8 +9,7 @@
     public sealed class DefaultValue_GuidEmptyAttribute : DefaultValueAttribute
     {
         /// <summary>
-        /// Yeni bir <see cref="DefaultValue_GuidEmptyAttribute"/> örneği oluşturur.
-        /// Varsayılan değeri <see cref="Guid.Empty"/> olarak ayarlar.
+        /// Yeni bir <see cref="DefaultValue_GuidEmptyAttribute"/> örneği oluşturur. Varsayılan değeri <see cref="Guid.Empty"/> olarak ayarlar.
         /// </summary>
         public DefaultValue_GuidEmptyAttribute() : base(typeof(Guid), Guid.Empty.ToString()) { }
     }

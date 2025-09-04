@@ -1,6 +1,7 @@
 ﻿namespace BayuOrtak.Core.Extensions
 {
     using BayuOrtak.Core.Helper;
+    using Microsoft.AspNetCore.Http;
     using System;
     using System.Threading;
     using System.Threading.Tasks;
@@ -14,8 +15,8 @@
         public static string GenerateVersionedUrl(this Uri uri)
         {
             Guard.CheckNull(uri, nameof(uri));
-            var separator = (uri.Query.Length > 0 ? "&" : "?");
-            return $"{uri.ToString().TrimEnd('/')}{separator}v={DateTime.Now.Ticks}";
+            var _separator = (uri.Query.Length > 0 ? "&" : "?");
+            return $"{uri.ToString().TrimEnd('/')}{_separator}v={DateTime.Now.Ticks}";
         }
         /// <summary>
         /// Verilen URI&#39;nin bir YouTube gömme(embed) bağlantısı olup olmadığını kontrol eder.
@@ -26,7 +27,7 @@
         /// <summary>
         /// Verilen URI&#39;nin bağlantı durumunu kontrol eder.
         /// </summary>
-        public static async Task<(bool statuswarning, Uri requesturi)> IsConnectionStatusAsync(this Uri uri, TimeSpan timeout, CancellationToken cancellationToken)
+        public static async Task<(bool statuswarning, Uri requesturi)> IsConnectionStatusAsync(this Uri uri, TimeSpan timeout, CancellationToken cancellationtoken)
         {
             if (uri == null) { return (true, default); }
             using (var client = new HttpClient
@@ -36,8 +37,8 @@
             {
                 try
                 {
-                    var response = await client.GetAsync(uri, cancellationToken);
-                    if (response.IsSuccessStatusCode) { return (false, response.RequestMessage.RequestUri); }
+                    var _response = await client.GetAsync(uri, cancellationtoken);
+                    if (_response.IsSuccessStatusCode) { return (false, _response.RequestMessage.RequestUri); }
                     return (true, default);
                 }
                 catch { return (true, default); }
@@ -46,7 +47,7 @@
         /// <summary>
         /// Belirtilen <see cref="Uri"/> adresinden byte[] veri almaya çalışır.
         /// </summary>
-        public static async Task<(bool statuswarning, byte[] databinary, string mimetype)> GetBinaryDataAsync(this Uri uri, TimeSpan timeout, CancellationToken cancellationToken)
+        public static async Task<(bool statuswarning, byte[] databinary, string mimetype, Exception? ex)> GetBinaryDataAsync(this Uri uri, TimeSpan timeout, CancellationToken cancellationtoken)
         {
             Guard.CheckNull(uri, nameof(uri));
             using (var client = new HttpClient
@@ -56,11 +57,11 @@
             {
                 try
                 {
-                    var response = await client.GetAsync(uri, cancellationToken);
-                    response.EnsureSuccessStatusCode();
-                    return (false, await response.Content.ReadAsByteArrayAsync(cancellationToken), response.Content.Headers.ContentType?.MediaType ?? "application/octet-stream");
+                    var _response = await client.GetAsync(uri, cancellationtoken);
+                    _response.EnsureSuccessStatusCode();
+                    return (false, await _response.Content.ReadAsByteArrayAsync(cancellationtoken), _response.Content.Headers.ContentType?.MediaType.CoalesceOrDefault("application/octet-stream"), null);
                 }
-                catch { return (true, default, ""); }
+                catch (Exception ex) { return (true, default, "", ex); }
             }
         }
         /// <summary>
@@ -86,12 +87,12 @@
         public static string SetHttpsAndRemoveWww(this Uri uri)
         {
             Guard.CheckNull(uri, nameof(uri));
-            var host = uri.Host;
-            if (host.StartsWith("www.", StringComparison.OrdinalIgnoreCase)) { host = host.Substring(4); }
+            var _host = uri.Host;
+            if (_host.StartsWith("www.", StringComparison.OrdinalIgnoreCase)) { _host = _host.Substring(4); }
             return new UriBuilder(uri)
             {
                 Scheme = Uri.UriSchemeHttps,
-                Host = host,
+                Host = _host,
                 Port = -1
             }.Uri.ToString().TrimEnd('/');
         }

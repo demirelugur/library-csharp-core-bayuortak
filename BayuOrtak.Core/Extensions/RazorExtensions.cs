@@ -38,7 +38,7 @@
         {
             if (value)
             {
-                var _t = state.ToString().ToLower();
+                var _t = state.ToString("g").ToLower();
                 return new HtmlString($"{_t}=\"{_t}\"");
             }
             return HtmlString.Empty;
@@ -52,35 +52,35 @@
             if (filepath == "") { return HtmlString.Empty; }
             if (filepath[0] == '~') { filepath = filepath.Substring(1); }
             if (filepath[0] != '/') { filepath = String.Concat("/", filepath); }
-            var extension = Path.GetExtension(filepath);
-            if (!extension.Includes(".js", ".css")) { return HtmlString.Empty; }
-            var base64Version = Convert.ToBase64String(Encoding.UTF8.GetBytes((version ?? new Version("0.0.0.1")).ToString())).Replace("=", "");
-            TagBuilder tb;
-            if (extension == ".css")
+            var _extension = Path.GetExtension(filepath);
+            if (!_extension.Includes(".js", ".css")) { return HtmlString.Empty; }
+            var _base64version = Convert.ToBase64String(Encoding.UTF8.GetBytes((version ?? new Version("0.0.0.1")).ToString())).Replace("=", "");
+            TagBuilder _tb;
+            if (_extension == ".css")
             {
-                tb = new TagBuilder("link");
-                tb.Attributes.Add("href", $"{filepath}?v={base64Version}");
-                tb.Attributes.Add("rel", "stylesheet");
-                tb.Attributes.Add("type", "text/css");
-                tb.TagRenderMode = TagRenderMode.SelfClosing;
+                _tb = new TagBuilder("link");
+                _tb.Attributes.Add("href", $"{filepath}?v={_base64version}");
+                _tb.Attributes.Add("rel", "stylesheet");
+                _tb.Attributes.Add("type", "text/css");
+                _tb.TagRenderMode = TagRenderMode.SelfClosing;
             }
             else
             {
-                tb = new TagBuilder("script");
-                tb.Attributes.Add("src", $"{filepath}?v={base64Version}");
-                tb.Attributes.Add("type", "module");
-                tb.TagRenderMode = TagRenderMode.Normal;
+                _tb = new TagBuilder("script");
+                _tb.Attributes.Add("src", $"{filepath}?v={_base64version}");
+                _tb.Attributes.Add("type", "module");
+                _tb.TagRenderMode = TagRenderMode.Normal;
             }
-            if (htmlattributes != null) { tb.MergeAttributes(HtmlHelper.AnonymousObjectToHtmlAttributes(htmlattributes), true); }
+            if (htmlattributes != null) { _tb.MergeAttributes(HtmlHelper.AnonymousObjectToHtmlAttributes(htmlattributes), true); }
             if (!isdebug)
             {
-                var minifiedPath = filepath.Replace(extension, $".min{extension}");
-                if (extension == ".css") { tb.MergeAttribute("href", $"{minifiedPath}?v={base64Version}", true); }
-                else { tb.MergeAttribute("src", $"{minifiedPath}?v={base64Version}", true); }
+                var _minifiedpath = filepath.Replace(_extension, $".min{_extension}");
+                if (_extension == ".css") { _tb.MergeAttribute("href", $"{_minifiedpath}?v={_base64version}", true); }
+                else { _tb.MergeAttribute("src", $"{_minifiedpath}?v={_base64version}", true); }
             }
             using (var sw = new StringWriter())
             {
-                tb.WriteTo(sw, HtmlEncoder.Default);
+                _tb.WriteTo(sw, HtmlEncoder.Default);
                 return new HtmlString(sw.ToString());
             }
         }
@@ -89,20 +89,20 @@
         /// </summary>
         public static IHtmlContent InputField_forlong(this IHtmlHelper htmlhelper, string name, long value = 0, object htmlattributes = null)
         {
-            var tb = new TagBuilder("input");
-            tb.Attributes.Add("id", name);
-            tb.Attributes.Add("min", "0");
-            tb.Attributes.Add("max", Int32.MaxValue.ToString());
-            tb.Attributes.Add("step", "1");
-            tb.Attributes.Add("onblur", "__InputField.long(this);");
-            if (htmlattributes != null) { tb.MergeAttributes(HtmlHelper.AnonymousObjectToHtmlAttributes(htmlattributes), true); }
-            tb.MergeAttribute("name", name, true);
-            tb.MergeAttribute("value", value.ToString(), true);
-            tb.MergeAttribute("type", "number", true);
-            tb.TagRenderMode = TagRenderMode.SelfClosing;
+            var _tb = new TagBuilder("input");
+            _tb.Attributes.Add("id", name);
+            _tb.Attributes.Add("min", "0");
+            _tb.Attributes.Add("max", Int32.MaxValue.ToString());
+            _tb.Attributes.Add("step", "1");
+            _tb.Attributes.Add("onblur", "__InputField.long(this);");
+            if (htmlattributes != null) { _tb.MergeAttributes(HtmlHelper.AnonymousObjectToHtmlAttributes(htmlattributes), true); }
+            _tb.MergeAttribute("name", name, true);
+            _tb.MergeAttribute("value", value.ToString(), true);
+            _tb.MergeAttribute("type", "number", true);
+            _tb.TagRenderMode = TagRenderMode.SelfClosing;
             using (var sw = new StringWriter())
             {
-                tb.WriteTo(sw, HtmlEncoder.Default);
+                _tb.WriteTo(sw, HtmlEncoder.Default);
                 return new HtmlString(sw.ToString());
             }
         }
@@ -111,20 +111,20 @@
         /// </summary>
         public static IHtmlContent InputField_fordecimal(this IHtmlHelper htmlhelper, string name, decimal value = Decimal.Zero, object htmlattributes = null)
         {
-            var tb = new TagBuilder("input");
-            tb.Attributes.Add("id", name);
-            tb.Attributes.Add("min", "0");
-            tb.Attributes.Add("max", Int32.MaxValue.ToString());
-            tb.Attributes.Add("step", "0.01");
-            tb.Attributes.Add("onblur", "__InputField.decimal(this);");
-            if (htmlattributes != null) { tb.MergeAttributes(HtmlHelper.AnonymousObjectToHtmlAttributes(htmlattributes), true); }
-            tb.MergeAttribute("name", name, true);
-            tb.MergeAttribute("value", value.ToString("0.##", CultureInfo.InvariantCulture), true);
-            tb.MergeAttribute("type", "number", true);
-            tb.TagRenderMode = TagRenderMode.SelfClosing;
+            var _tb = new TagBuilder("input");
+            _tb.Attributes.Add("id", name);
+            _tb.Attributes.Add("min", "0");
+            _tb.Attributes.Add("max", Int32.MaxValue.ToString());
+            _tb.Attributes.Add("step", "0.01");
+            _tb.Attributes.Add("onblur", "__InputField.decimal(this);");
+            if (htmlattributes != null) { _tb.MergeAttributes(HtmlHelper.AnonymousObjectToHtmlAttributes(htmlattributes), true); }
+            _tb.MergeAttribute("name", name, true);
+            _tb.MergeAttribute("value", value.ToString("0.##", CultureInfo.InvariantCulture), true);
+            _tb.MergeAttribute("type", "number", true);
+            _tb.TagRenderMode = TagRenderMode.SelfClosing;
             using (var sw = new StringWriter())
             {
-                tb.WriteTo(sw, HtmlEncoder.Default);
+                _tb.WriteTo(sw, HtmlEncoder.Default);
                 return new HtmlString(sw.ToString());
             }
         }
@@ -134,22 +134,22 @@
         public static IHtmlContent InputField_forfile(this IHtmlHelper htmlhelper, FileSettingsHelper properties, string name, object htmlattributes = null)
         {
             Guard.CheckNull(properties, nameof(properties));
-            var tb = new TagBuilder("input");
-            tb.Attributes.Add("id", name);
-            tb.Attributes.Add("accept", String.Join(",", properties.ext)); // htmlattributes yukarısında yazılmasının sebebi gerektiğinde accept: image/* gibi kayıt set edilebilmesi için
-            if (htmlattributes != null) { tb.MergeAttributes(HtmlHelper.AnonymousObjectToHtmlAttributes(htmlattributes), true); }
-            tb.MergeAttribute("data-size", properties.size.ToString(), true);
+            var _tb = new TagBuilder("input");
+            _tb.Attributes.Add("id", name);
+            _tb.Attributes.Add("accept", String.Join(",", properties.ext)); // htmlattributes yukarısında yazılmasının sebebi gerektiğinde accept: image/* gibi kayıt set edilebilmesi için
+            if (htmlattributes != null) { _tb.MergeAttributes(HtmlHelper.AnonymousObjectToHtmlAttributes(htmlattributes), true); }
+            _tb.MergeAttribute("data-size", properties.size.ToString(), true);
             if (properties.filecount > 1)
             {
-                tb.MergeAttribute("data-filecount", properties.filecount.ToString(), true);
-                tb.MergeAttribute("multiple", "multiple", true);
+                _tb.MergeAttribute("data-filecount", properties.filecount.ToString(), true);
+                _tb.MergeAttribute("multiple", "multiple", true);
             }
-            tb.MergeAttribute("name", name, true);
-            tb.MergeAttribute("type", "file", true);
-            tb.TagRenderMode = TagRenderMode.SelfClosing;
+            _tb.MergeAttribute("name", name, true);
+            _tb.MergeAttribute("type", "file", true);
+            _tb.TagRenderMode = TagRenderMode.SelfClosing;
             using (var sw = new StringWriter())
             {
-                tb.WriteTo(sw, HtmlEncoder.Default);
+                _tb.WriteTo(sw, HtmlEncoder.Default);
                 return new HtmlString(sw.ToString());
             }
         }
@@ -158,19 +158,19 @@
         /// </summary>
         public static IHtmlContent InputMask_forphonenumbertr(this IHtmlHelper htmlhelper, string name, string value = "", object htmlattributes = null)
         {
-            var tb = new TagBuilder("input");
-            tb.Attributes.Add("id", name); // '(501) 234-5678'.replace(/[()\-\s]/g, '') -> 5012345678
-            if (htmlattributes != null) { tb.MergeAttributes(HtmlHelper.AnonymousObjectToHtmlAttributes(htmlattributes), true); }
-            checkClassInputMask_private(tb);
-            tb.MergeAttribute("data-mask", "(999) 999-9999", true);
+            var _tb = new TagBuilder("input");
+            _tb.Attributes.Add("id", name); // '(501) 234-5678'.replace(/[()\-\s]/g, '') -> 5012345678
+            if (htmlattributes != null) { _tb.MergeAttributes(HtmlHelper.AnonymousObjectToHtmlAttributes(htmlattributes), true); }
+            checkClassInputMask_private(_tb);
+            _tb.MergeAttribute("data-mask", "(999) 999-9999", true);
             value = value.BeautifyPhoneNumberTR();
-            if (value != "") { tb.MergeAttribute("value", value, true); }
-            tb.MergeAttribute("type", "text", true);
-            tb.MergeAttribute("name", name, true);
-            tb.TagRenderMode = TagRenderMode.SelfClosing;
+            if (value != "") { _tb.MergeAttribute("value", value, true); }
+            _tb.MergeAttribute("type", "text", true);
+            _tb.MergeAttribute("name", name, true);
+            _tb.TagRenderMode = TagRenderMode.SelfClosing;
             using (var sw = new StringWriter())
             {
-                tb.WriteTo(sw, HtmlEncoder.Default);
+                _tb.WriteTo(sw, HtmlEncoder.Default);
                 return new HtmlString(sw.ToString());
             }
         }
@@ -179,33 +179,33 @@
         /// </summary>
         public static IHtmlContent InputMask_forpositivenumber(this IHtmlHelper htmlhelper, string name, int maskcount, string value = "", object htmlattributes = null)
         {
-            var tb = new TagBuilder("input");
-            tb.Attributes.Add("id", name); // '12__'.replace(/\_/g, '') ->  12
-            if (htmlattributes != null) { tb.MergeAttributes(HtmlHelper.AnonymousObjectToHtmlAttributes(htmlattributes), true); }
-            checkClassInputMask_private(tb);
-            tb.MergeAttribute("data-mask", new String('9', maskcount), true);
-            if (UInt64.TryParse(value, out ulong _v) && _v > 0) { tb.MergeAttribute("value", _v.ToString(), true); }
-            tb.MergeAttribute("type", "text", true);
-            tb.MergeAttribute("name", name, true);
-            tb.TagRenderMode = TagRenderMode.SelfClosing;
+            var _tb = new TagBuilder("input");
+            _tb.Attributes.Add("id", name); // '12__'.replace(/\_/g, '') ->  12
+            if (htmlattributes != null) { _tb.MergeAttributes(HtmlHelper.AnonymousObjectToHtmlAttributes(htmlattributes), true); }
+            checkClassInputMask_private(_tb);
+            _tb.MergeAttribute("data-mask", new String('9', maskcount), true);
+            if (UInt64.TryParse(value, out ulong _v) && _v > 0) { _tb.MergeAttribute("value", _v.ToString(), true); }
+            _tb.MergeAttribute("type", "text", true);
+            _tb.MergeAttribute("name", name, true);
+            _tb.TagRenderMode = TagRenderMode.SelfClosing;
             using (var sw = new StringWriter())
             {
-                tb.WriteTo(sw, HtmlEncoder.Default);
+                _tb.WriteTo(sw, HtmlEncoder.Default);
                 return new HtmlString(sw.ToString());
             }
         }
-        private static void checkClassInputMask_private(TagBuilder tb)
+        private static void checkClassInputMask_private(TagBuilder tagbuilder)
         {
-            if (tb.Attributes.TryGetValue("class", out string _class))
+            if (tagbuilder.Attributes.TryGetValue("class", out string _class))
             {
                 var _c = _class.Split(' ').Where(x => !x.IsNullOrEmpty_string()).ToList();
                 if (!_c.Contains("input-mask"))
                 {
                     _c.Add("input-mask");
-                    tb.MergeAttribute("class", String.Join(" ", _c), true);
+                    tagbuilder.MergeAttribute("class", String.Join(" ", _c), true);
                 }
             }
-            else { tb.Attributes.Add("class", "input-mask"); }
+            else { tagbuilder.Attributes.Add("class", "input-mask"); }
         }
     }
 }

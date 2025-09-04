@@ -43,11 +43,11 @@
         /// <returns>Oluşturulan <see cref="List{SelectListItem}"/>.</returns>
         public static List<SelectListItem> ToDropDownList_group(this IDictionary<string, object[]> source, string optiontitle, string optionvalue, string selectedvalue = "", SelectListItem firstitem = null)
         {
-            var ret = new List<SelectListItem>();
+            var _r = new List<SelectListItem>();
             source = source ?? new Dictionary<string, object[]>();
             foreach (var item in source)
             {
-                ret.AddRange(item.Value.Select(x => new
+                _r.AddRange(item.Value.Select(x => new
                 {
                     t = Convert.ToString(x.GetType().GetProperty(optiontitle).GetValue(x)),
                     v = Convert.ToString(x.GetType().GetProperty(optionvalue).GetValue(x))
@@ -56,8 +56,8 @@
                     Name = item.Key
                 }));
             }
-            if (firstitem != null) { ret.Insert(0, firstitem); }
-            return ret;
+            if (firstitem != null) { _r.Insert(0, firstitem); }
+            return _r;
         }
         /// <summary>
         /// Belirtilen anahtara (key) göre bir sözlükten (IDictionary) değer çekip, belirli bir türe <typeparamref name="T"/> dönüştürür. Eğer sözlük veya anahtar geçersizse, varsayılan değeri döndürür.
@@ -153,11 +153,11 @@
         public static List<SelectListItem> ToDropDownList<T>(this IEnumerable<T> source, string optiontitle, string optionvalue, string selectedvalue = "", SelectListItem firstitem = null) where T : class => source.ToDropDownList_private(optiontitle, optionvalue, selectedvalue, firstitem, default);
         private static List<SelectListItem> ToDropDownList_private<T>(this IEnumerable<T> source, string optiontitle, string optionvalue, string selectedvalue, SelectListItem firstitem, SelectListGroup group) where T : class
         {
-            var ret = new List<SelectListItem>();
+            var _r = new List<SelectListItem>();
             if (source != null && source.Any())
             {
-                var _hv = !selectedvalue.IsNullOrEmpty_string();
-                ret.AddRange(source.Select(item => new
+                var _hasvalue = !selectedvalue.IsNullOrEmpty_string();
+                _r.AddRange(source.Select(item => new
                 {
                     item,
                     type = item.GetType()
@@ -171,12 +171,12 @@
                 {
                     Text = x.Text,
                     Value = x.Value,
-                    Selected = (_hv && x.Value == selectedvalue),
+                    Selected = (_hasvalue && x.Value == selectedvalue),
                     Group = group
                 }).ToArray());
             }
-            if (firstitem != null) { ret.Insert(0, firstitem); }
-            return ret;
+            if (firstitem != null) { _r.Insert(0, firstitem); }
+            return _r;
         }
         /// <summary>
         /// Kaynakdaki elemanların sırasını <b>Fisher-Yates algoritmasını</b> kullanarak rastgele karıştırır ve karıştırılmış bir ICollection olarak geri döner.
@@ -190,27 +190,27 @@
         public static ICollection<T> Shuffle<T>(this IEnumerable<T> source)
         {
             T temp;
-            var r = source.ToList();
-            int i, j, n = r.Count, nm = (n - 1);
-            for (i = nm; i > 0; i--)
+            var _r = source.ToList();
+            int i, j, n = _r.Count, _count = (n - 1);
+            for (i = _count; i > 0; i--)
             {
                 j = Random.Shared.Next(0, i + 1);
-                temp = r[i];
-                r[i] = r[j];
-                r[j] = temp;
+                temp = _r[i];
+                _r[i] = _r[j];
+                _r[j] = temp;
             }
-            return r;
+            return _r;
         }
         /// <summary>
         /// Verilen asenkron sıralı enumerable (IAsyncEnumerable) koleksiyonundan ilk öğeyi döndürür. Koleksiyon boşsa, varsayılan değeri (default) döndürür. İşlem, verilen iptal token'ı ile iptal edilebilir.
         /// </summary>
         /// <typeparam name="T">Koleksiyondaki öğelerin türü.</typeparam>
         /// <param name="source">İlk öğenin alınacağı asenkron sıralı enumerable koleksiyon.</param>
-        /// <param name="cancellationToken">Asenkron işlemi iptal etmek için kullanılan token.</param>
+        /// <param name="cancellationtoken">Asenkron işlemi iptal etmek için kullanılan token.</param>
         /// <returns>Koleksiyonun ilk öğesi veya koleksiyon boşsa varsayılan değer (default).</returns>
-        public static async Task<T> FirstOrDefaultFromAsyncEnumerable<T>(this IAsyncEnumerable<T> source, CancellationToken cancellationToken)
+        public static async Task<T> FirstOrDefaultFromAsyncEnumerable<T>(this IAsyncEnumerable<T> source, CancellationToken cancellationtoken)
         {
-            await foreach (var item in source.WithCancellation(cancellationToken)) { return item; }
+            await foreach (var item in source.WithCancellation(cancellationtoken)) { return item; }
             return default;
         }
         #endregion
@@ -224,10 +224,10 @@
         /// <returns>İki koleksiyon eşitse <see langword="true"/>, aksi halde <see langword="false"/> döner.</returns>
         public static bool IsEqual<T>(this ICollection<T> left, ICollection<T> right)
         {
-            var leftisNull = left == null;
-            var rightisNull = right == null;
-            if (((leftisNull || rightisNull) && leftisNull == rightisNull)) { return true; }
-            if (!leftisNull && !rightisNull && left.All(right.Contains) && left.Count == right.Count) { return true; }
+            var _leftisnull = left == null;
+            var _rightisnull = right == null;
+            if (((_leftisnull || _rightisnull) && _leftisnull == _rightisnull)) { return true; }
+            if (!_leftisnull && !_rightisnull && left.All(right.Contains) && left.Count == right.Count) { return true; }
             return false;
         }
         /// <summary>
@@ -272,6 +272,14 @@
             }
             return _ex;
         }
+        /// <summary>
+        /// Verilen hata mesajlarını başarısız sonucu temsil edecek şekilde döndürür.
+        /// </summary>
+        public static IslemSonucResult<T> ReturnFailed<T>(this string[] errors) => new(default, false, errors);
+        /// <summary>
+        /// Verilen hata mesajlarını başarısız sonucu temsil edecek şekilde döndürür.
+        /// </summary>
+        public static IslemSonucResult<object[]> ReturnFailedObjectArray(this string[] errors) => new(default, false, errors);
         #endregion
     }
 }

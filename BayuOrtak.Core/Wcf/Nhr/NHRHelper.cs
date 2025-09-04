@@ -5,7 +5,6 @@
     using BayuOrtak.Core.Interface;
     using System.ServiceModel;
     using Wcf_Nhr_personelinfo;
-
     public interface INHRHelper : IConnectionStatus
     {
         PersonelinfoServiceClient client { get; }
@@ -41,9 +40,9 @@
                 return _Client;
             }
         }
-        public async Task<(bool statuswarning, string error)> IsConnectionStatusAsync(TimeSpan timeout, string dil, CancellationToken cancellationToken)
+        public async Task<(bool statuswarning, string error)> IsConnectionStatusAsync(TimeSpan timeout, string dil, CancellationToken cancellationtoken)
         {
-            var _t = await this.client.Endpoint.Address.Uri.IsConnectionStatusAsync(timeout, cancellationToken);
+            var _t = await this.client.Endpoint.Address.Uri.IsConnectionStatusAsync(timeout, cancellationtoken);
             return (_t.statuswarning, _t.statuswarning ? GlobalConstants.webservice_connectionwarning(dil, "NHR PersonelInfo") : "");
         }
         public async Task<wspersonel> bytckimliknoAsync(long tckn) => (await this.client.bytckimliknoAsync(this.username, this.password, tckn)).@return;

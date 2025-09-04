@@ -18,10 +18,10 @@
         /// <summary>
         /// Minimum uzunluğu parametre olarak kabul eden yapıcı (constructor).
         /// </summary>
-        /// <param name="minimumLength">Koleksiyonun sağlaması gereken minimum eleman sayısı.</param>
-        public Validation_ArrayMinLengthAttribute(int minimumLength) : base(minimumLength)
+        /// <param name="minimumlength">Koleksiyonun sağlaması gereken minimum eleman sayısı.</param>
+        public Validation_ArrayMinLengthAttribute(int minimumlength) : base(minimumlength)
         {
-            this.ErrorMessage = minimumLength > 1 ? _validationerrormessage.array_minlength : _validationerrormessage.required;
+            this.ErrorMessage = minimumlength > 1 ? _validationerrormessage.array_minlength : _validationerrormessage.required;
         }
     }
 }

@@ -31,16 +31,16 @@
             {
                 if (_Client == null)
                 {
-                    _Client = new YuksekOgretimEgitimBilgisiPortClient(YoksisTools.basicHttpBinding, new EndpointAddress("http://servisler.yok.gov.tr/ws/yuksekogretim/egitim?wsdl")); // Not: EndpointAddress uri yolu http ile başlamalıdır!
+                    _Client = new YuksekOgretimEgitimBilgisiPortClient(YoksisTools.basichttpbinding, new EndpointAddress("http://servisler.yok.gov.tr/ws/yuksekogretim/egitim?wsdl")); // Not: EndpointAddress uri yolu http ile başlamalıdır!
                     _Client.ClientCredentials.UserName.UserName = yoksis_UNI_code.ToString();
                     _Client.ClientCredentials.UserName.Password = this.password;
                 }
                 return _Client;
             }
         }
-        public async Task<(bool statuswarning, string error)> IsConnectionStatusAsync(TimeSpan timeout, string dil, CancellationToken cancellationToken)
+        public async Task<(bool statuswarning, string error)> IsConnectionStatusAsync(TimeSpan timeout, string dil, CancellationToken cancellationtoken)
         {
-            var _t = await this.client.Endpoint.Address.Uri.IsConnectionStatusAsync(timeout, cancellationToken);
+            var _t = await this.client.Endpoint.Address.Uri.IsConnectionStatusAsync(timeout, cancellationtoken);
             return (_t.statuswarning, _t.statuswarning ? GlobalConstants.webservice_connectionwarning(dil, "YÖKSİS, Egitim") : "");
         }
         public async Task<BirimResponse> BirimAsync(long birimid) => (await this.client.BirimAsync(new BirimRequestType

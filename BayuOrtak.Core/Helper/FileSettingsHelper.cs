@@ -37,7 +37,7 @@
         [JsonIgnore]
         [IgnoreDataMember]
         public string getformatsize => FormatSize(Convert.ToDouble(size));
-        public bool gettryfileisexception(ICollection<IFormFile> files, string dil, out string[] outvalues) => TryFileisException(files, this, dil, out outvalues);
+        public bool gettryfileisexception(ICollection<IFormFile> files, string dil, out string[] errors) => TryFileisException(files, this, dil, out errors);
         public FileSettingsHelper() : this(default, default, default) { }
         public FileSettingsHelper(string[] ext, long size, byte filecount)
         {
@@ -52,11 +52,11 @@
         /// <returns>Biçimlendirilmiş boyut.</returns>
         public static string FormatSize(double value)
         {
-            if (value < 0 || double.IsNaN(value)) { value = 0; }
-            var j = 0;
-            var sz = filesizeunits.Length - 1;
-            while (value > 1024 && j < sz) { value /= 1024; j++; }
-            return string.Join(" ", (Math.Ceiling(value * 100) / 100).ToString(), filesizeunits[j]);
+            if (value < 0 || Double.IsNaN(value)) { value = 0; }
+            var _j = 0;
+            var _sz = filesizeunits.Length - 1;
+            while (value > 1024 && _j < _sz) { value /= 1024; _j++; }
+            return String.Join(" ", (Math.Ceiling(value * 100) / 100).ToString(), filesizeunits[_j]);
         }
         /// <summary>
         /// Verilen bir değeri ayrıntılı biçimde biçimler.
@@ -64,7 +64,7 @@
         /// <param name="value">Biçimlendirilecek boyut değeri.</param>
         public static string FormatSizeDetail(double value)
         {
-            if (value < 0 || double.IsNaN(value)) { return ""; }
+            if (value < 0 || Double.IsNaN(value)) { return ""; }
             if (value < 1024 || value % 1024 == 0) { return FormatSize(value); }
             return $"{value.ToString()} {filesizeunits[0]} (~ {FormatSize(value)})";
         }
@@ -72,21 +72,21 @@
         /// Yükleme ayarlarına göre dosyaların geçerliliğini kontrol eder.
         /// </summary>
         /// <param name="files">Kontrol edilecek dosyaların koleksiyonu.</param>
-        /// <param name="uploadSettings">Yükleme ayarları.</param>
+        /// <param name="uploadsettings">Yükleme ayarları.</param>
         /// <param name="dil">İşlem sırasında kullanılacak dil (örneğin: &quot;tr&quot; veya &quot;en&quot;).</param>
-        /// <param name="outvalues">Hata mesajlarını içeren bir dizi.</param>
+        /// <param name="errors">Hata mesajlarını içeren bir dizi.</param>
         /// <returns>Geçersizlik durumu (true/false).</returns>
-        public static bool TryFileisException(ICollection<IFormFile> files, FileSettingsHelper uploadSettings, string dil, out string[] outvalues)
+        public static bool TryFileisException(ICollection<IFormFile> files, FileSettingsHelper uploadsettings, string dil, out string[] errors)
         {
             Guard.UnSupportLanguage(dil, nameof(dil));
             try
             {
                 if (files.Count > 0)
                 {
-                    uploadSettings = uploadSettings ?? new FileSettingsHelper();
-                    Guard.CheckEmpty(uploadSettings.ext, nameof(uploadSettings.ext));
-                    Guard.CheckZeroOrNegative(uploadSettings.size, nameof(uploadSettings.size));
-                    var ie_files = files.Select(file => new
+                    uploadsettings = uploadsettings ?? new FileSettingsHelper();
+                    Guard.CheckEmpty(uploadsettings.ext, nameof(uploadsettings.ext));
+                    Guard.CheckZeroOrNegative(uploadsettings.size, nameof(uploadsettings.size));
+                    var _files = files.Select(file => new
                     {
                         file,
                         uzn = file.GetFileExtension()
@@ -95,74 +95,74 @@
                         filename = x.file.FileName,
                         x.uzn,
                         size = x.file.Length,
-                        check_uzn = uploadSettings.ext.Contains(x.uzn),
-                        check_size = x.file.Length <= uploadSettings.size
+                        check_uzn = uploadsettings.ext.Contains(x.uzn),
+                        check_size = x.file.Length <= uploadsettings.size
                     }).ToArray();
-                    if (ie_files.Length > uploadSettings.filecount)
+                    if (_files.Length > uploadsettings.filecount)
                     {
                         if (dil == "en")
                         {
-                            outvalues = new string[] {
+                            errors = new string[] {
                                "You have exceeded the maximum number of files allowed to upload!",
-                               $"Maximum file count: {uploadSettings.filecount.ToString()}"
+                               $"Maximum file count: {uploadsettings.filecount.ToString()}"
                             };
                         }
                         else
                         {
-                            outvalues = new string[] {
+                            errors = new string[] {
                                "Yüklenecek maksimum dosya sayısını aştınız!",
-                               $"Maksimum dosya sayısı: {uploadSettings.filecount.ToString()}"
+                               $"Maksimum dosya sayısı: {uploadsettings.filecount.ToString()}"
                             };
                         }
                         return true;
                     }
-                    if (ie_files.Any(x => !x.check_uzn))
+                    if (_files.Any(x => !x.check_uzn))
                     {
                         if (dil == "en")
                         {
-                            outvalues = new string[] {
+                            errors = new string[] {
                                 "The file extensions are not compatible!",
-                                $"Incompatible files: {string.Join(", ", ie_files.Where(x => !x.check_uzn).OrderBy(x => x.filename).Select(x => x.filename).ToArray())}",
-                                $"Allowed extension types: {string.Join(", ", uploadSettings.ext)}"
+                                $"Incompatible files: {string.Join(", ", _files.Where(x => !x.check_uzn).OrderBy(x => x.filename).Select(x => x.filename).ToArray())}",
+                                $"Allowed extension types: {string.Join(", ", uploadsettings.ext)}"
                             };
                         }
                         else
                         {
-                            outvalues = new string[] {
+                            errors = new string[] {
                                "Yüklenecek dosya uzantıları uyumsuzdur!",
-                               $"Uyumsuz olan dosyalar: {string.Join(", ", ie_files.Where(x => !x.check_uzn).OrderBy(x => x.filename).Select(x => x.filename).ToArray())}",
-                               $"İzin verilen uzantı türleri: {string.Join(", ", uploadSettings.ext)}"
+                               $"Uyumsuz olan dosyalar: {string.Join(", ", _files.Where(x => !x.check_uzn).OrderBy(x => x.filename).Select(x => x.filename).ToArray())}",
+                               $"İzin verilen uzantı türleri: {string.Join(", ", uploadsettings.ext)}"
                             };
                         }
                         return true;
                     }
-                    if (ie_files.Any(x => !x.check_size))
+                    if (_files.Any(x => !x.check_size))
                     {
                         if (dil == "en")
                         {
-                            outvalues = new string[] {
+                            errors = new string[] {
                                 "You have exceeded the allowed upload size for a single file!",
-                                $"Files exceeding the size limit: {string.Join(", ", ie_files.Where(x => !x.check_size).OrderByDescending(x => x.size).ThenBy(x => x.filename).Select(x => string.Join(", ", x.filename, FormatSize(x.size))).ToArray())}",
-                                $"Maximum allowed size for a single file: {uploadSettings.getformatsize}"
+                                $"Files exceeding the size limit: {string.Join(", ", _files.Where(x => !x.check_size).OrderByDescending(x => x.size).ThenBy(x => x.filename).Select(x => string.Join(", ", x.filename, FormatSize(x.size))).ToArray())}",
+                                $"Maximum allowed size for a single file: {uploadsettings.getformatsize}"
                             };
                         }
                         else
                         {
-                            outvalues = new string[] {
+                            errors = new string[] {
                                 "Tek bir dosya için izin verilen yükleme miktarını aştınız!",
-                                $"Kapasite miktarı aşan dosyalar: {string.Join(", ", ie_files.Where(x => !x.check_size).OrderByDescending(x => x.size).ThenBy(x => x.filename).Select(x => string.Join(", ", x.filename, FormatSize(x.size))).ToArray())}",
-                                $"Tek bir dosya için izin verilen maksimum boyut miktarı: {uploadSettings.getformatsize}"
+                                $"Kapasite miktarı aşan dosyalar: {string.Join(", ", _files.Where(x => !x.check_size).OrderByDescending(x => x.size).ThenBy(x => x.filename).Select(x => string.Join(", ", x.filename, FormatSize(x.size))).ToArray())}",
+                                $"Tek bir dosya için izin verilen maksimum boyut miktarı: {uploadsettings.getformatsize}"
                             };
                         }
                         return true;
                     }
                 }
-                outvalues = Array.Empty<string>();
+                errors = Array.Empty<string>();
                 return false;
             }
             catch (Exception ex)
             {
-                outvalues = ex.AllExceptionMessage();
+                errors = ex.AllExceptionMessage();
                 return true;
             }
         }

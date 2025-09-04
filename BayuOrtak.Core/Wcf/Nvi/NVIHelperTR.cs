@@ -13,9 +13,7 @@
     public interface INVIHelperTR : IConnectionStatus
     {
         KPSPublicV2SoapClient client { get; }
-        Task<bool> KisiVeCuzdanDogrula_YeniKimlikAsync(long tckn, string ad, string soyad, DateOnly dogumTarih, string yeniTckkSeriNo);
-        Task<bool> KisiVeCuzdanDogrula_EskiKimlikAsync(long tckn, string ad, string soyad, DateOnly dogumTarih, string eskiCuzdanSeri, int eskiCuzdanNo);
-        Task<bool> KontrolAsync(long tckn, string ad, string soyad, DateOnly dogumTarih, Nvi_KimlikTypes tip, string yeniTckkSeriNo, string eskiCuzdanSeri, int eskiCuzdanNo);
+        Task<bool> KisiVeCuzdanDogrulaAsync(Nvi_KimlikTypes tip, long tckn, string ad, string soyad, DateOnly dogumtarih, string cuzdanserino);
     }
     public sealed class NVIHelperTR : INVIHelperTR, IDisposable
     {
@@ -36,60 +34,47 @@
                 return _Client;
             }
         }
-        public async Task<(bool statuswarning, string error)> IsConnectionStatusAsync(TimeSpan timeout, string dil, CancellationToken cancellationToken)
+        private async Task<bool> yenikimlikAsync(long tckn, string ad, string soyad, DateOnly dogumtarih, string yenitckkserino) => (await this.client.KisiVeCuzdanDogrulaAsync(tckn, ad.ToUpper(), soyad.ToUpper(), true, dogumtarih.Day, true, dogumtarih.Month, true, dogumtarih.Year, null, null, yenitckkserino.ToUpper())).Body.KisiVeCuzdanDogrulaResult;
+        private async Task<bool> eskikimlikAsync(long tckn, string ad, string soyad, DateOnly dogumtarih, string eskicuzdanseri, int eskicuzdanno) => (await this.client.KisiVeCuzdanDogrulaAsync(tckn, ad.ToUpper(), soyad.ToUpper(), true, dogumtarih.Day, true, dogumtarih.Month, true, dogumtarih.Year, eskicuzdanseri.ToUpper(), eskicuzdanno, null)).Body.KisiVeCuzdanDogrulaResult;
+        public async Task<(bool statuswarning, string error)> IsConnectionStatusAsync(TimeSpan timeout, string dil, CancellationToken cancellationtoken)
         {
-            var _t = await this.client.Endpoint.Address.Uri.IsConnectionStatusAsync(timeout, cancellationToken);
-            return (_t.statuswarning, _t.statuswarning ? GlobalConstants.webservice_connectionwarning(dil, "NVI KPSPublicV2") : "");
+            var _t = await this.client.Endpoint.Address.Uri.IsConnectionStatusAsync(timeout, cancellationtoken);
+            return (_t.statuswarning, _t.statuswarning ? webservice_connectionwarning(dil, "NVI KPSPublicV2") : "");
         }
-        public async Task<bool> KisiVeCuzdanDogrula_YeniKimlikAsync(long tckn, string ad, string soyad, DateOnly dogumTarih, string yeniTckkSeriNo) => (await this.client.KisiVeCuzdanDogrulaAsync(tckn, ad.ToUpper(), soyad.ToUpper(), true, dogumTarih.Day, true, dogumTarih.Month, true, dogumTarih.Year, null, null, yeniTckkSeriNo.ToUpper())).Body.KisiVeCuzdanDogrulaResult;
-        public async Task<bool> KisiVeCuzdanDogrula_EskiKimlikAsync(long tckn, string ad, string soyad, DateOnly dogumTarih, string eskiCuzdanSeri, int eskiCuzdanNo) => (await this.client.KisiVeCuzdanDogrulaAsync(tckn, ad.ToUpper(), soyad.ToUpper(), true, dogumTarih.Day, true, dogumTarih.Month, true, dogumTarih.Year, eskiCuzdanSeri.ToUpper(), eskiCuzdanNo, null)).Body.KisiVeCuzdanDogrulaResult;
-        public Task<bool> KontrolAsync(long tckn, string ad, string soyad, DateOnly dogumTarih, Nvi_KimlikTypes tip, string yeniTckkSeriNo, string eskiCuzdanSeri, int eskiCuzdanNo)
+        public Task<bool> KisiVeCuzdanDogrulaAsync(Nvi_KimlikTypes tip, long tckn, string ad, string soyad, DateOnly dogumtarih, string cuzdanserino)
         {
             Guard.CheckZeroOrNegative(tckn, nameof(tckn));
             Guard.CheckEmpty(ad, nameof(ad));
             Guard.CheckEmpty(soyad, nameof(soyad));
-            if (tip == Nvi_KimlikTypes.yeni)
-            {
-                Guard.CheckEmpty(yeniTckkSeriNo, nameof(yeniTckkSeriNo));
-                return this.KisiVeCuzdanDogrula_YeniKimlikAsync(tckn, ad, soyad, dogumTarih, yeniTckkSeriNo);
-            }
-            if (tip == Nvi_KimlikTypes.eski)
-            {
-                Guard.CheckEmpty(eskiCuzdanSeri, nameof(eskiCuzdanSeri));
-                Guard.CheckZeroOrNegative(eskiCuzdanNo, nameof(eskiCuzdanNo));
-                return this.KisiVeCuzdanDogrula_EskiKimlikAsync(tckn, ad, soyad, dogumTarih, eskiCuzdanSeri, eskiCuzdanNo);
-            }
+            Guard.CheckEmpty(cuzdanserino, nameof(cuzdanserino));
+            if (tip == Nvi_KimlikTypes.yeni) { return this.yenikimlikAsync(tckn, ad, soyad, dogumtarih, cuzdanserino); }
+            if (tip == Nvi_KimlikTypes.eski) { return (TryValidateEskiNufusCuzdaniSeriNo(cuzdanserino, out string _serino, out int _no) ? this.eskikimlikAsync(tckn, ad, soyad, dogumtarih, _serino, _no) : Task.FromResult(false)); }
             throw _other.ThrowNotSupportedForEnum<Nvi_KimlikTypes>();
         }
-        public static bool IsValidate(string value, Nvi_KimlikTypes tip)
+        public static bool IsValidate(ref string value, Nvi_KimlikTypes tip)
         {
-            if (tip == Nvi_KimlikTypes.yeni) { return TryValidate_YeniKimlikSeriNo(value, out _); }
-            if (tip == Nvi_KimlikTypes.eski) { return TryValidate_EskiNufusCuzdaniSeriNo(value, out _, out _); }
-            throw _other.ThrowNotSupportedForEnum<Nvi_KimlikTypes>();
-        }
-        public static bool TryValidate_YeniKimlikSeriNo(string value, out string outvalue)
-        {
-            outvalue = "";
             value = value.ToStringOrEmpty().Replace(" ", "").Replace("-", "").ToUpper();
-            if (value.Length == _maximumlength.cuzdanserino && Regex.IsMatch(value, @"^[A-Z][0-9]{2}[A-Z][0-9]{5}$"))
+            if (value.Length == _maximumlength.cuzdanserino)
             {
-                outvalue = value;
-                return true;
+                if (tip == Nvi_KimlikTypes.yeni && Regex.IsMatch(value, @"^[A-Z][0-9]{2}[A-Z][0-9]{5}$")) { return true; } //A12I34567
+                if (tip == Nvi_KimlikTypes.eski && Regex.IsMatch(value, @"^[A-Z][0-9]{8}$")) { return true; } // A12345678
             }
             return false;
         }
-        public static bool TryValidate_EskiNufusCuzdaniSeriNo(string value, out string serino, out int no)
+        public static bool TryValidateEskiNufusCuzdaniSeriNo(string value, out string serino, out int no)
         {
-            serino = "";
-            no = 0;
-            value = value.ToStringOrEmpty().Replace(" ", "").Replace("-", "").ToUpper();
-            if (value.Length == _maximumlength.cuzdanserino && Regex.IsMatch(value, @"^[A-Z][0-9]{8}$"))
+            if (IsValidate(ref value, Nvi_KimlikTypes.eski))
             {
                 serino = value.Substring(0, 3);
                 no = Convert.ToInt32(value.Substring(3, 6));
                 return true;
             }
-            return false;
+            else
+            {
+                serino = "";
+                no = 0;
+                return false;
+            }
         }
     }
 }

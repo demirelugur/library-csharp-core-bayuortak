@@ -22,13 +22,13 @@
         public (Nhr_UnvanTypes tip, int id, string adi, string adi_kisa) unvan { get; }
         public Nhr_DurumTypes? durumtip { get; }
         public string jobrecordalttipi { get; }
-        public DateTime basdate { get; }
-        public DateTime? bitdate { get; }
+        public DateOnly basdate { get; }
+        public DateOnly? bitdate { get; }
         public short? dahili { get; }
         public string tel { get; }
         public (int id, string adi) birim { get; }
         public (int? id, string adi) birim_fiiligorev { get; }
-        public DateTime dogumtarihi { get; }
+        public DateOnly dogumtarihi { get; }
         public (Nvi_KimlikTypes? tip, string serino) nvi_kimlikinfo { get; }
         public byte[] img { get; }
         public string nms => String.Concat(this.ad, " ", this.soyad);
@@ -37,35 +37,35 @@
         public bool isaktif => !this.bitdate.HasValue;
         public bool hasimg => this.img.Length > 0;
         public UyeInfoResult() : this(default) { }
-        public UyeInfoResult(wspersonel wspersonel)
+        public UyeInfoResult(wspersonel? item)
         {
-            wspersonel = wspersonel ?? new wspersonel();
-            this.ad = wspersonel.personelAd.SubstringUpToLength(_nhr.ad).ToTitleCase(true, new char[] { '.' });
-            this.soyad = wspersonel.personelSoyad.SubstringUpToLength(_nhr.soyad).ToUpper();
-            this.kuladi = ((_try.TryMailAddress(wspersonel.personelKurumemail, out MailAddress _ma) && _ma.IsBayburtUniEPosta()) ? _ma.User : "");
-            this.tckn = _try.TryTCKimlikNo(wspersonel.personelTckimlikno.ToString(), out long _tckn) ? _tckn : 0;
-            this.sicilno = NHRTools.TrySicilNo(wspersonel.personelKurumsicilno, out string _sicilno) ? _sicilno : "";
-            this.gender = wspersonel.personelCinsiyet.ToSeoFriendly().ToEnumerable().Select(x => x == "erkek" ? 'E' : (x == "kadin" ? 'K' : Char.MinValue)).FirstOrDefault();
-            this.unvan = (wspersonel.GetUnvanTypes(), wspersonel.personelUnvanid, new TitleCaseConfiguration().Execute(wspersonel.personelUnvan).SubstringUpToLength(_nhr.unvanadi), wspersonel.personelUnvanKisaltma.SubstringUpToLength(_nhr.unvanadi)); // unvankisa boş gelebilir!
-            this.durumtip = wspersonel.GetDurumTypes();
-            this.jobrecordalttipi = wspersonel.personelJobrecordalttipi.SubstringUpToLength(_nhr.jobrecordalttipi).ToUpper();
-            this.basdate = wspersonel.personelUnivbastar;
-            this.bitdate = (wspersonel.IsActivePersonel() ? null : wspersonel.personelAyrilmatar);
-            this.dahili = (Int16.TryParse(wspersonel.personelDahili, out short _dahili) && _dahili > 0 && wspersonel.personelDahili.Length == 4) ? _dahili : null;
-            this.tel = _try.TryPhoneNumberTR(wspersonel.personelCeptel1, out string _tel) ? _tel : "";
-            this.birim = (wspersonel.personelBirimid.ToInt32(), wspersonel.personelBirim.SubstringUpToLength(_nhr.birimadi).ToUpper());
-            this.birim_fiiligorev = ((wspersonel.fiiligorevlist ?? Array.Empty<wsfiiligorev>()).GetAktifFiiliGorev(this.birim.id)).ToEnumerable().Select(x => x.fiiligorevBirimid > 0 ? ((int?)x.fiiligorevBirimid, x.fiiligorevMasterbirim.SubstringUpToLength(_nhr.birimadi).ToUpper()) : (null, "")).FirstOrDefault();
-            this.dogumtarihi = wspersonel.personelKpsdogumtar;
-            this.nvi_kimlikinfo = wspersonel.GetKimlikInfo();
-            this.img = wspersonel.personelResim ?? Array.Empty<byte>();
+            item = item ?? new wspersonel();
+            this.ad = item.personelAd.SubstringUpToLength(_nhr.ad).ToTitleCase(true, new char[] { '.' });
+            this.soyad = item.personelSoyad.SubstringUpToLength(_nhr.soyad).ToUpper();
+            this.kuladi = ((_try.TryMailAddress(item.personelKurumemail, out MailAddress _ma) && _ma.IsBayburtUniEPosta()) ? _ma.User : "");
+            this.tckn = item.personelTckimlikno.ToLong().ToEnumerable().Select(x => _is.IsTCKimlikNo(x) ? x : 0).FirstOrDefault();
+            this.sicilno = NHRTools.TrySicilNo(item.personelKurumsicilno, out string _sicilno) ? _sicilno : "";
+            this.gender = item.personelCinsiyet.ToSeoFriendly().ToEnumerable().Select(x => x == "erkek" ? 'E' : (x == "kadin" ? 'K' : Char.MinValue)).FirstOrDefault();
+            this.unvan = (item.GetUnvanTypes(), item.personelUnvanid, new TitleCaseConfiguration().Execute(item.personelUnvan).SubstringUpToLength(_nhr.unvanadi), item.personelUnvanKisaltma.SubstringUpToLength(_nhr.unvanadi)); // unvankisa boş gelebilir!
+            this.durumtip = item.GetDurumTypes();
+            this.jobrecordalttipi = item.personelJobrecordalttipi.SubstringUpToLength(_nhr.jobrecordalttipi).ToUpper();
+            this.basdate = item.personelUnivbastar.ToDateOnly();
+            this.bitdate = (item.IsActivePersonel() ? null : item.personelAyrilmatar.ToDateOnly());
+            this.dahili = (Int16.TryParse(item.personelDahili, out short _dahili) && _dahili > 0 && item.personelDahili.Length == 4) ? _dahili : null;
+            this.tel = _try.TryPhoneNumberTR(item.personelCeptel1, out string _tel) ? _tel : "";
+            this.birim = (item.personelBirimid.ToInt32(), item.personelBirim.SubstringUpToLength(_nhr.birimadi).ToUpper());
+            this.birim_fiiligorev = ((item.fiiligorevlist ?? Array.Empty<wsfiiligorev>()).GetAktifFiiliGorev(this.birim.id)).ToEnumerable().Select(x => x.fiiligorevBirimid > 0 ? ((int?)x.fiiligorevBirimid, x.fiiligorevMasterbirim.SubstringUpToLength(_nhr.birimadi).ToUpper()) : (null, "")).FirstOrDefault();
+            this.dogumtarihi = item.personelKpsdogumtar.ToDateOnly();
+            this.nvi_kimlikinfo = item.GetKimlikInfo();
+            this.img = item.personelResim ?? Array.Empty<byte>();
         }
         /// <summary>
         /// Web servisinden gelen personel verilerinin doğruluğunu kontrol eder ve hata mesajlarını belirtilen dilde döndürür.
         /// </summary>
         /// <param name="dil">Hata mesajlarının döndürüleceği dil. Desteklenen değerler: &quot;tr&quot; (Türkçe) veya &quot;en&quot; (İngilizce).</param>
-        /// <param name="_warnings">Doğrulama sırasında tespit edilen hata mesajlarının dizisi.</param>
+        /// <param name="errors">Doğrulama sırasında tespit edilen hata mesajlarının dizisi.</param>
         /// <returns>Doğrulama sırasında hata bulunursa <see langword="true"/>, aksi takdirde <see langword="false"/> döner.</returns>
-        public bool TryIsWarning(string dil, out string[] _warnings)
+        public bool TryIsWarning(string dil, out string[] errors)
         {
             Guard.UnSupportLanguage(dil, nameof(dil));
             var _messages = new Dictionary<string, Dictionary<string, string>>
@@ -77,7 +77,7 @@
                     ["kuladi_empty"] = $"NHR \"{nameof(wspersonel.personelKurumemail)}\" property değeri bayburt.edu.tr uzantılı bir e-Posta olmalıdır!",
                     ["kuladi_length"] = $"NHR \"{nameof(wspersonel.personelKurumemail)}\" kullanıcı adı property değeri maksimum {_nhr.kuladi.ToString()} karakter uzunluğa olabilir!",
                     ["tckn_invalid"] = $"NHR \"{nameof(wspersonel.personelTckimlikno)}\" property değeri T.C. Kimlik Numarasına uygun biçiminde değildir!",
-                    ["sicilno_invalid"] = $"NHR \"{nameof(wspersonel.personelKurumsicilno)}\" property değeri T.C. {_title.name_bayburtuniversitesi} Kurum Sicil Numarasına uygun biçiminde değildir!",
+                    ["sicilno_invalid"] = $"NHR \"{nameof(wspersonel.personelKurumsicilno)}\" property değeri T.C. Bayburt Üniversitesi Kurum Sicil Numarasına uygun biçiminde değildir!",
                     ["gender_invalid"] = $"NHR \"{nameof(wspersonel.personelCinsiyet)}\" property değeri uygun biçimde değildir!",
                     ["unvan_id_invalid"] = $"NHR \"{nameof(wspersonel.personelUnvanid)}\" property değeri 0'dan büyük bir sayı olmalıdır!",
                     ["unvan_empty"] = $"NHR \"{nameof(wspersonel.personelUnvan)}\" property değeri boş geçilemez!",
@@ -123,7 +123,7 @@
                 if (this.birim_fiiligorev.id.Value == 0) { _r.Add(_messages[dil]["fiiligorev_id_invalid"]); }
                 if (this.birim_fiiligorev.adi.IsNullOrEmpty_string()) { _r.Add(_messages[dil]["fiiligorev_empty"]); }
             }
-            _warnings = _r.ToArray();
+            errors = _r.ToArray();
             return _r.Count > 0;
         }
     }

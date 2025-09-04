@@ -14,8 +14,8 @@ namespace BayuOrtak.Core.UnitTest.Helper
         {
             var input = "merhaba dünya";
             var timeout = TimeSpan.FromSeconds(10);
-            var cancellationToken = CancellationToken.None;
-            var (statuswarning, value) = await _try.TryGoogleTranslateAsync(input, timeout, cancellationToken, to: "en", from: "tr");
+            var cancellationtoken = CancellationToken.None;
+            var (statuswarning, value) = await _try.TryGoogleTranslateAsync(input, timeout, cancellationtoken, to: "en", from: "tr");
             using (Assert.EnterMultipleScope())
             {
                 Assert.That(statuswarning, Is.False);
@@ -28,8 +28,8 @@ namespace BayuOrtak.Core.UnitTest.Helper
         {
             var input = "";
             var timeout = TimeSpan.FromSeconds(10);
-            var cancellationToken = CancellationToken.None;
-            var (statuswarning, value) = await _try.TryGoogleTranslateAsync(input, timeout, cancellationToken, to: "en", from: "tr");
+            var cancellationtoken = CancellationToken.None;
+            var (statuswarning, value) = await _try.TryGoogleTranslateAsync(input, timeout, cancellationtoken, to: "en", from: "tr");
             using (Assert.EnterMultipleScope())
             {
                 Assert.That(statuswarning, Is.False);
@@ -41,8 +41,8 @@ namespace BayuOrtak.Core.UnitTest.Helper
         {
             string input = null;
             var timeout = TimeSpan.FromSeconds(10);
-            var cancellationToken = CancellationToken.None;
-            var (statuswarning, value) = await _try.TryGoogleTranslateAsync(input, timeout, cancellationToken, to: "en", from: "tr");
+            var cancellationtoken = CancellationToken.None;
+            var (statuswarning, value) = await _try.TryGoogleTranslateAsync(input, timeout, cancellationtoken, to: "en", from: "tr");
             using (Assert.EnterMultipleScope())
             {
                 Assert.That(statuswarning, Is.False);

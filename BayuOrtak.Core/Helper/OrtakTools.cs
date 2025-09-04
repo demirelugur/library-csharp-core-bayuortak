@@ -13,7 +13,6 @@
     using System.Drawing;
     using System.Dynamic;
     using System.Globalization;
-    using System.IdentityModel.Tokens.Jwt;
     using System.Linq;
     using System.Linq.Expressions;
     using System.Net.Http.Headers;
@@ -34,80 +33,80 @@
             /// <summary>
             /// Verilen fiziksel dosya yolunda bir dosya varsa onu siler.
             /// </summary>
-            /// <param name="physicallyPath">Silinecek dosyanın fiziksel yolu.</param>
-            public static void FileExiststhenDelete(string physicallyPath) { if (File.Exists(physicallyPath)) { File.Delete(physicallyPath); } }
+            /// <param name="physicallypath">Silinecek dosyanın fiziksel yolu.</param>
+            public static void FileExiststhenDelete(string physicallypath) { if (File.Exists(physicallypath)) { File.Delete(physicallypath); } }
             /// <summary>
             /// Verilen dosya yolunda bir dosya varsa belirtilen hedefe kopyalar. Eğer hedefte dosya mevcutsa ve overwrite parametresi true ise, mevcut dosyanın üzerine yazar.
             /// </summary>
-            /// <param name="physicallyPath">Kopyalanacak dosyanın fiziksel yolu.</param>
-            /// <param name="targetPhysicallyPath">Hedef dosya yolu.</param>
+            /// <param name="physicallypath">Kopyalanacak dosyanın fiziksel yolu.</param>
+            /// <param name="targetphysicallypath">Hedef dosya yolu.</param>
             /// <param name="overwrite">Hedefteki dosyanın üzerine yazılıp yazılmayacağını belirten parametre.</param>
             /// <exception cref="Exception">Eğer hedefte dosya varsa ve overwrite false ise bir istisna fırlatılır.</exception>
             /// <exception cref="FileNotFoundException">Verilen dosya yolunda dosya bulunmazsa istisna fırlatılır.</exception>
-            public static void FileExiststhenCopy(string physicallyPath, string targetPhysicallyPath, bool overwrite)
+            public static void FileExiststhenCopy(string physicallypath, string targetphysicallypath, bool overwrite)
             {
-                if (!File.Exists(physicallyPath)) { throw new FileNotFoundException($"\"{physicallyPath}\" yolunda belge bulunmadı. Kontrol ediniz!"); }
-                var fi = new FileInfo(targetPhysicallyPath);
-                DirectoryCreate(fi.DirectoryName);
-                if (fi.Exists && !overwrite) { throw new Exception($"\"{fi.DirectoryName}\" klasöründe \"{fi.Name.Split('.')[0]}\" adında \"{fi.Name.Split('.')[1]}\" uzantılı belge bulunmaktadır. Kontrol ediniz!"); }
-                File.Copy(physicallyPath, targetPhysicallyPath, overwrite);
+                if (!File.Exists(physicallypath)) { throw new FileNotFoundException($"\"{physicallypath}\" yolunda belge bulunmadı. Kontrol ediniz!"); }
+                var _fi = new FileInfo(targetphysicallypath);
+                DirectoryCreate(_fi.DirectoryName);
+                if (_fi.Exists && !overwrite) { throw new Exception($"\"{_fi.DirectoryName}\" klasöründe \"{_fi.Name.Split('.')[0]}\" adında \"{_fi.Name.Split('.')[1]}\" uzantılı belge bulunmaktadır. Kontrol ediniz!"); }
+                File.Copy(physicallypath, targetphysicallypath, overwrite);
             }
             /// <summary>
             /// Verilen dosya yolunda bir dosya varsa hedef konuma taşır. Hedefte aynı isimde bir dosya mevcutsa işlem gerçekleştirilmez ve bir istisna fırlatılır.
             /// </summary>
-            /// <param name="physicallyPath">Taşınacak dosyanın fiziksel yolu.</param>
-            /// <param name="targetPhysicallyPath">Dosyanın taşınacağı hedef yol.</param>
+            /// <param name="physicallypath">Taşınacak dosyanın fiziksel yolu.</param>
+            /// <param name="targetphysicallypath">Dosyanın taşınacağı hedef yol.</param>
             /// <exception cref="Exception">Hedef konumda aynı isimde bir dosya varsa istisna fırlatılır.</exception>
             /// <exception cref="FileNotFoundException">Verilen dosya yolunda dosya bulunmazsa istisna fırlatılır.</exception>
-            public static void FileExiststhenMove(string physicallyPath, string targetPhysicallyPath)
+            public static void FileExiststhenMove(string physicallypath, string targetphysicallypath)
             {
-                if (!File.Exists(physicallyPath)) { throw new FileNotFoundException($"\"{physicallyPath}\" yolunda belge bulunmadı. Kontrol ediniz!"); }
-                var fi = new FileInfo(targetPhysicallyPath);
-                DirectoryCreate(fi.DirectoryName);
-                if (fi.Exists) { throw new Exception($"\"{fi.DirectoryName}\" klasöründe \"{fi.Name.Split('.')[0]}\" adında \"{fi.Name.Split('.')[1]}\" uzantılı belge bulunmaktadır. Kontrol ediniz!"); }
-                File.Move(physicallyPath, targetPhysicallyPath);
+                if (!File.Exists(physicallypath)) { throw new FileNotFoundException($"\"{physicallypath}\" yolunda belge bulunmadı. Kontrol ediniz!"); }
+                var _fi = new FileInfo(targetphysicallypath);
+                DirectoryCreate(_fi.DirectoryName);
+                if (_fi.Exists) { throw new Exception($"\"{_fi.DirectoryName}\" klasöründe \"{_fi.Name.Split('.')[0]}\" adında \"{_fi.Name.Split('.')[1]}\" uzantılı belge bulunmaktadır. Kontrol ediniz!"); }
+                File.Move(physicallypath, targetphysicallypath);
             }
             /// <summary>
             /// Verilen klasör yolunda bir klasör varsa, isteğe bağlı olarak içindekilerle birlikte siler.
             /// </summary>
-            /// <param name="physicallyPath">Silinecek klasörün fiziksel yolu.</param>
+            /// <param name="physicallypath">Silinecek klasörün fiziksel yolu.</param>
             /// <param name="recursive">Eğer <see langword="true"/> verilirse, dizin ve altındaki tüm dosyalar ve alt dizinler silinir. <see langword="false"/> verilirse, dizin yalnızca boşsa silinir; aksi halde bir <see cref="IOException"/> fırlatılır.</param>
-            public static void DirectoryExiststhenDelete(string physicallyPath, bool recursive) { if (Directory.Exists(physicallyPath)) { Directory.Delete(physicallyPath, recursive); } }
+            public static void DirectoryExiststhenDelete(string physicallypath, bool recursive) { if (Directory.Exists(physicallypath)) { Directory.Delete(physicallypath, recursive); } }
             /// <summary>
             /// Verilen klasör yolunda bir klasör varsa hedef konuma kopyalar.
             /// </summary>
-            /// <param name="physicallyPath">Kopyalanacak klasörün fiziksel yolu.</param>
-            /// <param name="targetPhysicallyPath">Klasörün kopyalanacağı hedef yol.</param>
+            /// <param name="physicallypath">Kopyalanacak klasörün fiziksel yolu.</param>
+            /// <param name="targetphysicallypath">Klasörün kopyalanacağı hedef yol.</param>
             /// <exception cref="DirectoryNotFoundException">Verilen klasör yolunda klasör bulunmazsa istisna fırlatılır.</exception>
-            public static void DirectoryExiststhenCopy(string physicallyPath, string targetPhysicallyPath)
+            public static void DirectoryExiststhenCopy(string physicallypath, string targetphysicallypath)
             {
-                if (Directory.Exists(physicallyPath)) { new DirectoryInfo(physicallyPath).CopyAll(new DirectoryInfo(targetPhysicallyPath)); }
-                throw new DirectoryNotFoundException($"\"{physicallyPath}\" yolunda klasör bulunmadı! Kontrol ediniz.");
+                if (Directory.Exists(physicallypath)) { new DirectoryInfo(physicallypath).CopyAll(new DirectoryInfo(targetphysicallypath)); }
+                throw new DirectoryNotFoundException($"\"{physicallypath}\" yolunda klasör bulunmadı! Kontrol ediniz.");
             }
             /// <summary>
             /// Verilen klasör yolunda bir klasör varsa hedef konuma taşır.
             /// </summary>
-            /// <param name="physicallyPath">Taşınacak klasörün fiziksel yolu.</param>
-            /// <param name="targetPhysicallyPath">Klasörün taşınacağı hedef yol.</param>
+            /// <param name="physicallypath">Taşınacak klasörün fiziksel yolu.</param>
+            /// <param name="targetphysicallypath">Klasörün taşınacağı hedef yol.</param>
             /// <exception cref="DirectoryNotFoundException">Verilen klasör yolunda klasör bulunmazsa istisna fırlatılır.</exception>
-            public static void DirectoryExiststhenMove(string physicallyPath, string targetPhysicallyPath)
+            public static void DirectoryExiststhenMove(string physicallypath, string targetphysicallypath)
             {
-                if (!Directory.Exists(physicallyPath)) { throw new DirectoryNotFoundException($"\"{physicallyPath}\" yolunda klasör bulunmadı! Kontrol ediniz!"); }
-                var di = new DirectoryInfo(targetPhysicallyPath);
-                Guard.CheckNull(di, nameof(di));
-                Guard.CheckNull(di.Parent, nameof(di.Parent));
-                DirectoryCreate(di.Parent.FullName);
-                Directory.Move(physicallyPath, targetPhysicallyPath);
+                if (!Directory.Exists(physicallypath)) { throw new DirectoryNotFoundException($"\"{physicallypath}\" yolunda klasör bulunmadı! Kontrol ediniz!"); }
+                var _di = new DirectoryInfo(targetphysicallypath);
+                Guard.CheckNull(_di, nameof(_di));
+                Guard.CheckNull(_di.Parent, nameof(_di.Parent));
+                DirectoryCreate(_di.Parent.FullName);
+                Directory.Move(physicallypath, targetphysicallypath);
             }
             /// <summary>
             /// Verilen fiziksel dosya yolunda klasör mevcut değilse, ilgili klasörü ve varsa üst dizinlerini oluşturur.
             /// </summary>
-            /// <param name="physicallyPath">Oluşturulacak klasörün fiziksel yolu.</param>
-            public static void DirectoryCreate(string physicallyPath)
+            /// <param name="physicallypath">Oluşturulacak klasörün fiziksel yolu.</param>
+            public static void DirectoryCreate(string physicallypath)
             {
-                var di = new DirectoryInfo(physicallyPath);
-                if (di.Parent != null) { DirectoryCreate(di.Parent.FullName); }
-                if (!di.Exists) { di.Create(); }
+                var _di = new DirectoryInfo(physicallypath);
+                if (_di.Parent != null) { DirectoryCreate(_di.Parent.FullName); }
+                if (!_di.Exists) { _di.Create(); }
             }
         }
         public sealed class _get
@@ -140,16 +139,6 @@
                 TrustServerCertificate = true
             }.ToString();
             /// <summary>
-            /// Verilen bir JSON Web Token (JWT) için belirtilen bir özelliğin son kullanma tarihini alır.
-            /// <code>DateTimeOffset.FromUnixTimeSeconds(_to.ToJObjectFromToken(token)[&quot;exp&quot;].Value&lt;long&gt;()).UtcDateTime;</code>
-            /// </summary>
-            /// <param name="token">Son kullanma tarihi alınacak JWT.</param>
-            /// <returns>JWT&#39;nin Unix zaman damgasına göre belirlenen UTC tarih ve saat.</returns>
-            /// <exception cref="ArgumentNullException">Verilen token null ise.</exception>
-            /// <exception cref="FormatException">Token geçerli bir JWT formatında değilse.</exception>
-            /// <exception cref="KeyNotFoundException">Token içindeki belirtilen anahtar mevcut değilse.</exception>
-            public static DateTime GetExpValueFromToken(string token) => DateTimeOffset.FromUnixTimeSeconds(_to.ToJObjectFromToken(token)["exp"].Value<long>()).UtcDateTime;
-            /// <summary>
             /// Verilen sınıfın belirtilen özelliğindeki maksimum karakter uzunluğunu döner. Eğer <see cref="StringLengthAttribute"/> veya <see cref="MaxLengthAttribute"/> gibi uzunluk sınırlayıcı öznitelikler atanmışsa, bu değeri alır. Aksi takdirde 0 döner.
             /// </summary>
             /// <typeparam name="T">Kontrol edilecek sınıf türü.</typeparam>
@@ -166,8 +155,7 @@
                 return 0;
             }
             /// <summary>
-            /// Verilen sınıfın belirli bir string ifadesi için maksimum karakter uzunluğunu döner.
-            /// <see cref="StringLengthAttribute"/> veya <see cref="MaxLengthAttribute"/> atanmışsa bu değeri alır, aksi takdirde 0 döner.
+            /// Verilen sınıfın belirli bir string ifadesi için maksimum karakter uzunluğunu döner. <see cref="StringLengthAttribute"/> veya <see cref="MaxLengthAttribute"/> atanmışsa bu değeri alır, aksi takdirde 0 döner.
             /// </summary>
             /// <typeparam name="T">Kontrol edilecek sınıf türü.</typeparam>
             /// <param name="expression">Özellik ismini içeren ifade.</param>
@@ -178,11 +166,7 @@
             /// </summary>
             /// <param name="names">Kısaltma için kullanılacak isim dizisi.</param>
             /// <returns>Verilen isimlerin baş harflerinden oluşan kısaltma. Eğer parametreler boş veya geçersizse boş string döner.</returns>
-            public static string GetNameShort(params string[] names)
-            {
-                names = (names ?? Array.Empty<string>()).Select(x => x.ToStringOrEmpty()).Where(x => x != "").ToArray();
-                return names.Length > 0 ? String.Join(".", names.Select(x => String.Join("", x.ToUpper().Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries).Select(x => x[0])))) : "";
-            }
+            public static string GetNameShort(params string[] names) => (names.IsNullOrEmpty_collection() ? "" : String.Join(".", names.Select(x => String.Join("", x.ToUpper().Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries).Select(x => x[0]).ToArray()))));
             /// <summary>
             /// Belirtilen dil koduna göre CultureInfo nesnesini döner. Dil kodu &quot;tr&quot; veya &quot;en&quot; olabilir. Diğer diller desteklenmemektedir.
             /// </summary>
@@ -227,7 +211,7 @@
                 }).Select(x => String.Join(", ", new string[] { (x.isldate.Ticks > 0 ? x.isldate.ToString(dateformat) : ""), x.isluser.ToStringOrEmpty() }.Where(y => y != "").ToArray())).FirstOrDefault() ?? "";
             }
         }
-        public sealed class _other
+        public sealed class _is
         {
             /// <summary>
             /// Verilen string&#39;in HTML tag&#39;leri içerip içermediğini kontrol eder. String null, boş veya yalnızca boşluklardan oluşuyorsa <see langword="false"/> döner. HTML tag&#39;leri, düzenli ifade (regex) kullanılarak tespit edilir.
@@ -253,6 +237,76 @@
                 }
                 catch { return false; }
             }
+            /// <summary>
+            /// Verilen değerin geçerli bir T.C. Kimlik Numarası olup olmadığını kontrol eder.
+            /// <para>
+            /// Doğrulama adımları:
+            /// <list type="bullet">
+            /// <item><description>11 haneli olmalıdır.</description></item>
+            /// <item><description>Sadece rakamlardan oluşmalıdır.</description></item>
+            /// <item><description>İlk hanesi &#39;0&#39; olamaz.</description></item>
+            /// <item><description>10. hane, belirli aritmetik kurala göre (tek haneler ve çift haneler toplamı) kontrol edilir.</description></item>
+            /// <item><description>11. hane, ilk 10 hanenin toplamının 10&#39;a bölümünden kalan ile doğrulanır.</description></item>
+            /// </list>
+            /// </para>
+            /// </summary>
+            /// <param name="tckn">Geçerliliği kontrol edilecek T.C. Kimlik Numarası.</param>
+            /// <returns>
+            /// Geçerli bir T.C. Kimlik Numarası ise <see langword="true"/>, aksi durumda <see langword="false"/> döner.
+            /// </returns>
+            public static bool IsTCKimlikNo(long tckn)
+            {
+                var _r = false;
+                if (tckn > 0)
+                {
+                    var _tckn = tckn.ToString();
+                    if (_tckn.Length == _maximumlength.tckn)
+                    {
+                        var _t = _tckn.ToCharArray().Select(x => Convert.ToInt32(Convert.ToString(x))).ToArray();
+                        _r = ((((_t[0] + _t[2] + _t[4] + _t[6] + _t[8]) * 7) - (_t[1] + _t[3] + _t[5] + _t[7])) % 10) == _t[9] && (_t.Take(10).Sum() % 10) == _t[10];
+                    }
+                }
+                return _r;
+            }
+            /// <summary>
+            /// Verilen sayının geçerli bir T.C. Vergi Kimlik Numarası (VKN) olup olmadığını kontrol eder.
+            /// <para>
+            /// VKN doğrulama algoritması şu adımlarla çalışır:
+            /// <list type="bullet">
+            ///   <item><description>Eğer sayı 9 haneliyse, başına sıfır(lar) eklenerek 10 haneye tamamlanır.</description></item>
+            ///   <item><description>10 haneli VKN için her haneye özel matematiksel işlem uygulanır.</description></item>
+            ///   <item><description>İlk 9 haneden elde edilen ara sonuçların toplamı hesaplanır.</description></item>
+            ///   <item><description>Son hanenin (kontrol basamağı) doğruluğu algoritmaya göre kontrol edilir.</description></item>
+            /// </list>
+            /// </para>
+            /// </summary>
+            /// <param name="vkn">Doğrulanacak T.C. Vergi Kimlik Numarası</param>
+            /// <returns>VKN geçerliyse <see langword="true"/>, değilse <see langword="false"/> döner.</returns>
+            public static bool IsVergiKimlikNo(long vkn)
+            {
+                var _r = false;
+                if (vkn > 0)
+                {
+                    var _vkn = vkn.ToString();
+                    if (_vkn.Length < _maximumlength.vkn) { _vkn = _vkn.Replicate(_maximumlength.vkn, '0', 'l'); } // Not: 602883151(9 rakamlı) gibi değer gelirse başına 0602883151 yapabilmek için yazılmıştır
+                    if (_vkn.Length == _maximumlength.vkn)
+                    {
+                        int i, t;
+                        var _numbers = new int[9];
+                        for (i = 0; i < 9; i++)
+                        {
+                            t = (Convert.ToInt32(_vkn[i].ToString()) + (9 - i)) % 10;
+                            _numbers[i] = (t * Convert.ToInt32(Math.Pow(2, (9 - i)))) % 9;
+                            if (t != 0 && _numbers[i] == 0) { _numbers[i] = 9; }
+                        }
+                        _r = (((10 - ((_numbers.Sum() % 10) % 10)) % 10) == Convert.ToInt32(_vkn[9].ToString()));
+                    }
+                }
+                return _r;
+            }
+        }
+        public sealed class _other
+        {
             /// <summary>
             /// Asenkron işlemler için TransactionScope oluşturur. TransactionScope, işlem bütünlüğünü sağlamak için kullanılır. Bu metod, asenkron işlemlerin TransactionScope ile birlikte kullanılabilmesi için ayarlanmıştır.
             /// <code>new TransactionScope(TransactionScopeOption.Required, TransactionScopeAsyncFlowOption.Enabled);</code>
@@ -298,16 +352,16 @@
             {
                 Guard.CheckNull(func, nameof(func));
                 if (attempts < 1) { throw new ArgumentOutOfRangeException(nameof(attempts), attempts, "Maksimum deneme sayısı 1'den az olmamalıdır"); }
-                var attempt = 0;
+                var _attempt = 0;
                 while (true)
                 {
-                    if (attempt > 0 && wait.HasValue) { Thread.Sleep(wait.Value); }
+                    if (_attempt > 0 && wait.HasValue) { Thread.Sleep(wait.Value); }
                     try { return func(); }
                     catch (Exception ex)
                     {
-                        attempt++;
-                        if (onfailed != null) { onfailed(attempt, ex); }
-                        if (attempt >= attempts) { throw; }
+                        _attempt++;
+                        if (onfailed != null) { onfailed(_attempt, ex); }
+                        if (_attempt >= attempts) { throw; }
                     }
                 }
             }
@@ -320,30 +374,30 @@
             public static string CaesarCipherOperation(string value, int key)
             {
                 if (key < 0) { return CaesarCipherOperation(value, key + 26); }
-                var r = "";
-                foreach (var itemChar in value.ToStringOrEmpty().ToCharArray())
+                var _r = "";
+                foreach (var item in value.ToStringOrEmpty().ToCharArray())
                 {
-                    if ((itemChar >= 'A' && itemChar <= 'Z')) { r = String.Concat(r, Convert.ToChar(((itemChar - 'A' + key) % 26) + 'A').ToString()); }
-                    else if ((itemChar >= 'a' && itemChar <= 'z')) { r = String.Concat(r, Convert.ToChar(((itemChar - 'a' + key) % 26) + 'a').ToString()); }
-                    else { r = String.Concat(r, itemChar.ToString()); }
+                    if ((item >= 'A' && item <= 'Z')) { _r = String.Concat(_r, Convert.ToChar(((item - 'A' + key) % 26) + 'A').ToString()); }
+                    else if ((item >= 'a' && item <= 'z')) { _r = String.Concat(_r, Convert.ToChar(((item - 'a' + key) % 26) + 'a').ToString()); }
+                    else { _r = String.Concat(_r, item.ToString()); }
                 }
-                return r;
+                return _r;
             }
             /// <summary>
             /// Bir nesnenin belirtilen özelliğine veri atar. Eğer özellik bulunamazsa veya nesne bir sınıf değilse hata fırlatılır.
             /// </summary>
             /// <param name="value">Özelliği atanacak nesne</param>
-            /// <param name="propertyName">Atanacak özelliğin adı</param>
+            /// <param name="propertyname">Atanacak özelliğin adı</param>
             /// <param name="data">Atanacak veri</param>
-            public static void SetPropertyValue(object value, string propertyName, object data)
+            public static void SetPropertyValue(object value, string propertyname, object data)
             {
                 Guard.CheckNull(value, nameof(value));
-                Guard.CheckEmpty(propertyName, nameof(propertyName));
-                var type = value.GetType();
-                if (!type.IsCustomClass()) { throw new ArgumentException($"\"{value}\" argümanı türü class olmalıdır!", nameof(value)); }
-                var pi = type.GetProperty(propertyName);
-                Guard.CheckNull(pi, nameof(pi));
-                pi.SetValue(value, data == null ? null : ChangeType(data, pi.PropertyType));
+                Guard.CheckEmpty(propertyname, nameof(propertyname));
+                var _type = value.GetType();
+                if (!_type.IsCustomClass()) { throw new ArgumentException($"\"{value}\" argümanı türü class olmalıdır!", nameof(value)); }
+                var _pi = _type.GetProperty(propertyname);
+                Guard.CheckNull(_pi, nameof(_pi));
+                _pi.SetValue(value, data == null ? null : ChangeType(data, _pi.PropertyType));
             }
             /// <summary>
             /// Enum türleri için desteklenmeyen değer hatası oluşturur. Belirtilen Enum türü ve ek detaylarla birlikte bir hata mesajı üretir.
@@ -353,10 +407,9 @@
             /// <returns>Desteklenmeyen Enum değerine ait NotSupportedException nesnesi döner.</returns>
             public static NotSupportedException ThrowNotSupportedForEnum<T>(params string[] details) where T : Enum
             {
-                var r = new HashSet<string> { typeof(T).FullName, $"{nameof(Enum)} değeri uyumsuzdur! Kontrol ediniz." };
-                details = (details ?? Array.Empty<string>()).Where(x => !x.IsNullOrEmpty_string()).ToArray();
-                if (details.Length > 0) { r.AddRangeOptimized(details); }
-                return new NotSupportedException(String.Join(" ", r));
+                var _r = new HashSet<string> { typeof(T).FullName, $"{nameof(Enum)} değeri uyumsuzdur! Kontrol ediniz." };
+                if (!details.IsNullOrEmpty_collection()) { _r.AddRangeOptimized(details); }
+                return new NotSupportedException(String.Join(" ", _r));
             }
         }
         public sealed class _to
@@ -376,15 +429,9 @@
             public static T ToEntityFromXML<T>(string xml) where T : class
             {
                 if (xml.IsNullOrEmpty_string()) { return default; }
-                var xs = new XmlSerializer(typeof(T));
-                using (var sr = new StringReader(xml)) { return (T)xs.Deserialize(sr); }
+                var _xs = new XmlSerializer(typeof(T));
+                using (var sr = new StringReader(xml)) { return (T)_xs.Deserialize(sr); }
             }
-            /// <summary>
-            /// JWT token içindeki yük verilerinden bir JObject oluşturur.
-            /// </summary>
-            /// <param name="token">İşlenecek JWT token.</param>
-            /// <returns>Token yük verilerini içeren JObject.</returns>
-            public static JObject ToJObjectFromToken(string token) => JObject.FromObject(new JwtSecurityTokenHandler().ReadJwtToken(token).Payload);
             /// <summary>
             /// Verilen nesneyi <see cref="SHA256"/> hash string formatına dönüştürür. Eğer değer null ise boş string döner.
             /// </summary>
@@ -394,9 +441,9 @@
             public static string ToHashSHA256FromObject(object value)
             {
                 if (value == null) { return ""; } // SELECT SUBSTRING([sys].[fn_varbintohexstr](HASHBYTES('SHA2_256', 'Lorem Ipsum')), 3, 64)
-                var r = new List<string>();
-                foreach (var item in SHA256.HashData(Encoding.UTF8.GetBytes(value.GetType() == typeof(string) ? value.ToString() : ToJSON(value)))) { r.Add(item.ToString("x2")); }
-                return String.Join("", r);
+                var _r = new List<string>();
+                foreach (var item in SHA256.HashData(Encoding.UTF8.GetBytes(value.GetType() == typeof(string) ? value.ToString() : ToJSON(value)))) { _r.Add(item.ToString("x2")); }
+                return String.Join("", _r);
             }
             /// <summary>
             /// Belirtilen enum türündeki değerleri ve karşılık gelen long değerlerini içeren bir sözlük oluşturur.
@@ -405,8 +452,8 @@
             /// <returns>Enum isimlerini ve long karşılıklarını içeren sözlük.</returns>
             public static Dictionary<string, long> ToDictionaryFromEnum<T>() where T : Enum
             {
-                var t = typeof(T);
-                return ((T[])Enum.GetValues(t)).Select(x => Convert.ToInt64(_other.ChangeType(x, typeof(long)))).ToDictionary(x => Enum.GetName(t, x));
+                var _t = typeof(T);
+                return ((T[])Enum.GetValues(_t)).Select(x => Convert.ToInt64(_other.ChangeType(x, typeof(long)))).ToDictionary(x => Enum.GetName(_t, x));
             }
             /// <summary>
             /// Verilen nesneyi, özellik isimlerini ve değerlerini içeren bir sözlüğe dönüştürür. Yalnızca özel sınıf türlerinde çalışır.
@@ -416,8 +463,8 @@
             public static Dictionary<string, object> ToDictionaryFromObject(object obj)
             {
                 if (obj == null) { return new Dictionary<string, object>(); }
-                var t = obj.GetType();
-                if (t.IsCustomClass()) { return t.GetProperties().ToDictionary(x => x.Name, x => x.GetValue(obj)); }
+                var _t = obj.GetType();
+                if (_t.IsCustomClass()) { return _t.GetProperties().ToDictionary(x => x.Name, x => x.GetValue(obj)); }
                 throw new Exception($"{nameof(obj)} türü uygun biçimde değildir!");
             }
             /// <summary>
@@ -461,17 +508,17 @@
             /// <para>obj için tanımlanan nesneler: DateTime, DateOnly, Int64, String(DateTime, DateOnly, Int64 türlerine uygun biçimde olmalı)</para>
             /// </summary>
             /// <param name="obj">Dönüştürülecek nesne.</param>
-            /// <param name="timeOnly">Zaman bilgisi (isteğe bağlı). <paramref name="obj"/> değeri türü DateOnly iken girilecek değer anlamlıdır</param>
+            /// <param name="timeonly">Zaman bilgisi (isteğe bağlı). <paramref name="obj"/> değeri türü DateOnly iken girilecek değer anlamlıdır</param>
             /// <returns>DateTime değeri.</returns>
-            public static DateTime ToDateTimeFromObject(object obj, TimeOnly? timeOnly)
+            public static DateTime ToDateTimeFromObject(object obj, TimeOnly? timeonly)
             {
                 if (obj is DateTime _dt) { return _dt; }
-                if (obj is DateOnly _do) { return _do.ToDateTime(timeOnly ?? default); }
+                if (obj is DateOnly _do) { return _do.ToDateTime(timeonly ?? default); }
                 if (obj is Int64 _l) { return new DateTime(_l); }
                 if (obj is String _s)
                 {
                     if (DateTime.TryParse(_s, out _dt)) { return _dt; }
-                    if (DateOnly.TryParse(_s, out _do)) { return _do.ToDateTime(timeOnly ?? default); }
+                    if (DateOnly.TryParse(_s, out _do)) { return _do.ToDateTime(timeonly ?? default); }
                     if (Int64.TryParse(_s, out _l)) { return new DateTime(_l); }
                 }
                 return default;
@@ -480,44 +527,44 @@
             /// Verilen string değeri ve hedef tipini kullanarak, değeri uygun tipe dönüştürmeye çalışır. Dönüştürülemezse varsayılan bir değer döner. Bu metot özellikle nullable tipler, enumlar ve temel tiplerle çalışmak için tasarlanmıştır.
             /// </summary>
             /// <param name="value">Dönüştürülecek string değeri.</param>
-            /// <param name="propertyType">Hedef tip. Bu tip nullable olabilir.</param>
-            public static (object value, Type genericbasetype) ParseOrDefault_valuetuple(string value, Type propertyType)
+            /// <param name="propertytype">Hedef tip. Bu tip nullable olabilir.</param>
+            public static (object value, Type genericbasetype) ParseOrDefault_valuetuple(string value, Type propertytype)
             {
                 try
                 {
                     value = value.ToStringOrEmpty();
                     if (value == "") { return (default, default); }
-                    _ = _try.TryTypeIsNullable(propertyType, out Type _genericBaseType);
-                    if (_genericBaseType.IsEnum) { return (((Enum.TryParse(_genericBaseType, value, out object _enum) && Enum.IsDefined(_genericBaseType, _enum)) ? _enum : null), _genericBaseType); }
-                    if (_genericBaseType == typeof(bool))
+                    _ = _try.TryTypeIsNullable(propertytype, out Type _genericbasetype);
+                    if (_genericbasetype.IsEnum) { return (((Enum.TryParse(_genericbasetype, value, out object _enum) && Enum.IsDefined(_genericbasetype, _enum)) ? _enum : null), _genericbasetype); }
+                    if (_genericbasetype == typeof(bool))
                     {
-                        if (value == "0") { return (false, _genericBaseType); }
-                        if (value == "1") { return (true, _genericBaseType); }
-                        return (Boolean.TryParse(value, out bool _booleanresult) ? _booleanresult : null, _genericBaseType);
+                        if (value == "0") { return (false, _genericbasetype); }
+                        if (value == "1") { return (true, _genericbasetype); }
+                        return (Boolean.TryParse(value, out bool _booleanresult) ? _booleanresult : null, _genericbasetype);
                     }
-                    if (value.IndexOf('.') > -1 && _genericBaseType.Includes(typeof(float), typeof(double), typeof(decimal))) { value = value.Replace(".", ",", StringComparison.InvariantCulture); }
-                    return (TypeDescriptor.GetConverter(propertyType).ConvertFrom(value), _genericBaseType);
+                    if (value.IndexOf('.') > -1 && _genericbasetype.Includes(typeof(float), typeof(double), typeof(decimal))) { value = value.Replace(".", ",", StringComparison.InvariantCulture); }
+                    return (TypeDescriptor.GetConverter(propertytype).ConvertFrom(value), _genericbasetype);
                 }
                 catch { return (default, default); }
             }
             /// <summary>
             /// Belirtilen bir dosya yolundan <see cref="IFormFile"/> nesnesi oluşturur.
             /// </summary>
-            /// <param name="filePath">Dosyanın tam yolu.</param>
-            /// <param name="contentType">Dosyanın içerik türü (örneğin, &quot;application/pdf&quot;, &quot;image/jpeg&quot;)</param>
+            /// <param name="filepath">Dosyanın tam yolu.</param>
+            /// <param name="contenttype">Dosyanın içerik türü (örneğin, &quot;application/pdf&quot;, &quot;image/jpeg&quot;)</param>
             /// <param name="name">Dosya form alanında kullanılacak ad. Varsayılan olarak &quot;file&quot; değeri atanır. </param>
-            public static IFormFile ToIFormFileFromPath(string filePath, string contentType, string name = "file")
+            public static IFormFile ToIFormFileFromPath(string filepath, string contenttype, string name = "file")
             {
-                Guard.CheckEmpty(filePath, nameof(filePath));
-                Guard.CheckEmpty(contentType, nameof(contentType));
+                Guard.CheckEmpty(filepath, nameof(filepath));
+                Guard.CheckEmpty(contenttype, nameof(contenttype));
                 Guard.CheckEmpty(name, nameof(name));
-                if (!File.Exists(filePath)) { throw new FileNotFoundException("Belirtilen dosya bulunamadı.", filePath); }
-                using (var fs = new FileStream(filePath, FileMode.Open, FileAccess.Read))
+                if (!File.Exists(filepath)) { throw new FileNotFoundException("Belirtilen dosya bulunamadı.", filepath); }
+                using (var fs = new FileStream(filepath, FileMode.Open, FileAccess.Read))
                 {
-                    return new FormFile(fs, 0, fs.Length, name, Path.GetFileName(filePath))
+                    return new FormFile(fs, 0, fs.Length, name, Path.GetFileName(filepath))
                     {
                         Headers = new HeaderDictionary(),
-                        ContentType = contentType
+                        ContentType = contenttype
                     };
                 }
             }
@@ -675,77 +722,19 @@
             ///     <item><description>00905051234567</description></item>
             /// </list>
             /// </summary>
-            /// <param name="phoneNumberTR">Kontrol edilecek telefon numarası.</param>
+            /// <param name="phonenumberTR">Kontrol edilecek telefon numarası.</param>
             /// <param name="outvalue">Geçerli olduğu tespit edilen telefon numarası.</param>
             /// <returns>Telefon numarasının geçerli biçimde olup olmadığını belirtir; geçerli ise <see langword="true"/>, değilse <see langword="false"/> döner.</returns>
-            public static bool TryPhoneNumberTR(string phoneNumberTR, out string outvalue)
+            public static bool TryPhoneNumberTR(string phonenumberTR, out string outvalue)
             {
-                phoneNumberTR = new String(phoneNumberTR.ToStringOrEmpty().Where(x => (x == '+' || Char.IsDigit(x))).ToArray());
-                if (phoneNumberTR.Length == 14 && phoneNumberTR.StartsWith("0090")) { phoneNumberTR = phoneNumberTR.Substring(4); }
-                else if (phoneNumberTR.Length == 13 && phoneNumberTR.StartsWith("+90")) { phoneNumberTR = phoneNumberTR.Substring(3); }
-                else if (phoneNumberTR.Length == 12 && phoneNumberTR.StartsWith("90")) { phoneNumberTR = phoneNumberTR.Substring(2); }
-                else if (phoneNumberTR.Length == 11 && phoneNumberTR[0] == '0') { phoneNumberTR = phoneNumberTR.Substring(1); }
-                var r = phoneNumberTR.Length == 10 && Regex.IsMatch(phoneNumberTR, @"^\d+$");
-                outvalue = r ? phoneNumberTR : "";
+                phonenumberTR = new String(phonenumberTR.ToStringOrEmpty().Where(x => (x == '+' || Char.IsDigit(x))).ToArray());
+                if (phonenumberTR.Length == 14 && phonenumberTR.StartsWith("0090")) { phonenumberTR = phonenumberTR.Substring(4); }
+                else if (phonenumberTR.Length == 13 && phonenumberTR.StartsWith("+90")) { phonenumberTR = phonenumberTR.Substring(3); }
+                else if (phonenumberTR.Length == 12 && phonenumberTR.StartsWith("90")) { phonenumberTR = phonenumberTR.Substring(2); }
+                else if (phonenumberTR.Length == 11 && phonenumberTR[0] == '0') { phonenumberTR = phonenumberTR.Substring(1); }
+                var r = phonenumberTR.Length == 10 && Regex.IsMatch(phonenumberTR, @"^\d+$");
+                outvalue = r ? phonenumberTR : "";
                 return r;
-            }
-            /// <summary>
-            /// Verilen T.C. Kimlik numarasının geçerliliğini kontrol eder. T.C. Kimlik numarası, belirli bir format ve kurallara göre doğrulanır.
-            /// </summary>
-            /// <param name="tckn">Doğrulanacak T.C. Kimlik numarası.</param>
-            /// <param name="outvalue">Geçerli olduğu tespit edilen T.C. Kimlik numarası.</param>
-            /// <returns>T.C. Kimlik numarasının geçerli olup olmadığını belirtir; geçerli ise <see langword="true"/>, değilse <see langword="false"/> döner.</returns>
-            public static bool TryTCKimlikNo(string tckn, out long outvalue)
-            {
-                var r = false;
-                tckn = tckn.ToStringOrEmpty();
-                if (tckn.Length == _maximumlength.tckn && Regex.IsMatch(tckn, @"^\d+$") && tckn[0] != '0')
-                {
-                    var t = tckn.ToCharArray().Select(x => Convert.ToInt32(Convert.ToString(x))).ToArray();
-                    r = ((((t[0] + t[2] + t[4] + t[6] + t[8]) * 7) - (t[1] + t[3] + t[5] + t[7])) % 10) == t[9] && (t.Take(10).Sum() % 10) == t[10];
-                }
-                outvalue = (r ? Convert.ToInt64(tckn) : 0);
-                return r;
-            }
-            /// <summary>
-            /// Verilen kimlik numarasının geçerli olup olmadığını kontrol eder. Geçerli bir kimlik numarası şu kriterlere uygun olmalıdır: &quot;98&quot; ile başlamalı veya bir Türkiye Cumhuriyeti Kimlik Numarası (TCKN) biçiminde olmalıdır.
-            /// <para>
-            /// Yükseköğretim Kurulu (YÖK) tarafından, yabancı uyruklu öğrenciler için oturumları oluşmadığı sürece, geçici olarak &quot;98&quot; ile başlayan ve TCKN algoritmasıyla uyumsuz bir değer atanmaktadır.
-            /// </para>
-            /// </summary>
-            /// <param name="tckn">Doğrulanacak TCKN değeri.</param>
-            /// <param name="outvalue">Geçerli TCKN değeri, dönüş değeri olarak atanır.</param>
-            /// <returns>Geçerli bir TCKN ise <see langword="true"/>, aksi takdirde <see langword="false"/> döner.</returns>
-            public static bool TryTCKimlikNoOrSW98(string tckn, out long outvalue)
-            {
-                if (TryTCKimlikNo(tckn, out outvalue) || (Int64.TryParse(tckn, out outvalue) && outvalue > 0 && tckn.Length == _maximumlength.tckn && tckn.StartsWith("98"))) { return true; }
-                outvalue = 0;
-                return false;
-            }
-            /// <summary>
-            /// T.C. Vergi Kimlik Numarası (VKN) doğrulaması yapan bir yöntemdir. VKN geçerli ise, dönen outValue parametresine VKN değeri atanır. VKN, belirtilen maksimum uzunluğa sahip olmalı ve sadece rakamlardan oluşmalıdır. Ayrıca kontrol için belirli matematiksel hesaplamalar yapılır.
-            /// </summary>
-            /// <param name="vkn">Doğrulanacak VKN değeri.</param>
-            /// <param name="outvalue">Geçerli VKN değeri, dönüş değeri olarak atanır.</param>
-            /// <returns>Geçerli bir VKN ise <see langword="true"/>, aksi takdirde <see langword="false"/> döner.</returns>
-            public static bool TryVergiKimlikNo(string vkn, out long outvalue)
-            {
-                vkn = vkn.ToStringOrEmpty();
-                outvalue = 0;
-                if (vkn.Length < _maximumlength.vkn) { vkn = vkn.Replicate(_maximumlength.vkn, '0', 'l'); } // Not: 602883151(9 rakamlı) gibi değer gelirse başına 0602883151 yapabilmek için yazılmıştır
-                if (vkn.Length == _maximumlength.vkn && Regex.IsMatch(vkn, @"^\d+$"))
-                {
-                    int i, t;
-                    var numbers = new int[9];
-                    for (i = 0; i < 9; i++)
-                    {
-                        t = (Convert.ToInt32(vkn[i].ToString()) + (9 - i)) % 10;
-                        numbers[i] = (t * Convert.ToInt32(Math.Pow(2, (9 - i)))) % 9;
-                        if (t != 0 && numbers[i] == 0) { numbers[i] = 9; }
-                    }
-                    if (((10 - ((numbers.Sum() % 10) % 10)) % 10) == Convert.ToInt32(vkn[9].ToString())) { outvalue = Convert.ToInt64(vkn); }
-                }
-                return outvalue > 0;
             }
             /// <summary>
             /// Verilen türün Nullable (null değeri alabilen) olup olmadığını kontrol eder. Eğer tür nullable ise, outvalue parametresine nullable olmayan tür atanır.
@@ -791,7 +780,7 @@
                 }
             }
             /// <summary>
-            /// Belirtilen öğe üzerinde verilen türde bir özel niteliğin (attribute) var olup olmadığını kontrol eder. Eğer nitelik bulunursa, outValue parametresine niteliğin değeri atanır.
+            /// Belirtilen öğe üzerinde verilen türde bir özel niteliğin (attribute) var olup olmadığını kontrol eder. Eğer nitelik bulunursa, <paramref name="outvalue"/> parametresine niteliğin değeri atanır.
             /// </summary>
             /// <typeparam name="T">Öğenin türü.</typeparam>
             /// <typeparam name="Y">Kontrol edilecek özel niteliğin türü.</typeparam>
@@ -812,7 +801,7 @@
                 }
             }
             /// <summary>
-            /// Verilen byte dizisinden bir resim (<see cref="Image"/>) oluşturmayı dener. Başarılı olursa, outValue parametresine oluşturulan resim atanır. Resim nesnesinin kullanımında dikkatli olunmalı ve gerektiğinde dispose edilmelidir.
+            /// Verilen byte dizisinden bir resim (<see cref="Image"/>) oluşturmayı dener. Başarılı olursa, <paramref name="outvalue"/> parametresine oluşturulan resim atanır. Resim nesnesinin kullanımında dikkatli olunmalı ve gerektiğinde dispose edilmelidir.
             /// </summary>
             /// <param name="bytes">Resim verilerini içeren byte dizisi.</param>
             /// <param name="outvalue">Oluşturulan resim nesnesi, dönüş değeri olarak atanır.</param>
@@ -835,7 +824,7 @@
                 }
             }
             /// <summary>
-            /// Verilen değerin geçerli bir MAC adresi olup olmadığını kontrol eder. Eğer geçerliyse, outValue parametresine temizlenmiş MAC adresi atanır. MAC adresinin belirli bir biçimde olması gerekmektedir.
+            /// Verilen değerin geçerli bir MAC adresi olup olmadığını kontrol eder. Eğer geçerliyse, <paramref name="outvalue"/> parametresine temizlenmiş MAC adresi atanır. MAC adresinin belirli bir biçimde olması gerekmektedir.
             /// </summary>
             /// <param name="value">Kontrol edilecek MAC adresi.</param>
             /// <param name="outvalue">Geçerli MAC adresi, dönüş değeri olarak atanır.</param>
@@ -862,7 +851,7 @@
             /// <summary>
             /// Verilen değerin geçerli bir koordinat (enlem, boylam) olup olmadığını kontrol eder. Koordinat geçerli ise, Google Maps bağlantısı oluşturularak <paramref name="outvalue"/> parametresine atanır. Koordinat değeri, virgülle ayrılmış iki decimal sayıdan oluşmalıdır.
             /// </summary>
-            /// <param name="value">Doğrulanacak koordinat değeri. <c>Örnek: <see cref="_title.koordinat_bayburtuniversitesi"/></c></param>
+            /// <param name="value">Doğrulanacak koordinat değeri.</param>
             /// <param name="outvalue">Geçerli koordinat için oluşturulan URI değeri, dönüş değeri olarak atanır.</param>
             /// <returns>Geçerli bir koordinat ise <see langword="true"/>, aksi takdirde <see langword="false"/> döner.</returns>
             public static bool TryGoogleMapsCoordinate(string value, out Uri outvalue)
@@ -891,7 +880,7 @@
             /// Bu metot, çeviri işlemi için Google Çeviri API&#39;sini kullanarak, verilen &quot;value&quot; parametresindeki metni &quot;from&quot; dilinden &quot;to&quot; diline çevirir. Varsayılan olarak &quot;from&quot; dili Türkçe (tr) olarak ayarlanmıştır. Eğer çeviri işlemi başarılı olursa, metnin çevirisi ve işlem durumu döndürülür. Hata durumunda, boş bir değer ve false durumu döner.
             /// </para>
             /// </summary>
-            public static async Task<(bool statuswarning, string value)> TryGoogleTranslateAsync(string value, TimeSpan timeout, CancellationToken cancellationToken, string to = "en", string from = "tr")
+            public static async Task<(bool statuswarning, string value)> TryGoogleTranslateAsync(string value, TimeSpan timeout, CancellationToken cancellationtoken, string to = "en", string from = "tr")
             {
                 value = value.ToStringOrEmpty();
                 if (value == "") { return (false, ""); }
@@ -905,7 +894,7 @@
                         DefaultRequestHeaders = { UserAgent = { new ProductInfoHeaderValue("Mozilla", "4.0") } }
                     })
                     {
-                        var _response = await client.GetStringAsync($"https://translate.googleapis.com/translate_a/single?client=gtx&sl={from}&tl={to}&dt=t&q={Uri.EscapeDataString(HttpUtility.HtmlEncode(value))}", cancellationToken);
+                        var _response = await client.GetStringAsync($"https://translate.googleapis.com/translate_a/single?client=gtx&sl={from}&tl={to}&dt=t&q={Uri.EscapeDataString(HttpUtility.HtmlEncode(value))}", cancellationtoken);
                         using (var doc = JsonDocument.Parse(_response))
                         {
                             return (false, doc.RootElement[0][0][0].GetString().ToStringOrEmpty());

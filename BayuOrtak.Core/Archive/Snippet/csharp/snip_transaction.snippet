@@ -13,18 +13,18 @@
     <Snippet>
       <Code Language="csharp">
         <![CDATA[
-        using (var tran = await _sql.Context.Database.BeginTransactionAsync())
+        using (var tran = await _sql.Context.Database.BeginTransactionAsync(default))
             {
                 try
                 {
 
-                    await _sql.Context.SaveChangesAsync();
-                    await tran.CommitAsync();
+                    await _sql.Context.SaveChangesAsync(default);
+                    await tran.CommitAsync(default);
 					          return _Return_success();
                 }
                 catch
                 {
-                    await tran.RollbackAsync();
+                    await tran.RollbackAsync(default);
                     throw;
                 }
             }

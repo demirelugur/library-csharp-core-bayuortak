@@ -79,9 +79,9 @@
         /// <returns>SQL Server&#39;dan alınacak özellikleri içeren bir SQL sorgusu.</returns>
         public static string query()
         {
-            var r = new List<string>();
-            foreach (var item in typeof(SqlServerProperties).GetProperties().Select(x => x.Name).ToArray()) { r.Add($"SERVERPROPERTY('{item}') AS [{item}]"); }
-            return String.Concat("SELECT ", String.Join(", ", r));
+            var _r = new List<string>();
+            foreach (var item in typeof(SqlServerProperties).GetProperties().Select(x => x.Name).ToArray()) { _r.Add($"SERVERPROPERTY('{item}') AS [{item}]"); }
+            return String.Concat("SELECT ", String.Join(", ", _r));
         }
     }
 }

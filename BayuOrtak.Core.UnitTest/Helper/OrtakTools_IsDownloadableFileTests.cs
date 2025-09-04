@@ -3,7 +3,7 @@ namespace BayuOrtak.Core.UnitTest.Helper
     using NUnit.Framework;
     using static BayuOrtak.Core.Helper.OrtakTools;
     [TestFixture]
-    public class OrtakTools_OtherIsDownloadableFileTests
+    public class OrtakTools_IsDownloadableFileTests
     {
         [TestCase("file.pdf", false)]
         [TestCase("file.PDF", false)]
@@ -24,7 +24,7 @@ namespace BayuOrtak.Core.UnitTest.Helper
         [TestCase("file.unknownext", true)]
         public void IsDownloadableFile_VariousInputs_ReturnsExpected(string path, bool expected)
         {
-            var result = _other.IsDownloadableFile(path);
+            var result = _is.IsDownloadableFile(path);
             Assert.That(result, Is.EqualTo(expected));
         }
     }

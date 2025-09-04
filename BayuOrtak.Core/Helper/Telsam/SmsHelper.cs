@@ -9,7 +9,7 @@
     using System.Linq;
     public interface ISmsHelper
     {
-        (long? messageid, Exception ex) Send(string message, List<long> nums, DateTime? sendingdate);
+        (long messageid, Exception ex) Send(string message, long[] nums, DateTime? sendingdate, string dil);
         (SmsReportResult[] data, Exception[] exs) Report(long messageid);
     }
     /// <summary>
@@ -30,25 +30,27 @@
         /// <summary>
         /// SMS&#39;i gönderir.
         /// </summary>
-        public (long? messageid, Exception ex) Send(string message, List<long> nums, DateTime? sendingdate)
+        public (long messageid, Exception ex) Send(string message, long[] nums, DateTime? sendingdate, string dil)
         {
-            message = this.quotationreplace(message);
-            if (message.IsNullOrEmpty_string()) { return (default, new Exception($"\"{nameof(message)}\" boş geçilemez!")); }
-            nums = (nums ?? new List<long>()).Where(x => x > 0).Distinct().ToList();
-            if (nums.Count == 0) { return (default, new Exception($"\"{nameof(nums)}\" boş geçilemez!")); }
+            Guard.UnSupportLanguage(dil, nameof(dil));
+            var _isen = dil == "en";
+            this.quotationreplace(ref message);
+            if (message == "") { return (default, new Exception(_isen ? $"The \"{nameof(message)}\" cannot be left empty!" : $"\"{nameof(message)}\" boş geçilemez!")); }
+            nums = (nums ?? Array.Empty<long>()).Where(x => x > 0).Distinct().ToArray();
+            if (nums.Length == 0) { return (default, new Exception(_isen ? $"The \"{nameof(nums)}\" cannot be left empty!" : $"\"{nameof(nums)}\" boş geçilemez!")); }
             try
             {
                 var _r = this.messenger.SendMultiSms(new SendMultiSms
                 {
                     Content = message,
-                    Numbers = nums,
+                    Numbers = nums.ToList(),
                     Sender = "BAYBURT UNI",
                     Encoding = 1,
                     Validity = 1440,
                     SendingDate = sendingdate.NullIfOrDefault()
                 });
                 if (_r.PackageId > 0) { return (_r.PackageId, default); }
-                else { return (default, (_r.Err == null ? new Exception("SMS iletimi sırasında beklenmeyen bir hata meydana geldi. Yönetici ile iletişime geçiniz!") : this.setexception(_r.Err, null))); }
+                else { return (default, (_r.Err == null ? new Exception(_isen ? "An unexpected error occurred during SMS transmission!" : "SMS iletimi sırasında beklenmeyen bir hata meydana geldi!") : this.setexception(_r.Err, null))); }
             }
             catch (Exception ex) { return (default, ex); }
         }
@@ -57,6 +59,7 @@
         /// </summary>
         public (SmsReportResult[] data, Exception[] exs) Report(long messageid)
         {
+            Guard.CheckZeroOrNegative(messageid, nameof(messageid));
             var _data = new List<SmsReportResult>();
             var _exs = new List<Exception>();
             try { this.getreport(messageid, 0, ref _data, ref _exs); }
@@ -65,12 +68,14 @@
         }
         #region Private
         private const int pagesize = 1000;
-        private string quotationreplace(string s)
+        private void quotationreplace(ref string s)
         {
             s = s.ToStringOrEmpty();
             s = s.Replace(Convert.ToChar(8216).ToString(), "'"); // ‘, Left Single Quotation Mark, HttpUtility.HtmlEncode
             s = s.Replace(Convert.ToChar(8217).ToString(), "'"); // ’, Right Single Quotation Mark
-            return s;
+            s = s.Replace(Convert.ToChar(8220), '"'); // “, Left Double Quotation Mark
+            s = s.Replace(Convert.ToChar(8221), '"'); // ”, Right Double Quotation Mark
+            s = s.Replace("`", "'");
         }
         private Exception setexception(Err err, int? index)
         {

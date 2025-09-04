@@ -29,16 +29,16 @@
             {
                 if (_Client == null)
                 {
-                    _Client = new DocentlikBilgiPortClient(YoksisTools.basicHttpBinding, new EndpointAddress("http://servisler.yok.gov.tr/ws/DocentlikBilgi?wsdl")); // Not: EndpointAddress uri yolu http ile başlamalıdır!
+                    _Client = new DocentlikBilgiPortClient(YoksisTools.basichttpbinding, new EndpointAddress("http://servisler.yok.gov.tr/ws/DocentlikBilgi?wsdl")); // Not: EndpointAddress uri yolu http ile başlamalıdır!
                     _Client.ClientCredentials.UserName.UserName = yoksis_UNI_code.ToString();
                     _Client.ClientCredentials.UserName.Password = this.password;
                 }
                 return _Client;
             }
         }
-        public async Task<(bool statuswarning, string error)> IsConnectionStatusAsync(TimeSpan timeout, string dil, CancellationToken cancellationToken)
+        public async Task<(bool statuswarning, string error)> IsConnectionStatusAsync(TimeSpan timeout, string dil, CancellationToken cancellationtoken)
         {
-            var _t = await this.client.Endpoint.Address.Uri.IsConnectionStatusAsync(timeout, cancellationToken);
+            var _t = await this.client.Endpoint.Address.Uri.IsConnectionStatusAsync(timeout, cancellationtoken);
             return (_t.statuswarning, _t.statuswarning ? GlobalConstants.webservice_connectionwarning(dil, "YÖKSİS, DocentlikBilgi") : "");
         }
         public async Task<DocentlikBilgiResponse> DocentlikBilgiAsync(long tckn) => (await this.client.DocentlikBilgiAsync(new DocentlikBilgiRequestType

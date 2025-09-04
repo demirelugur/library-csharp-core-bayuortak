@@ -1,11 +1,13 @@
 ﻿namespace BayuOrtak.Core.Extensions
 {
     using BayuOrtak.Core.Helper;
+    using BayuOrtak.Core.Helper.Results;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Mvc.Abstractions;
     using Microsoft.AspNetCore.Mvc.Controllers;
     using Microsoft.EntityFrameworkCore;
+    using Microsoft.Extensions.Caching.Memory;
     using Newtonsoft.Json.Linq;
     using System;
     using System.Collections.Specialized;
@@ -13,7 +15,6 @@
     using System.ComponentModel.DataAnnotations.Schema;
     using System.Data;
     using System.Diagnostics;
-    using System.DirectoryServices;
     using System.Globalization;
     using System.Linq.Expressions;
     using System.Net.Mail;
@@ -22,18 +23,17 @@
     using static BayuOrtak.Core.Helper.OrtakTools;
     public static class OtherExtensions
     {
-        #region DbContext
         /// <summary>
         /// Belirtilen varlığın (entity) bir veya daha fazla özelliğinin değiştirilip değiştirilmediğini kontrol eder.
         /// </summary>
         /// <typeparam name="T">Kontrol edilecek varlık türü.</typeparam>
-        /// <param name="dbContext">DbContext örneği.</param>
+        /// <param name="dbcontext">DbContext örneği.</param>
         /// <param name="entity">Değişiklik durumu kontrol edilecek varlık.</param>
         /// <param name="expressions">Kontrol edilecek özelliklerin ifadeleri.</param>
         /// <returns>Değiştirilmişse <see langword="true"/>, değilse <see langword="false"/> döner.</returns>
-        public static bool IsModified<T>(this DbContext dbContext, T entity, params Expression<Func<T, object>>[] expressions) where T : class
+        public static bool IsModified<T>(this DbContext dbcontext, T entity, params Expression<Func<T, object>>[] expressions) where T : class
         {
-            var _entry = dbContext.Entry(entity);
+            var _entry = dbcontext.Entry(entity);
             var _ie = typeof(T).GetProperties().Where(x => x.IsMappedProperty() && _entry.Property(x.Name).IsModified).ToArray();
             var _columns = (expressions ?? Array.Empty<Expression<Func<T, object>>>()).Select(x => x.GetExpressionName()).ToArray();
             if (_columns.Length == 0) { return _ie.Length > 0; }
@@ -42,11 +42,11 @@
         /// <summary>
         /// Belirli bir bileşik anahtar özelliği ile eski varlığın güncellenmesini sağlar.
         /// </summary>
-        public static async Task<T> SetCompositeKeyAsync<T, TKey>(this DbContext dbContext, bool isSaveChanges, T oldEntity, Expression<Func<T, TKey>> compositeKey, TKey compositeKeyValue, string dil, CancellationToken cancellationToken) where T : class, new()
+        public static async Task<T> SetCompositeKeyAsync<T, CompositeKey>(this DbContext dbcontext, bool issavechanges, T oldentity, Expression<Func<T, CompositeKey>> compositekey, CompositeKey compositekeyvalue, string dil, CancellationToken cancellationtoken) where T : class, new()
         {
             var _t = typeof(T);
             var _tablename = _t.GetTableName(false);
-            var _c = compositeKey.GetExpressionName();
+            var _c = compositekey.GetExpressionName();
             var _props = _t.GetProperties().Where(x => x.IsMappedProperty()).Select(x => new
             {
                 name = x.Name,
@@ -62,24 +62,22 @@
             if (_props.Any(x => x.setcolumn && x.iscompositekey))
             {
                 var _newentity = new T();
-                var _entry = dbContext.Entry(oldEntity);
-                var _dbset = dbContext.Set<T>();
-                _dbset.Attach(oldEntity);
-                foreach (var itemProp in _props.Select(x => new
+                var _entry = dbcontext.Entry(oldentity);
+                var _dbset = dbcontext.Set<T>();
+                _dbset.Attach(oldentity);
+                foreach (var item in _props.Select(x => new
                 {
                     x.name,
                     x.setcolumn
-                }).ToArray()) { _other.SetPropertyValue(_newentity, itemProp.name, (itemProp.setcolumn ? compositeKeyValue : _entry.Property(itemProp.name).OriginalValue)); }
-                await _dbset.AddAsync(_newentity, cancellationToken);
-                _dbset.Remove(oldEntity);
-                if (isSaveChanges) { await dbContext.SaveChangesAsync(cancellationToken); }
+                }).ToArray()) { _other.SetPropertyValue(_newentity, item.name, (item.setcolumn ? compositekeyvalue : _entry.Property(item.name).OriginalValue)); }
+                await _dbset.AddAsync(_newentity, cancellationtoken);
+                _dbset.Remove(oldentity);
+                if (issavechanges) { await dbcontext.SaveChangesAsync(cancellationtoken); }
                 return _newentity;
             }
             if (dil == "en") { throw new Exception($"The property \"{_c}\" in table \"{_tablename}\" must have either \"{typeof(KeyAttribute).FullName}\" or \"{typeof(DatabaseGeneratedAttribute).FullName}\" specified!"); }
             throw new Exception($"\"{_tablename}\" tablosundaki \"{_c}\" özelliğinde \"{typeof(KeyAttribute).FullName}\" veya \"{typeof(DatabaseGeneratedAttribute).FullName}\" belirtilmelidir!");
         }
-        #endregion
-        #region Decimal
         /// <summary>
         /// Bir decimal değeri, InvariantCulture kullanarak string&#39;e dönüştürür.
         /// </summary>
@@ -92,58 +90,52 @@
         /// </summary>
         /// <param name="d">Yuvarlanacak <see cref="decimal"/> değeri.</param>
         /// <param name="decimals">Yuvarlanacak ondalık basamak sayısı (varsayılan olarak 2).</param>
-        /// <param name="midpointRounding">Yuvarlama yöntemi (varsayılan olarak <see cref="MidpointRounding.AwayFromZero"/>).</param>
+        /// <param name="midpointrounding">Yuvarlama yöntemi (varsayılan olarak <see cref="MidpointRounding.AwayFromZero"/>).</param>
         /// <returns>Yuvarlanmış değerin string temsili.</returns>
-        public static string ToRound(this decimal d, int decimals = 2, MidpointRounding midpointRounding = MidpointRounding.AwayFromZero) => Decimal.Round(d, decimals, midpointRounding).ToString();
-        #endregion
-        #region MailAddress
+        public static string ToRound(this decimal d, int decimals = 2, MidpointRounding midpointrounding = MidpointRounding.AwayFromZero) => Decimal.Round(d, decimals, midpointrounding).ToString();
         /// <summary>
         /// Verilen e-Posta adresinin T.C. Bayburt Üniversitesi&#39;ne ait olup olmadığını kontrol eder.
         /// </summary>
-        /// <param name="mailAddress">MailAddress nesnesi.</param>
+        /// <param name="mailaddress">MailAddress nesnesi.</param>
         /// <returns>T.C. Bayburt Üniversitesi e-Postası ise <see langword="true"/>, değilse <see langword="false"/> döner.</returns>
-        public static bool IsBayburtUniEPosta(this MailAddress mailAddress) => (mailAddress != null && mailAddress.Host == "bayburt.edu.tr");
+        public static bool IsBayburtUniEPosta(this MailAddress mailaddress) => (mailaddress != null && mailaddress.Host == "bayburt.edu.tr");
         /// <summary>
         /// Verilen e-Posta adresindeki &quot;@&quot; karakterini &quot;[at]&quot; ile değiştirir.
         /// </summary>
-        /// <param name="mailAddress">MailAddress nesnesi.</param>
+        /// <param name="mailaddress">MailAddress nesnesi.</param>
         /// <returns>Dönüştürülmüş e-Posta adresi.</returns>
         /// <exception cref="ArgumentNullException">Verilen e-Posta adresi null ise fırlatılır.</exception>
-        public static string ReplaceAT(this MailAddress mailAddress)
+        public static string ReplaceAT(this MailAddress mailaddress)
         {
-            Guard.CheckNull(mailAddress, nameof(mailAddress));
-            return mailAddress.Address.Replace("@", "[at]");
+            Guard.CheckNull(mailaddress, nameof(mailaddress));
+            return mailaddress.Address.Replace("@", "[at]");
         }
-        #endregion
-        #region ValidationContext
         /// <summary>
         /// Verilen validation bağlamında bir özelliğin gerekli olup olmadığını kontrol eder.
         /// </summary>
-        /// <param name="context">ValidationContext nesnesi.</param>
+        /// <param name="validationcontext">ValidationContext nesnesi.</param>
         /// <returns>Gerekli ise <see langword="true"/>, değilse <see langword="false"/> döner.</returns>
-        public static bool IsRequiredAttribute(this ValidationContext context)
+        public static bool IsRequiredAttribute(this ValidationContext validationcontext)
         {
-            if (context == null) { return false; }
-            var pi = context.ObjectInstance.GetType().GetProperty(context.MemberName);
+            if (validationcontext == null) { return false; }
+            var pi = validationcontext.ObjectInstance.GetType().GetProperty(validationcontext.MemberName);
             if (pi == null) { return false; }
             return _try.TryCustomAttribute(pi, out RequiredAttribute _);
         }
         /// <summary>
         /// Verilen doğrulama bağlamına göre, belirtilen özelliğin değerini günceller. Eğer özellik yazılabilir durumdaysa, yeni değer atanır.
         /// </summary>
-        /// <param name="validationContext">Doğrulama işlemi sırasında bağlam bilgilerini içeren nesne.</param>
+        /// <param name="validationcontext">Doğrulama işlemi sırasında bağlam bilgilerini içeren nesne.</param>
         /// <param name="value">Güncellenmek istenen yeni değer.</param>
-        /// <exception cref="ArgumentNullException">Eğer <paramref name="validationContext"/> null ise tetiklenir.</exception>
-        public static void SetValidatePropertyValue(this ValidationContext validationContext, object value)
+        /// <exception cref="ArgumentNullException">Eğer <paramref name="validationcontext"/> null ise tetiklenir.</exception>
+        public static void SetValidatePropertyValue(this ValidationContext validationcontext, object value)
         {
-            if (validationContext != null)
+            if (validationcontext != null)
             {
-                var propertyInfo = validationContext.ObjectType.GetProperty(validationContext.MemberName);
-                if (propertyInfo != null && propertyInfo.CanWrite) { propertyInfo.SetValue(validationContext.ObjectInstance, value); }
+                var _propertyinfo = validationcontext.ObjectType.GetProperty(validationcontext.MemberName);
+                if (_propertyinfo != null && _propertyinfo.CanWrite) { _propertyinfo.SetValue(validationcontext.ObjectInstance, value); }
             }
         }
-        #endregion
-        #region Other
         /// <summary>
         /// Verilen sayının asal olup olmadığını kontrol eder.
         /// </summary>
@@ -161,6 +153,26 @@
             return true;
         }
         /// <summary>
+        /// Unix zaman damgasını, yerel bir <see cref="DateTime"/> değerine dönüştürür.
+        /// </summary>
+        /// <param name="gettime">Unix zaman damgası (milisaniye cinsinden).</param>
+        /// <returns>Dönüştürülen yerel <see cref="DateTime"/> değeri.</returns>
+        public static DateTime ToJsDate(this long gettime) => DateTime.UnixEpoch.AddMilliseconds(Convert.ToDouble(gettime)).ToLocalTime();
+        /// <summary>
+        /// Active Directory&#39;de kullanılan FILETIME formatındaki bir değeri (1 Ocak 1601&#39;den itibaren 100 nanosaniye cinsinden tick) UTC zaman diliminde bir DateTime nesnesine çevirir. 
+        /// <para>
+        /// Eğer filetime değeri 0 veya <see cref="Int64.MaxValue"/> ise, hesap süresiz kabul edilir ve <see cref="DateTime.MaxValue"/> döndürülür. Geçersiz bir filetime değeri durumunda null döner.
+        /// </para>
+        /// </summary>
+        /// <param name="filetime">Çevrilecek 64 bitlik FILETIME değeri.</param>
+        /// <returns>Başarılı olursa DateTime nesnesi, süresiz hesaplar için DateTime.MaxValue, geçersiz değerler için null.</returns>
+        public static DateTime? ToFileTimeUTC(this long filetime)
+        {
+            if (filetime.Includes(0, Int64.MaxValue)) { return DateTime.MaxValue; }
+            try { return DateTime.FromFileTimeUtc(filetime); }
+            catch { return null; }
+        }
+        /// <summary>
         /// Belirtilen <see cref="ActionDescriptor"/> nesnesinin dönüş tipinin &quot;ActionResult&quot; veya &quot;IActionResult&quot; olup olmadığını ve &quot;public&quot; erişim seviyesinde olup olmadığını kontrol eder. Eğer dönüş tipi &quot;Task&lt;ActionResult&gt;&quot; veya &quot;Task&lt;IActionResult&gt;&quot; ise bunu da geçerli kabul eder.
         /// </summary>
         /// <param name="value">Kontrol edilecek <see cref="ActionDescriptor"/> nesnesi.</param>
@@ -169,9 +181,9 @@
         /// </returns>
         public static bool IsPublicActionResult(this ActionDescriptor value)
         {
-            if (value is ControllerActionDescriptor cad)
+            if (value is ControllerActionDescriptor _cad)
             {
-                var _methodinfo = cad.MethodInfo;
+                var _methodinfo = _cad.MethodInfo;
                 if (!_methodinfo.IsPublic) { return false; }
                 var _returntypes = new Type[] { typeof(ActionResult), typeof(IActionResult) };
                 if (_returntypes.Contains(_methodinfo.ReturnType)) { return true; }
@@ -204,12 +216,6 @@
         /// <param name="guid">Dönüştürülecek Guid.</param>
         /// <returns>Guid&#39;in SQL biçimindeki string temsilini döner.</returns>
         public static string ToSqlUniqueIdentifier(this Guid guid) => $"CONVERT(UNIQUEIDENTIFIER, '{guid.ToString().ToUpper()}')";
-        /// <summary>
-        /// Unix zaman damgasını, yerel bir <see cref="DateTime"/> değerine dönüştürür.
-        /// </summary>
-        /// <param name="getTime">Unix zaman damgası (milisaniye cinsinden).</param>
-        /// <returns>Dönüştürülen yerel <see cref="DateTime"/> değeri.</returns>
-        public static DateTime ToJsDate(this long getTime) => DateTime.UnixEpoch.AddMilliseconds(Convert.ToDouble(getTime)).ToLocalTime();
         /// <summary>
         /// Verilen <see cref="SqlDbType"/> enum değerini, SQL Server sistem tür kimliğine (<c>[system_type_id]</c>) dönüştürür. Bu kimlikler, SQL Server&#39;ın [sys].[types] sistem tablosunda bulunan ve her veri türü için benzersiz olan sayısal değerlerdir.
         /// </summary>
@@ -324,27 +330,27 @@
         /// Bir <see cref="JToken"/> nesnesini belirtilen <typeparamref name="T"/> türündeki bir diziye dönüştürür. Eğer <see cref="JToken"/> null ise boş bir dizi döner, array türünde ise içindeki değerleri <typeparamref name="T"/> türüne çevirip dizi olarak döner. Diğer durumlarda bir istisna fırlatır.
         /// </summary>
         /// <typeparam name="T">Dönüştürülecek hedef veri türü.</typeparam>
-        /// <param name="jToken">Dönüştürülecek <see cref="JToken"/> nesnesi.</param>
+        /// <param name="jtoken">Dönüştürülecek <see cref="JToken"/> nesnesi.</param>
         /// <returns><typeparamref name="T"/> türünden bir dizi.</returns>
         /// <exception cref="NotSupportedException"><see cref="JToken"/> türü null veya array değilse fırlatılır.</exception>
-        public static T[] ToArrayFromJToken<T>(this JToken jToken)
+        public static T[] ToArrayFromJToken<T>(this JToken jtoken)
         {
-            if (jToken == null || jToken.Type == JTokenType.Null) { return Array.Empty<T>(); }
-            if (jToken.Type == JTokenType.Array) { return jToken.Select(x => x.Value<T>()).ToArray(); }
-            throw new NotSupportedException($"\"{nameof(jToken)}\" türü uyumsuzdur!");
+            if (jtoken == null || jtoken.Type == JTokenType.Null) { return Array.Empty<T>(); }
+            if (jtoken.Type == JTokenType.Array) { return jtoken.Select(x => x.Value<T>()).ToArray(); }
+            throw new NotSupportedException($"\"{nameof(jtoken)}\" türü uyumsuzdur!");
         }
         /// <summary>
         /// <see cref="QueryString"/> içindeki belirtilen anahtarı alır ve uygun türde bir değere dönüştürür. Eğer anahtar bulunamazsa veya dönüştürme başarısız olursa, varsayılan değeri döner.
         /// </summary>
         /// <typeparam name="T">Dönüştürülecek hedef tür.</typeparam>
-        /// <param name="query">İçinde sorgu parametrelerini barındıran <see cref="QueryString"/> nesnesi.</param>
+        /// <param name="querystring">İçinde sorgu parametrelerini barındıran <see cref="QueryString"/> nesnesi.</param>
         /// <param name="propertyname">Alınacak sorgu parametresinin adı (anahtar).</param>
         /// <returns>Başarılıysa sorgu parametresi uygun türe dönüştürülür, aksi halde varsayılan değer döner.</returns>
-        public static T ToKeyValueParseOrDefault_querystring<T>(this QueryString query, string propertyname)
+        public static T ToKeyValueParseOrDefault_querystring<T>(this QueryString querystring, string propertyname)
         {
+            var _querydic = (querystring.HasValue ? HttpUtility.ParseQueryString(querystring.Value) : new NameValueCollection());
             propertyname = propertyname.ToStringOrEmpty();
-            var queryDictionary = (query.HasValue ? HttpUtility.ParseQueryString(query.Value) : new NameValueCollection());
-            if (queryDictionary.AllKeys.Contains(propertyname)) { return queryDictionary[propertyname].ParseOrDefault<T>(); }
+            if (_querydic.AllKeys.Contains(propertyname)) { return _querydic[propertyname].ParseOrDefault<T>(); }
             return default;
         }
         /// <summary>
@@ -357,6 +363,19 @@
             stopwatch.Stop();
             return stopwatch.Elapsed;
         }
-        #endregion
+        /// <summary>
+        /// <paramref name="data"/> verisini önbelleğe ekler ve başarılı işlem sonucunu (<see cref="IslemSonucResult{T}"/>) döndürür.
+        /// </summary>
+        /// <typeparam name="T">Önbelleğe eklenecek verinin tipi.</typeparam>
+        /// <param name="memorycache">Önbellek nesnesi.</param>
+        /// <param name="cachekey">Önbelleğe eklenecek değerin anahtarı.</param>
+        /// <param name="data">Önbelleğe eklenecek veri.</param>
+        /// <param name="timespan">Önbellekte tutulma süresi. Boş bırakılırsa varsayılan olarak 1 dakika kullanılır.</param>
+        /// <returns>Başarılı işlem sonucunu temsil eden <see cref="IslemSonucResult{T}"/> nesnesi.</returns>
+        public static IslemSonucResult<T> SetCacheAndReturnSuccess<T>(this IMemoryCache memorycache, object cachekey, T data, TimeSpan? timespan = null)
+        {
+            memorycache.Set(cachekey, data, timespan ?? TimeSpan.FromMinutes(1));
+            return new(data, true, default);
+        }
     }
 }

@@ -22,9 +22,9 @@
         protected override ValidationResult IsValid(object value, ValidationContext validationContext)
         {
             var phoneTR = value.ToStringOrEmpty();
-            if (_try.TryPhoneNumberTR(phoneTR, out string _phoneTR))
+            if (_try.TryPhoneNumberTR(phoneTR, out string _phonetr))
             {
-                validationContext.SetValidatePropertyValue(_phoneTR);
+                validationContext.SetValidatePropertyValue(_phonetr);
                 return ValidationResult.Success;
             }
             if (phoneTR == "" && !validationContext.IsRequiredAttribute())

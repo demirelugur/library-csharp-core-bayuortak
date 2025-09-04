@@ -27,7 +27,7 @@ namespace BayuOrtak.Core.UnitTest.Attributes.DataAnnotations
         }
         [TestCase("http://example.com")]
         [TestCase("https://example.com/path?query=1")]
-        [TestCase("https://www.bayburt.edu.tr")] 
+        [TestCase("https://www.bayburt.edu.tr")]
         public void UrlHttp_Valid_ShouldPass(string url)
         {
             var model = new RequiredTestModel { Url = url };
@@ -39,7 +39,7 @@ namespace BayuOrtak.Core.UnitTest.Attributes.DataAnnotations
         [TestCase("mailto:test@example.com")]
         [TestCase("ws://example.com")]
         [TestCase("wss://example.com")]
-        [TestCase("not-a-url")] 
+        [TestCase("not-a-url")]
         [TestCase("://missing.scheme.com")]
         public void UrlHttp_Invalid_ShouldFail(string url)
         {

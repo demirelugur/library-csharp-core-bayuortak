@@ -3,17 +3,10 @@
     using BayuOrtak.Core.Base;
     using BayuOrtak.Core.Extensions;
     using BayuOrtak.Core.Helper;
-    using System;
     using System.ComponentModel;
     using static BayuOrtak.Core.Helper.OrtakTools;
-    /// <summary>
-    /// Ayların Türkçe karşılığını temsil eden class.
-    /// </summary>
     public sealed class CMonthTR : BaseEnum<CMonthTR.MonthTR>
     {
-        /// <summary>
-        /// Ayları tanımlayan enum.
-        /// </summary>
         public enum MonthTR : byte
         {
             [Description("Ocak")]
@@ -41,15 +34,6 @@
             [Description("Aralık")]
             ara
         }
-        /// <summary>
-        /// Verilen <see cref="MonthTR"/> değerine göre yerelleştirilmiş ay adını döndürür.
-        /// </summary>
-        /// <param name="value">Ayı temsil eden <see cref="MonthTR"/> enum değeri.</param>
-        /// <param name="dil">Dil kodu; &quot;tr&quot; Türkçe için, &quot;en&quot; İngilizce için.</param>
-        /// <returns>Belirtilen dilde ay adını döndürür.</returns>
-        /// <exception cref="NotSupportedException">
-        /// Eğer <paramref name="value"/> geçerli bir <see cref="MonthTR"/> değeri değilse veya desteklenmeyen bir dil girildiyse fırlatılır.
-        /// </exception>
         public static string GetDescriptionLocalizationValue(MonthTR value, string dil)
         {
             Guard.UnSupportLanguage(dil, nameof(dil));

@@ -14,10 +14,14 @@
         /// </summary>
         /// <typeparam name="T">Sayfalama yapılacak tür.</typeparam>
         /// <param name="source">Sayfalama işlemi yapılacak IQueryable kaynağı.</param>
-        /// <param name="pageNumber">Sayfa numarası (1 tabanlı).</param>
+        /// <param name="pagenumber">Sayfa numarası (1 tabanlı).</param>
         /// <param name="take">Her sayfada gösterilecek kayıt sayısı.</param>
         /// <returns>Paginasyon yapılmış IQueryable kaynak.</returns>
-        public static IQueryable<T> Paginate<T>(this IQueryable<T> source, int pageNumber, int take) where T : class => source.Skip((pageNumber - 1) * take).Take(take);
+        public static IQueryable<T> Paginate<T>(this IQueryable<T> source, int pagenumber, int take) where T : class
+        {
+            Guard.CheckZeroOrNegative(pagenumber, nameof(pagenumber));
+            return source.Skip((pagenumber - 1) * take).Take(take);
+        }
         /// <summary>
         /// İki IQueryable arasında 1-1 sol birleştirme (left join) işlemi gerçekleştirir.
         /// </summary>
@@ -42,49 +46,49 @@
         /// <summary>
         /// Seçilen ifadeye göre ilk kayıt veya varsayılan değeri asenkron olarak getirir.
         /// </summary>
-        public static Task<TObject> SelectThenFirstOrDefaultAsync<T, TObject>(this IQueryable<T> source, Expression<Func<T, TObject>> selector, CancellationToken cancellationToken) where T : class => source.Select(selector).FirstOrDefaultAsync(cancellationToken);
+        public static Task<TObject> SelectThenFirstOrDefaultAsync<T, TObject>(this IQueryable<T> source, Expression<Func<T, TObject>> selector, CancellationToken cancellationtoken) where T : class => source.Select(selector).FirstOrDefaultAsync(cancellationtoken);
         /// <summary>
         /// Verilen ifade ile maksimum değeri asenkron olarak getirir, yoksa varsayılan değeri döner.
         /// </summary>
-        public static async Task<TKey> MaxOrDefaultAsync<T, TKey>(this IQueryable<T> source, Expression<Func<T, TKey>> selector, CancellationToken cancellationToken) where T : class => (await source.AnyAsync(cancellationToken) ? await source.MaxAsync(selector, cancellationToken) : default(TKey));
+        public static async Task<TKey> MaxOrDefaultAsync<T, TKey>(this IQueryable<T> source, Expression<Func<T, TKey>> selector, CancellationToken cancellationtoken) where T : class => (await source.AnyAsync(cancellationtoken) ? await source.MaxAsync(selector, cancellationtoken) : default(TKey));
         /// <summary>
         /// Verilen ifade ile minimum değeri asenkron olarak getirir, yoksa varsayılan değeri döner.
         /// </summary>
-        public static async Task<TKey> MinOrDefaultAsync<T, TKey>(this IQueryable<T> source, Expression<Func<T, TKey>> selector, CancellationToken cancellationToken) where T : class => (await source.AnyAsync(cancellationToken) ? await source.MinAsync(selector, cancellationToken) : default(TKey));
+        public static async Task<TKey> MinOrDefaultAsync<T, TKey>(this IQueryable<T> source, Expression<Func<T, TKey>> selector, CancellationToken cancellationtoken) where T : class => (await source.AnyAsync(cancellationtoken) ? await source.MinAsync(selector, cancellationtoken) : default(TKey));
         /// <summary>
         /// Verilen IQueryable kaynağındaki sayısal değerlerin toplamını asenkron olarak getirir, yoksa varsayılan değeri döner.
         /// </summary>
-        public static async Task<TKey> SumOrDefaultAsync<TKey>(this IQueryable<TKey> source, CancellationToken cancellationToken) where TKey : struct, IConvertible
+        public static async Task<TKey> SumOrDefaultAsync<TKey>(this IQueryable<TKey> source, CancellationToken cancellationtoken) where TKey : struct, IConvertible
         {
-            if (!await source.AnyAsync(cancellationToken)) { return default(TKey); }
+            if (!await source.AnyAsync(cancellationtoken)) { return default(TKey); }
             object value;
-            var elementType = (source.ElementType.IsEnum ? Enum.GetUnderlyingType(source.ElementType) : source.ElementType);
-            if (elementType == typeof(int)) { value = await source.Cast<int>().SumAsync(cancellationToken); }
-            else if (elementType == typeof(long)) { value = await source.Cast<long>().SumAsync(cancellationToken); }
-            else if (elementType == typeof(decimal)) { value = await source.Cast<decimal>().SumAsync(cancellationToken); }
-            else if (elementType == typeof(double)) { value = await source.Cast<double>().SumAsync(cancellationToken); }
-            else if (elementType == typeof(float)) { value = await source.Cast<float>().SumAsync(cancellationToken); }
+            var _elementtype = (source.ElementType.IsEnum ? Enum.GetUnderlyingType(source.ElementType) : source.ElementType);
+            if (_elementtype == typeof(int)) { value = await source.Cast<int>().SumAsync(cancellationtoken); }
+            else if (_elementtype == typeof(long)) { value = await source.Cast<long>().SumAsync(cancellationtoken); }
+            else if (_elementtype == typeof(decimal)) { value = await source.Cast<decimal>().SumAsync(cancellationtoken); }
+            else if (_elementtype == typeof(double)) { value = await source.Cast<double>().SumAsync(cancellationtoken); }
+            else if (_elementtype == typeof(float)) { value = await source.Cast<float>().SumAsync(cancellationtoken); }
             else { throw new NotSupportedException($"\"{source.ElementType.FullName}\" türü uyumsuzdur!"); }
             return (TKey)_other.ChangeType(value, typeof(TKey));
         }
         /// <summary>
         /// Verilen metin için benzersiz bir SEO dostu string oluşturur.
         /// </summary>
-        public static async Task<string> GenerateUniqueSEOStringAsync(this IQueryable<string> source, string text, int maxLength, string dil, CancellationToken cancellationToken)
+        public static async Task<string> GenerateUniqueSEOStringAsync(this IQueryable<string> source, string text, int maxlength, string dil, CancellationToken cancellationtoken)
         {
             var i = 0;
-            string r, t = text.ToSeoFriendly();
-            Guard.CheckEmpty(t, nameof(t));
+            string r, _t = text.ToSeoFriendly();
+            Guard.CheckEmpty(_t, nameof(_t));
             while (true)
             {
-                r = (i == 0 ? t : String.Join("-", t, i.ToString()));
-                if (!await source.ContainsAsync(r, cancellationToken)) { break; }
+                r = (i == 0 ? _t : String.Join("-", _t, i.ToString()));
+                if (!await source.ContainsAsync(r, cancellationtoken)) { break; }
                 i++;
             }
-            if (r.Length <= maxLength) { return r; }
+            if (r.Length <= maxlength) { return r; }
             Guard.UnSupportLanguage(dil, nameof(dil));
-            if (dil == "en") { throw new ArgumentOutOfRangeException($"The generated SEO data exceeds the maximum length of {maxLength.ToString()} characters!", new Exception($"Value: \"{text}\"")); }
-            throw new ArgumentOutOfRangeException($"Oluşturulan SEO verisi {maxLength.ToString()} karakterlik maksimum uzunluğu aşıyor!", new Exception($"Gelen değer: \"{text}\""));
+            if (dil == "en") { throw new ArgumentOutOfRangeException($"The generated SEO data exceeds the maximum length of {maxlength.ToString()} characters!", new Exception($"Value: \"{text}\"")); }
+            throw new ArgumentOutOfRangeException($"Oluşturulan SEO verisi {maxlength.ToString()} karakterlik maksimum uzunluğu aşıyor!", new Exception($"Gelen değer: \"{text}\""));
         }
     }
 }

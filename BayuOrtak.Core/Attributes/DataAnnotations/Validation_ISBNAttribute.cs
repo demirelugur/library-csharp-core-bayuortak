@@ -15,21 +15,20 @@
         /// </summary>
         public Validation_ISBNAttribute() { }
         /// <summary>
-        /// Verilen değerin geçerli bir ISBN(Uluslararası Standart Kitap Numarası) numarası olup olmadığını doğrular.
-        /// Eğer değer boşsa ve gerekli değilse, doğrulama başarılı kabul edilir.
+        /// Verilen değerin geçerli bir ISBN(Uluslararası Standart Kitap Numarası) numarası olup olmadığını doğrular. Eğer değer boşsa ve gerekli değilse, doğrulama başarılı kabul edilir.
         /// </summary>
         /// <param name="value">Doğrulanan değer (ISBN numarası).</param>
         /// <param name="validationContext">Doğrulama bağlamı.</param>
         /// <returns>Geçerli ise <see cref="ValidationResult.Success"/>; aksi takdirde hata mesajı ile birlikte <see cref="ValidationResult"/> döner.</returns>
         protected override ValidationResult IsValid(object value, ValidationContext validationContext)
         {
-            var isbn = value.ToStringOrEmpty().ToUpper();
-            if (ISBNHelper.IsValid(isbn))
+            var _isbn = value.ToStringOrEmpty().ToUpper();
+            if (ISBNHelper.IsValid(_isbn))
             {
-                validationContext.SetValidatePropertyValue(isbn);
+                validationContext.SetValidatePropertyValue(_isbn);
                 return ValidationResult.Success;
             }
-            if (isbn == "" && !validationContext.IsRequiredAttribute())
+            if (_isbn == "" && !validationContext.IsRequiredAttribute())
             {
                 validationContext.SetValidatePropertyValue(null);
                 return ValidationResult.Success;

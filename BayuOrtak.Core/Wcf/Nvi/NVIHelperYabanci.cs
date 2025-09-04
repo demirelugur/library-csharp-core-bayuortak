@@ -9,7 +9,7 @@
     public interface INVIHelperYabanci : IConnectionStatus
     {
         KPSPublicYabanciDogrulaSoapClient client { get; }
-        Task<bool> YabanciKimlikNoDogrulaAsync(long tckn, string ad, string soyad, DateOnly dogumTarih);
+        Task<bool> YabanciKimlikNoDogrulaAsync(long tckn, string ad, string soyad, DateOnly dogumtarih);
     }
     public sealed class NVIHelperYabanci : INVIHelperYabanci, IDisposable
     {
@@ -30,11 +30,17 @@
                 return _Client;
             }
         }
-        public async Task<(bool statuswarning, string error)> IsConnectionStatusAsync(TimeSpan timeout, string dil, CancellationToken cancellationToken)
+        public async Task<(bool statuswarning, string error)> IsConnectionStatusAsync(TimeSpan timeout, string dil, CancellationToken cancellationtoken)
         {
-            var _t = await this.client.Endpoint.Address.Uri.IsConnectionStatusAsync(timeout, cancellationToken);
+            var _t = await this.client.Endpoint.Address.Uri.IsConnectionStatusAsync(timeout, cancellationtoken);
             return (_t.statuswarning, _t.statuswarning ? GlobalConstants.webservice_connectionwarning(dil, "NVI KPSPublicYabanciDogrula") : "");
         }
-        public async Task<bool> YabanciKimlikNoDogrulaAsync(long tckn, string ad, string soyad, DateOnly dogumTarih) => (await this.client.YabanciKimlikNoDogrulaAsync(tckn, ad.ToUpper(), soyad.ToUpper(), dogumTarih.Day, dogumTarih.Month, dogumTarih.Year)).Body.YabanciKimlikNoDogrulaResult;
+        public async Task<bool> YabanciKimlikNoDogrulaAsync(long tckn, string ad, string soyad, DateOnly dogumtarih)
+        {
+            Guard.CheckZeroOrNegative(tckn, nameof(tckn));
+            Guard.CheckEmpty(ad, nameof(ad));
+            Guard.CheckEmpty(soyad, nameof(soyad));
+            return (await this.client.YabanciKimlikNoDogrulaAsync(tckn, ad.ToUpper(), soyad.ToUpper(), dogumtarih.Day, dogumtarih.Month, dogumtarih.Year)).Body.YabanciKimlikNoDogrulaResult;
+        }
     }
 }
